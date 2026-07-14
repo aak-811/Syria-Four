@@ -249,20 +249,10 @@ async function sbReady() {
   try { return await checkTables(); } catch { return false; }
 }
 
-function smart(method, ...args) {
-  return (async () => {
-    return await method.file(...args);
-  })();
-}
-
 async function trySync(operation) {
   if (await sbReady()) {
     try { return await operation(); } catch (e) { console.warn('Supabase sync error:', e.message); }
   }
-}
-
-function s(supabaseFn, fileFn) {
-  return (...args) => smart({ supabase: () => supabaseFn(...args), file: () => fileFn(...args) });
 }
 
 // Helper: write to file, then sync to Supabase in background
@@ -273,66 +263,74 @@ function rw(supabaseFn, fileFn) {
     return result;
   };
 }
-// Helper: read-only from file
-function ro(fileFn) {
-  return (...args) => fileFn(...args);
+// Async read: try Supabase first, fallback to file
+function ar(supabaseFn, fileFn) {
+  return (...args) => {
+    const doRead = async () => {
+      if (await sbReady()) {
+        try { return await supabaseFn(...args); } catch (e) { console.warn('Supabase read error:', e.message); }
+      }
+      return fileFn(...args);
+    };
+    return doRead();
+  };
 }
 
 const DB = {
-  getAll: ro(c => fileDB.getAll(c)),
+  getAll: ar(c => supabaseDB.getAll(c), c => fileDB.getAll(c)),
   add: rw((c, d) => supabaseDB.add(c, d), (c, d) => fileDB.add(c, d)),
   update: rw((c, id, d) => supabaseDB.update(c, id, d), (c, id, d) => fileDB.update(c, id, d)),
   delete: rw((c, id) => supabaseDB.delete(c, id), (c, id) => fileDB.delete(c, id)),
 
-  getMembers: ro(() => fileDB.getMembers()),
+  getMembers: ar(() => supabaseDB.getMembers(), () => fileDB.getMembers()),
   addMember: rw(d => supabaseDB.addMember(d), d => fileDB.addMember(d)),
   updateMember: rw((id, d) => supabaseDB.updateMember(id, d), (id, d) => fileDB.updateMember(id, d)),
   deleteMember: rw(id => supabaseDB.deleteMember(id), id => fileDB.deleteMember(id)),
 
-  getTournaments: ro(() => fileDB.getTournaments()),
+  getTournaments: ar(() => supabaseDB.getTournaments(), () => fileDB.getTournaments()),
   addTournament: rw(d => supabaseDB.addTournament(d), d => fileDB.addTournament(d)),
   deleteTournament: rw(id => supabaseDB.deleteTournament(id), id => fileDB.deleteTournament(id)),
 
-  getEvents: ro(() => fileDB.getEvents()),
+  getEvents: ar(() => supabaseDB.getEvents(), () => fileDB.getEvents()),
   addEvent: rw(d => supabaseDB.addEvent(d), d => fileDB.addEvent(d)),
   deleteEvent: rw(id => supabaseDB.deleteEvent(id), id => fileDB.deleteEvent(id)),
 
-  getLeaderboard: ro(() => fileDB.getLeaderboard()),
+  getLeaderboard: ar(() => supabaseDB.getLeaderboard(), () => fileDB.getLeaderboard()),
   addLeaderboardEntry: rw(d => supabaseDB.addLeaderboardEntry(d), d => fileDB.addLeaderboardEntry(d)),
   updateLeaderboardEntry: rw((id, d) => supabaseDB.updateLeaderboardEntry(id, d), (id, d) => fileDB.updateLeaderboardEntry(id, d)),
   deleteLeaderboardEntry: rw(id => supabaseDB.deleteLeaderboardEntry(id), id => fileDB.deleteLeaderboardEntry(id)),
 
-  getOrders: ro(() => fileDB.getOrders()),
+  getOrders: ar(() => supabaseDB.getOrders(), () => fileDB.getOrders()),
   addOrder: rw(d => supabaseDB.addOrder(d), d => fileDB.addOrder(d)),
   updateOrderStatus: rw((id, s) => supabaseDB.updateOrderStatus(id, s), (id, s) => fileDB.updateOrderStatus(id, s)),
   deleteOrder: rw(id => supabaseDB.deleteOrder(id), id => fileDB.deleteOrder(id)),
 
-  getInstagramAccounts: ro(() => fileDB.getInstagramAccounts()),
+  getInstagramAccounts: ar(() => supabaseDB.getInstagramAccounts(), () => fileDB.getInstagramAccounts()),
   addInstagramAccount: rw(d => supabaseDB.addInstagramAccount(d), d => fileDB.addInstagramAccount(d)),
   updateInstagramAccount: rw((id, d) => supabaseDB.updateInstagramAccount(id, d), (id, d) => fileDB.updateInstagramAccount(id, d)),
   deleteInstagramAccount: rw(id => supabaseDB.deleteInstagramAccount(id), id => fileDB.deleteInstagramAccount(id)),
 
-  getSupportRequests: ro(() => fileDB.getSupportRequests()),
+  getSupportRequests: ar(() => supabaseDB.getSupportRequests(), () => fileDB.getSupportRequests()),
   addSupportRequest: rw(d => supabaseDB.addSupportRequest(d), d => fileDB.addSupportRequest(d)),
   markSupportRead: rw(id => supabaseDB.markSupportRead(id), id => fileDB.markSupportRead(id)),
   deleteSupportRequest: rw(id => supabaseDB.deleteSupportRequest(id), id => fileDB.deleteSupportRequest(id)),
 
-  getGalleryImages: ro(() => fileDB.getGalleryImages()),
+  getGalleryImages: ar(() => supabaseDB.getGalleryImages(), () => fileDB.getGalleryImages()),
   addGalleryImage: rw(d => supabaseDB.addGalleryImage(d), d => fileDB.addGalleryImage(d)),
   deleteGalleryImage: rw(id => supabaseDB.deleteGalleryImage(id), id => fileDB.deleteGalleryImage(id)),
 
-  getVideos: ro(() => fileDB.getVideos()),
+  getVideos: ar(() => supabaseDB.getVideos(), () => fileDB.getVideos()),
   addVideo: rw(d => supabaseDB.addVideo(d), d => fileDB.addVideo(d)),
   deleteVideo: rw(id => supabaseDB.deleteVideo(id), id => fileDB.deleteVideo(id)),
 
-  getNotifications: ro(() => fileDB.getNotifications()),
+  getNotifications: ar(() => supabaseDB.getNotifications(), () => fileDB.getNotifications()),
   addNotification: rw(d => supabaseDB.addNotification(d), d => fileDB.addNotification(d)),
   updateNotification: rw((id, d) => supabaseDB.updateNotification(id, d), (id, d) => fileDB.updateNotification(id, d)),
   deleteNotification: rw(id => supabaseDB.deleteNotification(id), id => fileDB.deleteNotification(id)),
 
-  getPlayers: ro(() => fileDB.getPlayers()),
+  getPlayers: ar(() => supabaseDB.getPlayers(), () => fileDB.getPlayers()),
   addPlayer: rw(d => supabaseDB.addPlayer(d), d => fileDB.addPlayer(d)),
-  getPlayerBySlug: ro(slug => fileDB.getPlayerBySlug(slug)),
+  getPlayerBySlug: ar(slug => supabaseDB.getPlayerBySlug(slug), slug => fileDB.getPlayerBySlug(slug)),
   updatePlayer: rw((slug, d) => supabaseDB.updatePlayer(slug, d), (slug, d) => fileDB.updatePlayer(slug, d)),
   deletePlayer: rw(slug => supabaseDB.deletePlayer(slug), slug => fileDB.deletePlayer(slug)),
 };

@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SYRIA FOUR | الأعضاء</title>
   <link rel="icon" type="image/png" href="/images/favicon.png">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <link rel="stylesheet" href="/css/styles.css">
 </head>
@@ -12,7 +15,7 @@
 
 <div id="loadingScreen">
   <div class="loader-content">
-    <img src="/images/clan-logo.png" alt="SYRIA FOUR" class="loader-logo" id="loaderLogo">
+    <img loading="lazy" src="/images/clan-logo.png" alt="SYRIA FOUR" class="loader-logo" id="loaderLogo">
     <h2 class="loader-title">SYRIA FOUR</h2>
     <div class="loader-bar">
       <div class="loader-progress" id="loaderProgress"></div>
@@ -24,7 +27,7 @@
 <nav class="navbar" id="navbar">
   <div class="nav-container">
     <a href="/" class="nav-logo">
-      <img src="/images/clan-logo.png" alt="SYRIA FOUR"> SYRIA FOUR
+      <img loading="lazy" src="/images/clan-logo.png" alt="SYRIA FOUR"> SYRIA FOUR
     </a>
     <button class="nav-toggle" id="navToggle" aria-label="القائمة">
       <i class="fas fa-bars"></i>
@@ -69,6 +72,46 @@
       </div>
       <div class="search-suggestions" id="searchSuggestions"></div>
     </div>
+    <div class="member-filters">
+      <select class="filter-select" id="filterRank">
+        <option value="">جميع الرتب</option>
+        <option value="Rookie">Rookie</option>
+        <option value="Bronze">Bronze</option>
+        <option value="Silver">Silver</option>
+        <option value="Gold">Gold</option>
+        <option value="Platinum">Platinum</option>
+        <option value="Diamond">Diamond</option>
+        <option value="Master">Master</option>
+        <option value="Grandmaster">Grandmaster</option>
+        <option value="Heroic">Heroic</option>
+      </select>
+      <select class="filter-select" id="filterCountry">
+        <option value="">جميع الدول</option>
+        <option value="سوريا">سوريا</option>
+        <option value="العراق">العراق</option>
+        <option value="مصر">مصر</option>
+        <option value="السعودية">السعودية</option>
+        <option value="الأردن">الأردن</option>
+        <option value="لبنان">لبنان</option>
+        <option value="فلسطين">فلسطين</option>
+        <option value="اليمن">اليمن</option>
+        <option value="ليبيا">ليبيا</option>
+        <option value="تونس">تونس</option>
+        <option value="الجزائر">الجزائر</option>
+        <option value="المغرب">المغرب</option>
+        <option value="السودان">السودان</option>
+        <option value="الكويت">الكويت</option>
+        <option value="قطر">قطر</option>
+        <option value="الإمارات">الإمارات</option>
+        <option value="عمان">عمان</option>
+        <option value="البحرين">البحرين</option>
+      </select>
+      <select class="filter-select" id="filterSort">
+        <option value="name">الترتيب: الاسم</option>
+        <option value="level">الترتيب: المستوى</option>
+        <option value="date">الترتيب: تاريخ الانضمام</option>
+      </select>
+    </div>
     <div class="members-grid" id="membersGrid"></div>
   </div>
 </section>
@@ -77,7 +120,7 @@
 <footer class="footer">
   <div class="container">
     <div class="footer-content">
-      <img src="/images/clan-logo.png" alt="SYRIA FOUR" class="footer-logo">
+      <img loading="lazy" src="/images/clan-logo.png" alt="SYRIA FOUR" class="footer-logo">
       <h3>SYRIA FOUR</h3>
       <p class="footer-desc">الموقع الرسمي ل SYRIA FOUR</p>
       <p class="footer-creator"><i class="fas fa-code"></i> منشئ الموقع: أبو أمير</p>
@@ -89,7 +132,7 @@
 
 <div id="toastContainer" class="toast-container"></div>
 
-<script src="/js/database.js"></script>
-<script src="/js/app.js"></script>
+<script defer src="/js/database.js"></script>
+<script defer src="/js/app.js"></script>
 </body>
 </html>

@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if ($('footerSocial')) loadFooterSocial();
   if ($('memberSearch')) initMemberSearch();
   initScrollReveal();
+  finishLoading();
 });
 
 window.checkAdmin = function() {
@@ -154,17 +155,33 @@ function clearDebounce(timer) {
   if (timer) clearTimeout(timer);
 }
 
+function skeletonGrid() {
+  return Array(6).fill(`
+    <div class="skeleton-card">
+      <div class="skeleton-img"></div>
+      <div class="skeleton-body">
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
 async function loadMembers() {
   const grid = $('membersGrid');
+  if (!grid) return;
+  grid.innerHTML = skeletonGrid();
   try {
-    grid.innerHTML = loadingState('جاري تحميل الأعضاء...');
     const members = await DB.getMembers();
     if (!members || members.length === 0) {
       grid.innerHTML = emptyState('لا يوجد أعضاء', 'fa-users');
+      window.allMembers = [];
       return;
     }
     window.allMembers = members;
     renderMemberGrid(members);
+    setupMemberFilters();
   } catch (err) {
     grid.innerHTML = errorState('فشل تحميل الأعضاء');
   }
@@ -175,31 +192,59 @@ function renderMemberGrid(members) {
   grid.style.display = 'grid';
   grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(260px, 1fr))';
   grid.style.gap = '20px';
+  if (!members || members.length === 0) {
+    grid.innerHTML = emptyState('لا توجد نتائج للبحث', 'fa-search');
+    return;
+  }
   grid.innerHTML = members.map(m => `
     <div class="member-card" onclick="window.location.href='/member-detail?id=${m.id}'">
       <div class="member-avatar">
-        <img src="${m.image || '/images/favicon.png'}" alt="${m.name}">
+        <img src="${m.image || '/images/favicon.png'}" alt="${escHtml(m.name)}" loading="lazy">
         ${m.prime ? `<div class="prime-badge">${'★'.repeat(parseInt(m.prime))}</div>` : ''}
       </div>
-      <h3>${escHtml(m.name)}</h3>
-      ${m.level ? `<p class="member-level"><i class="fas fa-level-up-alt"></i> المستوى: ${m.level}</p>` : ''}
-      ${m.gameId ? `<p class="member-gameid"><i class="fas fa-id-card"></i> ID: ${escHtml(m.gameId)}</p>` : ''}
-      ${m.instagram ? `<p class="member-instagram"><i class="fab fa-instagram"></i> @${escHtml(m.instagram)}</p>` : ''}
+      <div class="member-info">
+        <h3>${escHtml(m.name)}</h3>
+        ${m.level ? `<p><i class="fas fa-level-up-alt"></i> المستوى: ${escHtml(m.level)}</p>` : ''}
+        ${m.gameId ? `<p><i class="fas fa-id-card"></i> ID: ${escHtml(m.gameId)}</p>` : ''}
+        ${m.country ? `<p><i class="fas fa-map-marker-alt"></i> ${escHtml(m.country)}</p>` : ''}
+        ${m.role ? `<p><i class="fas fa-shield-alt"></i> ${roleName(m.role)}</p>` : ''}
+        ${m.instagram ? `<p><i class="fab fa-instagram"></i> @${escHtml(m.instagram)}</p>` : ''}
+      </div>
     </div>
   `).join('');
+}
+
+function roleName(r) {
+  const names = { leader: 'قائد', vice: 'شريك قائد', chief: 'زعيم' };
+  return names[r] || 'عضو';
 }
 
 function filterMembers(query) {
   if (!window.allMembers) return;
   const q = query.trim().toLowerCase();
-  if (!q) { renderMemberGrid(window.allMembers); return; }
-  const filtered = window.allMembers.filter(m =>
-    (m.name && m.name.toLowerCase().includes(q)) ||
-    (m.gameId && m.gameId.toLowerCase().includes(q))
-  );
+  const rank = $('filterRank')?.value || '';
+  const country = $('filterCountry')?.value || '';
+  const sort = $('filterSort')?.value || 'name';
+  let filtered = window.allMembers;
+  if (q) {
+    filtered = filtered.filter(m =>
+      (m.name && m.name.toLowerCase().includes(q)) ||
+      (m.gameId && m.gameId.toLowerCase().includes(q))
+    );
+  }
+  if (rank) filtered = filtered.filter(m => m.rank === rank);
+  if (country) filtered = filtered.filter(m => m.country === country);
+  if (sort === 'level') filtered.sort((a, b) => (parseInt(b.level) || 0) - (parseInt(a.level) || 0));
+  else if (sort === 'date') filtered.sort((a, b) => (b.joinDate || '').localeCompare(a.joinDate || ''));
+  else filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
   renderMemberGrid(filtered);
-  const grid = $('membersGrid');
-  if (filtered.length === 0) grid.innerHTML = emptyState('لا توجد نتائج للبحث', 'fa-search');
+}
+
+function setupMemberFilters() {
+  ['filterRank', 'filterCountry', 'filterSort'].forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener('change', () => filterMembers($('memberSearch')?.value || ''));
+  });
 }
 
 async function loadMemberDetail() {
@@ -213,18 +258,33 @@ async function loadMemberDetail() {
     const m = members.find(x => x.id === id);
     if (!m) { container.innerHTML = errorState('العضو غير موجود'); return; }
     const primeHtml = m.prime ? `<div class="member-detail-prime">${'★'.repeat(parseInt(m.prime))}</div>` : '';
+    const role = m.role || '';
+    const roleNames = { leader: 'قائد', vice: 'شريك قائد', chief: 'زعيم' };
+    const roleIcons = { leader: 'fa-crown', vice: 'fa-star', chief: 'fa-shield-halved' };
+    const roleName = roleNames[role] || '';
+    const roleIcon = roleIcons[role] || '';
     container.innerHTML = `
       <div class="member-detail-card">
         <div class="member-detail-avatar">
-          <img src="${m.image || '/images/favicon.png'}" alt="${escHtml(m.name)}">
+          <img src="${m.image || '/images/favicon.png'}" alt="${escHtml(m.name)}" loading="lazy">
           ${primeHtml}
         </div>
         <h1 class="member-detail-name">${escHtml(m.name)}</h1>
-        ${m.gameId ? `<p class="member-detail-info"><i class="fas fa-id-card"></i> الأيدي: ${escHtml(m.gameId)}</p>` : ''}
-        ${m.level ? `<p class="member-detail-info"><i class="fas fa-level-up-alt"></i> المستوى: ${m.level}</p>` : ''}
-        ${m.instagram ? `<a href="https://instagram.com/${m.instagram}" target="_blank" class="btn btn-accent member-detail-btn"><i class="fab fa-instagram"></i> @${escHtml(m.instagram)}</a>` : ''}
+        ${roleName ? `<p class="member-detail-role"><i class="fas ${roleIcon}"></i> ${roleName}</p>` : ''}
+        <div class="member-detail-info-grid">
+          ${m.gameId ? `<div class="member-detail-info-item"><span class="label">أيدي اللاعب</span><span class="value"><i class="fas fa-id-card"></i> ${escHtml(m.gameId)}</span></div>` : ''}
+          ${m.level ? `<div class="member-detail-info-item"><span class="label">المستوى</span><span class="value"><i class="fas fa-level-up-alt"></i> ${escHtml(m.level)}</span></div>` : ''}
+          ${m.country ? `<div class="member-detail-info-item"><span class="label">الدولة</span><span class="value"><i class="fas fa-map-marker-alt"></i> ${escHtml(m.country)}</span></div>` : ''}
+          ${m.age ? `<div class="member-detail-info-item"><span class="label">العمر</span><span class="value"><i class="fas fa-birthday-cake"></i> ${escHtml(m.age)}</span></div>` : ''}
+          ${m.joinDate ? `<div class="member-detail-info-item"><span class="label">تاريخ الانضمام</span><span class="value"><i class="fas fa-calendar-plus"></i> ${escHtml(m.joinDate)}</span></div>` : ''}
+          ${m.weapon ? `<div class="member-detail-info-item"><span class="label">السلاح المفضل</span><span class="value"><i class="fas fa-crosshairs"></i> ${escHtml(m.weapon)}</span></div>` : ''}
+          ${m.wins ? `<div class="member-detail-info-item"><span class="label">الانتصارات</span><span class="value"><i class="fas fa-trophy"></i> ${m.wins}</span></div>` : ''}
+          ${m.instagram ? `<div class="member-detail-info-item"><span class="label">Instagram</span><span class="value"><i class="fab fa-instagram"></i> @${escHtml(m.instagram)}</span></div>` : ''}
+        </div>
+        ${m.bio ? `<div class="member-detail-bio"><i class="fas fa-quote-right"></i> ${escHtml(m.bio)}</div>` : ''}
         <a href="/members" class="btn btn-secondary member-detail-btn"><i class="fas fa-arrow-right"></i> العودة للأعضاء</a>
       </div>`;
+    document.title = `SYRIA FOUR | ${escHtml(m.name)}`;
   } catch (err) {
     container.innerHTML = errorState('فشل تحميل ملف العضو');
   }
@@ -266,26 +326,58 @@ async function loadLeaderDetail() {
   }
 }
 
+let loadingScreenShown = false;
+let loadingScreenTimer = null;
+
 function initLoadingScreen() {
   const screen = $('loadingScreen');
   const progress = $('loaderProgress');
-  const logo = $('loaderLogo');
-  screen.id = 'loadingScreen';
-  screen.classList.add('loading-screen');
-  let p = 0;
-  const interval = setInterval(() => {
-    p += Math.random() * 15 + 5;
-    if (p >= 100) { p = 100; clearInterval(interval); }
-    progress.style.width = p + '%';
-  }, 200);
-  setTimeout(() => {
-    progress.style.width = '100%';
-    clearInterval(interval);
+  if (!screen) return;
+
+  // Don't show if page loads quickly (under 300ms)
+  loadingScreenTimer = setTimeout(() => {
+    loadingScreenShown = true;
+    screen.style.opacity = '1';
+    screen.style.display = 'flex';
+    // Animate progress bar
+    let p = 0;
+    const interval = setInterval(() => {
+      p += Math.random() * 15 + 5;
+      if (p >= 100) { p = 100; clearInterval(interval); }
+      progress.style.width = p + '%';
+    }, 200);
+    // Store cleanup on window for ready callback
+    window.__hideLoading = function() {
+      progress.style.width = '100%';
+      clearInterval(interval);
+      setTimeout(() => {
+        screen.classList.add('hidden');
+        setTimeout(() => {
+          screen.remove();
+          window.__hideLoading = null;
+        }, 300);
+      }, 300);
+    };
+  }, 300);
+
+  // If page loads before 300ms, cancel and remove immediately
+  requestAnimationFrame(() => {
     setTimeout(() => {
-      screen.classList.add('hidden');
-      setTimeout(() => screen.style.display = 'none', 500);
-    }, 500);
-  }, 2500);
+      if (!loadingScreenShown) {
+        clearTimeout(loadingScreenTimer);
+        screen.remove();
+      }
+    }, 0);
+  });
+}
+
+// Call this when page is fully ready
+function finishLoading() {
+  if (window.__hideLoading) window.__hideLoading();
+  else {
+    const screen = $('loadingScreen');
+    if (screen) screen.remove();
+  }
 }
 
 function initNavbar() {
@@ -521,25 +613,69 @@ async function savePendingUploads(type) {
   if (type === 'image') renderAdminGallery(); else renderAdminVideos();
 }
 
-function initCounters() {
-  const counters = document.querySelectorAll('.stat-number');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const el = entry.target;
-        const target = parseInt(el.dataset.target);
+async function initCounters() {
+  const statMembers = $('statMembers');
+  const statTournaments = $('statTournaments');
+  const statWins = $('statWins');
+  if (!statMembers && !statTournaments && !statWins) return;
+
+  async function fetchStats() {
+    try {
+      const [members, tournaments] = await Promise.all([
+        DB.getMembers().catch(() => []),
+        DB.getTournaments().catch(() => [])
+      ]);
+      return {
+        members: members.length || 0,
+        tournaments: tournaments.length || 0,
+        wins: members.reduce((sum, m) => sum + (parseInt(m.wins) || 0), 0) || 0
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  const stats = await fetchStats();
+  const targets = {
+    members: stats?.members ?? 0,
+    tournaments: stats?.tournaments ?? 0,
+    wins: stats?.wins ?? 0
+  };
+
+  function animateCounter(el, target) {
+    if (!el) return;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const skeleton = el.querySelector('.skeleton-stat');
+        if (skeleton) skeleton.remove();
+        if (target === 0) {
+          el.textContent = '0';
+          observer.unobserve(el);
+          return;
+        }
         let current = 0;
-        const step = Math.ceil(target / 60);
+        const duration = 1200;
+        const stepMs = 20;
+        const totalSteps = duration / stepMs;
+        const increment = target / totalSteps;
         const interval = setInterval(() => {
-          current += step;
-          if (current >= target) { current = target; clearInterval(interval); }
-          el.textContent = current;
-        }, 30);
+          current += increment;
+          if (current >= target) {
+            current = target;
+            clearInterval(interval);
+          }
+          el.textContent = Math.floor(current);
+        }, stepMs);
         observer.unobserve(el);
-      }
-    });
-  }, { threshold: 0.5 });
-  counters.forEach(c => observer.observe(c));
+      });
+    }, { threshold: 0.5 });
+    observer.observe(el);
+  }
+
+  animateCounter(statMembers, targets.members);
+  animateCounter(statTournaments, targets.tournaments);
+  animateCounter(statWins, targets.wins);
 }
 
 function initScrollIndicator() {

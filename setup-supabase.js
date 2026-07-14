@@ -27,14 +27,15 @@ async function runSetup() {
   try {
     const schemaSql = fs.readFileSync(path.join(__dirname, 'supabase-schema.sql'), 'utf8');
     await pool.query(schemaSql);
+    // Reload PostgREST schema cache so it picks up new columns
+    try { await pool.query("NOTIFY pgrst, 'reload schema'"); } catch(e) { /* not critical */ }
     console.log('Schema created successfully.\n');
   } catch (err) {
     console.error('Schema creation failed:', err.message);
     process.exit(1);
   }
 
-  // 3. Migrate data
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  // 3. Migrate data using pg directly (bypass PostgREST cache)
   const collections = [
     'members', 'tournaments', 'events', 'leaderboard',
     'orders', 'support', 'instagram', 'gallery', 'videos',
@@ -51,9 +52,25 @@ async function runSetup() {
     console.log(`Migrating ${col}: ${data.length} records...`);
     for (const item of data) {
       if (Object.keys(item).length === 0) continue;
-      const { error } = await supabase.from(col).upsert(item, { onConflict: 'id' });
-      if (error) console.error(`  Error inserting into ${col}:`, error.message);
-      else totalMigrated++;
+      // Convert camelCase keys to match SQL column names, add created_at if missing
+      const record = { ...item };
+      if (!record.created_at) record.created_at = new Date().toISOString();
+      const keys = Object.keys(record);
+      const values = keys.map(k => {
+        const v = record[k];
+        return typeof v === 'object' && v !== null ? JSON.stringify(v) : v;
+      });
+      const placeholders = keys.map((_, i) => `$${i + 1}`);
+      const cols = keys.map(k => `"${k}"`).join(', ');
+      // Build upsert: INSERT ... ON CONFLICT (id) DO UPDATE
+      const updates = keys.map(k => `"${k}" = EXCLUDED."${k}"`).join(', ');
+      const sql = `INSERT INTO "${col}" (${cols}) VALUES (${placeholders}) ON CONFLICT ("id") DO UPDATE SET ${updates}`;
+      try {
+        await pool.query(sql, values);
+        totalMigrated++;
+      } catch (err) {
+        console.error(`  Error inserting into ${col}:`, err.message);
+      }
     }
   }
 
