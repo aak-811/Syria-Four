@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SYRIA FOUR - لوحة الإدارة</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <!-- Loading Screen -->
+  <div id="loadingScreen">
+    <img src="/images/logo.svg" alt="SYRIA FOUR" class="loader-logo">
+    <h2 class="loader-title">SYRIA FOUR</h2>
+    <div class="loader-bar">
+      <div class="loader-progress"></div>
+    </div>
+    <p class="loader-text">جاري التحميل...</p>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <ul class="nav-links">
+        <li><a href="/"><i class="fas fa-home"></i> الرئيسية</a></li>
+        <li><a href="/about"><i class="fas fa-info-circle"></i> عن الكلان</a></li>
+        <li><a href="/leaders"><i class="fas fa-crown"></i> القيادات</a></li>
+        <li><a href="/players"><i class="fas fa-users"></i> اللاعبون</a></li>
+        <li><a href="/tournaments"><i class="fas fa-trophy"></i> البطولات</a></li>
+        <li><a href="/shop"><i class="fas fa-shopping-cart"></i> الشحن</a></li>
+        <li><a href="/events"><i class="fas fa-calendar-alt"></i> الفعاليات</a></li>
+        <li><a href="/gallery"><i class="fas fa-images"></i> المعرض</a></li>
+        <li><a href="/rules"><i class="fas fa-gavel"></i> الشروط</a></li>
+        <li><a href="/support"><i class="fas fa-headset"></i> الدعم</a></li>
+        <li><a href="/admin" class="active"><i class="fas fa-shield-alt"></i> الإدارة</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <h1>لوحة الإدارة</h1>
+    <p>إدارة SYRIA FOUR - تحكم بكل شيء</p>
+  </div>
+
+  <!-- Admin Login -->
+  <section class="section">
+    <div class="container">
+      <div class="admin-login" id="adminLogin">
+        <div class="admin-login-box">
+          <i class="fas fa-lock"></i>
+          <h3>تسجيل الدخول</h3>
+          <input type="password" id="adminPassword" placeholder="كلمة المرور">
+          <button class="btn btn-primary" onclick="checkAdmin()">دخول</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Admin Panel -->
+  <div id="adminPanel" class="admin-panel" style="display:none;">
+    <div class="admin-tabs">
+      <button class="admin-tab" data-admin="members">الأعضاء</button>
+      <button class="admin-tab" data-admin="tournaments">البطولات</button>
+      <button class="admin-tab" data-admin="events">الفعاليات</button>
+      <button class="admin-tab" data-admin="leaderboard">الترتيب</button>
+      <button class="admin-tab" data-admin="orders">طلبات الشحن</button>
+      <button class="admin-tab" data-admin="support">الدعم</button>
+      <button class="admin-tab" data-admin="instagram">إنستغرام</button>
+      <button class="admin-tab" data-admin="gallery">الصور</button>
+      <button class="admin-tab" data-admin="videos">الفيديوهات</button>
+      <button class="admin-tab" data-admin="notifications">الإشعارات</button>
+      <button class="admin-tab" data-admin="players">اللاعبين</button>
+    </div>
+    <div id="adminContent" class="admin-content"></div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <img src="/images/logo.svg" alt="SYRIA FOUR" class="footer-logo">
+      <h3>SYRIA FOUR</h3>
+      <p class="footer-desc">كلان Free Fire سوري - القوة والإتقان</p>
+      <p class="footer-creator">صنع بواسطة <strong>أبو أمير</strong></p>
+      <div class="footer-social">
+        <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+        <a href="#" target="_blank"><i class="fab fa-facebook"></i></a>
+        <a href="#" target="_blank"><i class="fab fa-youtube"></i></a>
+        <a href="#" target="_blank"><i class="fab fa-discord"></i></a>
+      </div>
+      <p class="footer-copy">&copy; 2026 SYRIA FOUR. جميع الحقوق محفوظة.</p>
+    </div>
+  </footer>
+
+  <!-- Toast Container -->
+  <div id="toastContainer"></div>
+
+  <script src="/js/database.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

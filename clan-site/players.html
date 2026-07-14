@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>جميع اللاعبين - SYRIA FOUR</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <!-- Loading Screen -->
+  <div id="loadingScreen">
+    <img src="/images/logo.svg" alt="SYRIA FOUR" class="loader-logo">
+    <h2 class="loader-title">SYRIA FOUR</h2>
+    <div class="loader-bar">
+      <div class="loader-progress"></div>
+    </div>
+    <p class="loader-text">جاري التحميل...</p>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <img src="/images/logo.svg" alt="SYRIA FOUR">
+        <span>SYRIA FOUR</span>
+      </div>
+      <button class="nav-toggle" aria-label="القائمة">
+        <i class="fas fa-bars"></i>
+      </button>
+      <ul class="nav-menu">
+        <li><a href="/"><i class="fas fa-home"></i> الرئيسية</a></li>
+        <li><a href="/about"><i class="fas fa-info-circle"></i> عن الكلان</a></li>
+        <li><a href="/leaders"><i class="fas fa-crown"></i> القيادات</a></li>
+        <li><a href="/players" class="active"><i class="fas fa-users"></i> اللاعبون</a></li>
+        <li><a href="/tournaments"><i class="fas fa-trophy"></i> البطولات</a></li>
+        <li><a href="/shop"><i class="fas fa-shopping-cart"></i> الشحن</a></li>
+        <li><a href="/events"><i class="fas fa-calendar-alt"></i> الفعاليات</a></li>
+        <li><a href="/gallery"><i class="fas fa-images"></i> المعرض</a></li>
+        <li><a href="/rules"><i class="fas fa-file-alt"></i> الشروط</a></li>
+        <li><a href="/support"><i class="fas fa-headset"></i> الدعم</a></li>
+        <li><a href="/admin"><i class="fas fa-shield-alt"></i> الإدارة</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <h1>جميع اللاعبين</h1>
+    <p>قائمة أعضاء SYRIA FOUR الكاملة</p>
+  </div>
+
+  <!-- Players Section -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>لاعبونا</h2>
+        <p>نخبة لاعبي SYRIA FOUR</p>
+      </div>
+      <div class="filter-buttons">
+        <button class="active" data-filter="all">الكل</button>
+        <button data-filter="leader">القيادات</button>
+        <button data-filter="member">حسابات المستخدمين</button>
+      </div>
+      <div class="all-players-grid" id="allPlayersGrid"></div>
+    </div>
+  </section>
+
+  <!-- Player Modal -->
+  <div id="playerModal" class="modal" style="display:none">
+    <div class="modal-overlay" onclick="closePlayerModal()"></div>
+    <div class="modal-content" id="playerModalContent"></div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-logo">
+      <img src="/images/logo.svg" alt="SYRIA FOUR">
+      <h3>SYRIA FOUR</h3>
+    </div>
+    <p class="footer-desc">كلان SYRIA FOUR هو فريق عربي محترف في لعبة Free Fire، نسعى للمنافسة والتطوير المستمر.</p>
+    <p class="footer-creator">صنع بواسطة <span>أبو أمير</span></p>
+    <div class="footer-social">
+      <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+      <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      <a href="#" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
+      <a href="#" aria-label="Discord"><i class="fab fa-discord"></i></a>
+      <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+    </div>
+    <p class="footer-copy">&copy; 2026 SYRIA FOUR. جميع الحقوق محفوظة.</p>
+  </footer>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="/js/database.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

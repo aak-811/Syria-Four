@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SYRIA FOUR | الرئيسية</title>
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+<div id="loadingScreen">
+  <div class="loader-content">
+    <img src="/images/logo.svg" alt="SYRIA FOUR" class="loader-logo" id="loaderLogo">
+    <h2 class="loader-title">SYRIA FOUR</h2>
+    <div class="loader-bar">
+      <div class="loader-progress" id="loaderProgress"></div>
+    </div>
+    <p class="loader-text">جاري التحميل...</p>
+  </div>
+</div>
+
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/images/logo.svg" alt="SYRIA FOUR"> SYRIA FOUR
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="القائمة">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="nav-menu" id="navMenu">
+      <a href="/" class="nav-link active">الرئيسية</a>
+      <a href="/about" class="nav-link">عن الكلان</a>
+      <a href="/leaders" class="nav-link">القيادات</a>
+      <a href="/players" class="nav-link">اللاعبون</a>
+      <a href="/tournaments" class="nav-link">البطولات</a>
+      <a href="/shop" class="nav-link">الشحن</a>
+      <a href="/events" class="nav-link">الفعاليات</a>
+      <a href="/gallery" class="nav-link">المعرض</a>
+      <a href="/rules" class="nav-link">الشروط</a>
+      <a href="/support" class="nav-link">الدعم</a>
+      <a href="/admin" class="nav-link">الإدارة</a>
+    </div>
+  </div>
+</nav>
+
+<div id="siteBanner" class="site-banner" style="display:none"></div>
+
+<section id="home" class="hero">
+  <div id="particlesCanvas" class="particles"></div>
+  <div class="hero-content">
+    <span class="hero-badge"><i class="fas fa-check-circle"></i> الموقع الرسمي</span>
+    <h1 class="hero-title">SYRIA FOUR</h1>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="stat-number" data-target="27">0</span>
+        <span class="stat-label">عدد الأعضاء</span>
+      </div>
+      <div class="hero-stat">
+        <span class="stat-number" data-target="4">0</span>
+        <span class="stat-label">عدد البطولات</span>
+      </div>
+      <div class="hero-stat">
+        <span class="stat-number" data-target="156">0</span>
+        <span class="stat-label">عدد الانتصارات</span>
+      </div>
+      <div class="hero-stat">
+        <span class="stat-number" data-target="89">0</span>
+        <span class="stat-label">نسبة الفوز %</span>
+      </div>
+    </div>
+    <div class="hero-buttons">
+      <a href="/leaders" class="btn btn-primary"><i class="fas fa-crown"></i> قادتنا</a>
+      <a href="/players" class="btn btn-secondary"><i class="fas fa-users"></i> أعضاؤنا</a>
+      <a href="/tournaments" class="btn btn-accent"><i class="fas fa-trophy"></i> البطولات</a>
+    </div>
+    <div class="scroll-indicator">
+      <span>تصفح</span>
+      <i class="fas fa-chevron-down"></i>
+    </div>
+  </div>
+</section>
+
+<section class="section section-light">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">مرحباً بكم في SYRIA FOUR</h2>
+      <p class="section-subtitle">كلان فري فاير سوري - نخبة اللاعبين المحترفين</p>
+    </div>
+    <div class="about-content">
+      <p>SYRIA FOUR هو كلان فري فاير سوري يضم نخبة من اللاعبين المحترفين. نسعى دائماً لتحقيق الانتصارات والبطولات ونشر روح المنافسة الشريفة بين أعضائنا.</p>
+      <p>نؤمن بأن العمل الجماعي هو مفتاح النجاح، ونسعى لبناء مجتمع قوي من اللاعبين المتميزين.</p>
+      <a href="/about" class="btn btn-primary" style="margin-top:20px"><i class="fas fa-info-circle"></i> المزيد عنا</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">تصفح الموقع</h2>
+      <p class="section-subtitle">اكتشف أقسام SYRIA FOUR</p>
+    </div>
+    <div class="quick-links">
+      <a href="/about" class="quick-link-card">
+        <i class="fas fa-info-circle"></i>
+        <h3>عن الكلان</h3>
+        <p>تعرف علينا أكثر</p>
+      </a>
+      <a href="/leaders" class="quick-link-card">
+        <i class="fas fa-crown"></i>
+        <h3>القيادات</h3>
+        <p>قادة SYRIA FOUR</p>
+      </a>
+      <a href="/players" class="quick-link-card">
+        <i class="fas fa-users"></i>
+        <h3>اللاعبون</h3>
+        <p>جميع أعضاء الكلان</p>
+      </a>
+      <a href="/tournaments" class="quick-link-card">
+        <i class="fas fa-trophy"></i>
+        <h3>البطولات</h3>
+        <p>سجل البطولات والألقاب</p>
+      </a>
+      <a href="/shop" class="quick-link-card">
+        <i class="fas fa-gem"></i>
+        <h3>الشحن</h3>
+        <p>شحن جواهر فري فاير</p>
+      </a>
+      <a href="/events" class="quick-link-card">
+        <i class="fas fa-calendar-alt"></i>
+        <h3>الفعاليات</h3>
+        <p>فعاليات ومسابقات أسبوعية</p>
+      </a>
+      <a href="/gallery" class="quick-link-card">
+        <i class="fas fa-images"></i>
+        <h3>المعرض</h3>
+        <p>صور وفيديوهات الكلان</p>
+      </a>
+      <a href="/rules" class="quick-link-card">
+        <i class="fas fa-shield-alt"></i>
+        <h3>الشروط</h3>
+        <p>قوانين وأنظمة الكلان</p>
+      </a>
+      <a href="/support" class="quick-link-card">
+        <i class="fas fa-headset"></i>
+        <h3>الدعم الفني</h3>
+        <p>تواصل معنا</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section section-light">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">الأرباح والجوائز</h2>
+      <p class="section-subtitle">مكافآت وجوائز SYRIA FOUR</p>
+    </div>
+    <div class="earnings-grid">
+      <div class="earnings-card">
+        <i class="fas fa-gamepad"></i>
+        <h3>حسابات فري فاير</h3>
+        <p>5 حسابات</p>
+      </div>
+      <div class="earnings-card">
+        <i class="fas fa-gem"></i>
+        <h3>جواهر</h3>
+        <p>10000+ جوهرة</p>
+      </div>
+      <div class="earnings-card">
+        <i class="fas fa-gift"></i>
+        <h3>هدايا برايم</h3>
+        <p>12 هدية</p>
+      </div>
+      <div class="earnings-card">
+        <i class="fas fa-award"></i>
+        <h3>جوائز الفعاليات</h3>
+        <p>جوائز متنوعة</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">تابعونا على إنستغرام</h2>
+      <p class="section-subtitle">حسابات SYRIA FOUR الرسمية</p>
+    </div>
+    <div class="instagram-grid" id="instagramGrid"></div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <img src="/images/logo.svg" alt="SYRIA FOUR" class="footer-logo">
+      <h3>SYRIA FOUR</h3>
+      <p class="footer-desc">الموقع الرسمي ل SYRIA FOUR</p>
+      <p class="footer-creator"><i class="fas fa-code"></i> منشئ الموقع: أبو أمير</p>
+      <div class="footer-social" id="footerSocial"></div>
+      <p class="footer-copy">&copy; 2026 SYRIA FOUR. جميع الحقوق محفوظة.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<script src="/js/database.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
