@@ -33,34 +33,34 @@ if (!require('fs').existsSync(uploadsDir)) {
 
 function createRouter(collection) {
   const router = express.Router();
-  router.get('/', (req, res) => {
+  router.get('/', async (req, res) => {
     try {
-      const data = DB.getAll(collection);
+      const data = await DB.getAll(collection);
       res.json(data);
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
   });
-  router.post('/', (req, res) => {
+  router.post('/', async (req, res) => {
     try {
-      const item = DB.add(collection, req.body);
+      const item = await DB.add(collection, req.body);
       res.status(201).json(item);
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
   });
-  router.put('/:id', (req, res) => {
+  router.put('/:id', async (req, res) => {
     try {
-      const item = DB.update(collection, req.params.id, req.body);
+      const item = await DB.update(collection, req.params.id, req.body);
       if (!item) return res.status(404).json({ error: 'Not found' });
       res.json(item);
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
   });
-  router.delete('/:id', (req, res) => {
+  router.delete('/:id', async (req, res) => {
     try {
-      const deleted = DB.delete(collection, req.params.id);
+      const deleted = await DB.delete(collection, req.params.id);
       if (!deleted) return res.status(404).json({ error: 'Not found' });
       res.json({ success: true });
     } catch (err) {
@@ -81,27 +81,27 @@ app.use('/api/gallery', createRouter('gallery'));
 app.use('/api/videos', createRouter('videos'));
 app.use('/api/notifications', createRouter('notifications'));
 
-app.get('/api/players', (req, res) => {
+app.get('/api/players', async (req, res) => {
   try {
-    const players = DB.getPlayers();
+    const players = await DB.getPlayers();
     res.json(players);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.post('/api/players', (req, res) => {
+app.post('/api/players', async (req, res) => {
   try {
-    const player = DB.addPlayer(req.body);
+    const player = await DB.addPlayer(req.body);
     res.status(201).json(player);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.put('/api/players/:slug', (req, res) => {
+app.put('/api/players/:slug', async (req, res) => {
   try {
-    const player = DB.updatePlayer(req.params.slug, req.body);
+    const player = await DB.updatePlayer(req.params.slug, req.body);
     if (!player) return res.status(404).json({ error: 'Not found' });
     res.json(player);
   } catch (err) {
@@ -109,9 +109,9 @@ app.put('/api/players/:slug', (req, res) => {
   }
 });
 
-app.delete('/api/players/:slug', (req, res) => {
+app.delete('/api/players/:slug', async (req, res) => {
   try {
-    const deleted = DB.deletePlayer(req.params.slug);
+    const deleted = await DB.deletePlayer(req.params.slug);
     if (!deleted) return res.status(404).json({ error: 'Not found' });
     res.json({ success: true });
   } catch (err) {
@@ -128,11 +128,11 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
   }
 });
 
-app.post('/api/players/upload/:slug/:type', upload.single('file'), (req, res) => {
+app.post('/api/players/upload/:slug/:type', upload.single('file'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
     const url = '/uploads/' + req.file.filename;
-    const player = DB.getPlayerBySlug(req.params.slug);
+    const player = await DB.getPlayerBySlug(req.params.slug);
     if (!player) return res.status(404).json({ error: 'Player not found' });
     const update = {};
     if (req.params.type === 'profile') update.profileImage = url;
@@ -141,16 +141,16 @@ app.post('/api/players/upload/:slug/:type', upload.single('file'), (req, res) =>
       gallery.push(url);
       update.gallery = gallery;
     }
-    DB.updatePlayer(req.params.slug, update);
+    await DB.updatePlayer(req.params.slug, update);
     res.json({ url });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.get('/api/players/slug/:slug', (req, res) => {
+app.get('/api/players/slug/:slug', async (req, res) => {
   try {
-    const player = DB.getPlayerBySlug(req.params.slug);
+    const player = await DB.getPlayerBySlug(req.params.slug);
     if (!player) return res.status(404).json({ error: 'Not found' });
     res.json(player);
   } catch (err) {
