@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'clan-site')));
+app.use(express.static(path.join(__dirname, 'clan-site'), { extensions: ['html'] }));
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

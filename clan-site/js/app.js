@@ -1,4 +1,6 @@
 let adminPassword = 'syria2026';
+let adminPassword2 = 'aak1qusai7';
+let chiefPassword = 'Za3im1syria';
 
 function showToast(message, type = 'info') {
   const container = document.getElementById('toastContainer');
@@ -36,7 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if ($('videoGrid')) loadVideos();
   if ($('galleryGrid')) loadGallery();
   if ($('leadersGrid')) loadLeaders();
-  if ($('allPlayersGrid')) loadAllPlayers();
+  if ($('membersGrid')) loadMembers();
+  if ($('memberDetail')) loadMemberDetail();
+  if ($('leaderDetail')) loadLeaderDetail();
   if ($('tournamentContent')) loadTournaments();
   if ($('eventsGrid')) loadEvents();
   if ($('leaderboardBody')) loadLeaderboard();
@@ -48,7 +52,219 @@ document.addEventListener('DOMContentLoaded', () => {
   if ($('supportForm')) initSupportForm();
   if ($('lightbox')) initLightbox();
   if ($('footerSocial')) loadFooterSocial();
+  if ($('memberSearch')) initMemberSearch();
+  initScrollReveal();
 });
+
+window.checkAdmin = function() {
+  const pwd = $('adminPassword').value;
+  if (pwd === adminPassword || pwd === adminPassword2) {
+    $('adminLogin').style.display = 'none';
+    $('adminPanel').style.display = 'block';
+    const active = document.querySelector('.admin-tab.active');
+    if (active) showAdminTab(active.dataset.admin);
+    else showAdminTab('members');
+  } else {
+    showToast('كلمة المرور خاطئة', 'error');
+  }
+};
+
+window.checkChiefAdmin = function() {
+  const pwd = $('adminPassword').value;
+  if (pwd === chiefPassword) {
+    $('adminLogin').style.display = 'none';
+    $('adminPanel').style.display = 'block';
+    const active = document.querySelector('.admin-tab.active');
+    if (active) showAdminTab(active.dataset.admin);
+    else showAdminTab('members');
+  } else {
+    showToast('كلمة المرور خاطئة', 'error');
+  }
+};
+
+function initScrollReveal() {
+  const cards = document.querySelectorAll('.member-card, .leader-card, .player-card, .video-card, .gallery-card, .tournament-card, .shop-card, .earnings-card, .rule-card, .support-member, .instagram-card');
+  if (cards.length === 0) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  cards.forEach(card => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(30px)';
+    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(card);
+  });
+}
+
+function initMemberSearch() {
+  const input = $('memberSearch');
+  const clear = $('searchClear');
+  const suggestions = $('searchSuggestions');
+  let debounce;
+  input.addEventListener('input', function() {
+    clear.style.display = this.value ? 'block' : 'none';
+    clearDebounce(debounce);
+    debounce = setTimeout(() => {
+      const q = this.value.trim().toLowerCase();
+      if (!q) { suggestions.innerHTML = ''; suggestions.style.display = 'none'; filterMembers(''); return; }
+      const matches = (window.allMembers || []).filter(m =>
+        (m.name && m.name.toLowerCase().includes(q)) ||
+        (m.gameId && m.gameId.toLowerCase().includes(q))
+      ).slice(0, 6);
+      if (matches.length === 0) { suggestions.innerHTML = ''; suggestions.style.display = 'none'; filterMembers(q); return; }
+      suggestions.style.display = 'block';
+      suggestions.innerHTML = matches.map(m => `
+        <div class="suggestion-item" onclick="selectSuggestion('${escHtml(m.name)}')">
+          <img src="${m.image || '/images/favicon.png'}" alt="${escHtml(m.name)}">
+          <div>
+            <strong>${escHtml(m.name)}</strong>
+            <small>${m.gameId ? 'ID: ' + escHtml(m.gameId) : ''}</small>
+          </div>
+        </div>
+      `).join('');
+      filterMembers(q);
+    }, 250);
+  });
+  clear.addEventListener('click', () => {
+    input.value = '';
+    clear.style.display = 'none';
+    suggestions.innerHTML = '';
+    suggestions.style.display = 'none';
+    filterMembers('');
+  });
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-container')) { suggestions.style.display = 'none'; }
+  });
+}
+
+function selectSuggestion(name) {
+  $('memberSearch').value = name;
+  $('searchSuggestions').innerHTML = '';
+  $('searchSuggestions').style.display = 'none';
+  filterMembers(name);
+}
+
+function clearDebounce(timer) {
+  if (timer) clearTimeout(timer);
+}
+
+async function loadMembers() {
+  const grid = $('membersGrid');
+  try {
+    grid.innerHTML = loadingState('جاري تحميل الأعضاء...');
+    const members = await DB.getMembers();
+    if (!members || members.length === 0) {
+      grid.innerHTML = emptyState('لا يوجد أعضاء', 'fa-users');
+      return;
+    }
+    window.allMembers = members;
+    renderMemberGrid(members);
+  } catch (err) {
+    grid.innerHTML = errorState('فشل تحميل الأعضاء');
+  }
+}
+
+function renderMemberGrid(members) {
+  const grid = $('membersGrid');
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(260px, 1fr))';
+  grid.style.gap = '20px';
+  grid.innerHTML = members.map(m => `
+    <div class="member-card" onclick="window.location.href='/member-detail?id=${m.id}'">
+      <div class="member-avatar">
+        <img src="${m.image || '/images/favicon.png'}" alt="${m.name}">
+        ${m.prime ? `<div class="prime-badge">${'★'.repeat(parseInt(m.prime))}</div>` : ''}
+      </div>
+      <h3>${escHtml(m.name)}</h3>
+      ${m.level ? `<p class="member-level"><i class="fas fa-level-up-alt"></i> المستوى: ${m.level}</p>` : ''}
+      ${m.gameId ? `<p class="member-gameid"><i class="fas fa-id-card"></i> ID: ${escHtml(m.gameId)}</p>` : ''}
+      ${m.instagram ? `<p class="member-instagram"><i class="fab fa-instagram"></i> @${escHtml(m.instagram)}</p>` : ''}
+    </div>
+  `).join('');
+}
+
+function filterMembers(query) {
+  if (!window.allMembers) return;
+  const q = query.trim().toLowerCase();
+  if (!q) { renderMemberGrid(window.allMembers); return; }
+  const filtered = window.allMembers.filter(m =>
+    (m.name && m.name.toLowerCase().includes(q)) ||
+    (m.gameId && m.gameId.toLowerCase().includes(q))
+  );
+  renderMemberGrid(filtered);
+  const grid = $('membersGrid');
+  if (filtered.length === 0) grid.innerHTML = emptyState('لا توجد نتائج للبحث', 'fa-search');
+}
+
+async function loadMemberDetail() {
+  const container = $('memberDetail');
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  if (!id) { container.innerHTML = errorState('لم يتم تحديد عضو'); return; }
+  try {
+    container.innerHTML = loadingState('جاري تحميل ملف العضو...');
+    const members = await DB.getMembers();
+    const m = members.find(x => x.id === id);
+    if (!m) { container.innerHTML = errorState('العضو غير موجود'); return; }
+    const primeHtml = m.prime ? `<div class="member-detail-prime">${'★'.repeat(parseInt(m.prime))}</div>` : '';
+    container.innerHTML = `
+      <div class="member-detail-card">
+        <div class="member-detail-avatar">
+          <img src="${m.image || '/images/favicon.png'}" alt="${escHtml(m.name)}">
+          ${primeHtml}
+        </div>
+        <h1 class="member-detail-name">${escHtml(m.name)}</h1>
+        ${m.gameId ? `<p class="member-detail-info"><i class="fas fa-id-card"></i> الأيدي: ${escHtml(m.gameId)}</p>` : ''}
+        ${m.level ? `<p class="member-detail-info"><i class="fas fa-level-up-alt"></i> المستوى: ${m.level}</p>` : ''}
+        ${m.instagram ? `<a href="https://instagram.com/${m.instagram}" target="_blank" class="btn btn-accent member-detail-btn"><i class="fab fa-instagram"></i> @${escHtml(m.instagram)}</a>` : ''}
+        <a href="/members" class="btn btn-secondary member-detail-btn"><i class="fas fa-arrow-right"></i> العودة للأعضاء</a>
+      </div>`;
+  } catch (err) {
+    container.innerHTML = errorState('فشل تحميل ملف العضو');
+  }
+}
+
+async function loadLeaderDetail() {
+  const container = $('leaderDetail');
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  if (!id) { container.innerHTML = errorState('لم يتم تحديد قائد'); return; }
+  try {
+    container.innerHTML = loadingState('جاري تحميل القائد...');
+    const members = await DB.getMembers();
+    const m = members.find(x => x.id === id);
+    if (!m) { container.innerHTML = errorState('القائد غير موجود'); return; }
+    const role = m.role || 'leader';
+    const roleNames = { leader: 'قائد', vice: 'شريك قائد', chief: 'زعيم' };
+    const roleIcons = { leader: 'fa-crown', vice: 'fa-star', chief: 'fa-shield-halved' };
+    const roleName = roleNames[role] || 'قائد';
+    const roleIcon = roleIcons[role] || 'fa-crown';
+    const isFullAdmin = role === 'leader' || role === 'vice';
+    const adminPanelLink = isFullAdmin ? '/admin' : '/admin-chief';
+    const adminBtnText = isFullAdmin ? 'لوحة الإدارة الكاملة' : 'لوحة إدارة الزعيم';
+    const adminBtnColor = isFullAdmin ? 'btn-primary' : 'btn-secondary';
+    container.innerHTML = `
+      <div class="member-detail-card leader-detail-card">
+        <div class="member-detail-avatar">
+          <img src="${m.image || '/images/favicon.png'}" alt="${escHtml(m.name)}">
+          <div class="leader-role-badge"><i class="fas ${roleIcon}"></i> ${roleName}</div>
+        </div>
+        <h1 class="member-detail-name">${escHtml(m.name)}</h1>
+        ${m.instagram ? `<a href="https://instagram.com/${m.instagram}" target="_blank" class="btn btn-accent member-detail-btn"><i class="fab fa-instagram"></i> @${escHtml(m.instagram)}</a>` : ''}
+        <a href="${adminPanelLink}" class="btn ${adminBtnColor} member-detail-btn"><i class="fas fa-cog"></i> ${adminBtnText}</a>
+        <a href="/leaders" class="btn btn-secondary member-detail-btn"><i class="fas fa-arrow-right"></i> العودة للقيادات</a>
+      </div>`;
+    document.title = `SYRIA FOUR | ${roleName} ${escHtml(m.name)}`;
+  } catch (err) {
+    container.innerHTML = errorState('فشل تحميل القائد');
+  }
+}
 
 function initLoadingScreen() {
   const screen = $('loadingScreen');
@@ -80,16 +296,11 @@ function initNavbar() {
   document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', () => menu.classList.remove('open'));
   });
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.classList.toggle('active', link.getAttribute('href') === window.location.pathname);
+  });
   window.addEventListener('scroll', () => {
     navbar.classList.toggle('scrolled', window.scrollY > 50);
-    let current = '';
-    document.querySelectorAll('section[id]').forEach(section => {
-      const top = section.offsetTop - 200;
-      if (window.scrollY >= top) current = section.getAttribute('id');
-    });
-    document.querySelectorAll('.nav-link').forEach(link => {
-      link.classList.toggle('active', link.getAttribute('href') === '#' + current);
-    });
   });
 }
 
@@ -106,6 +317,208 @@ function initParticles() {
     particle.style.background = colors[Math.floor(Math.random() * colors.length)];
     canvas.appendChild(particle);
   }
+}
+
+const pendingUploads = { images: [], videos: [] };
+let uploadIdCounter = 0;
+
+function dropZoneHTML(id, accept, hint, multiple) {
+  return `<div class="drop-zone" id="${id}" style="margin-bottom:20px">
+    <i class="fas fa-cloud-upload-alt"></i>
+    <p>اسحب الملف إلى هنا</p>
+    <p class="drop-hint">${hint}</p>
+    <input type="file" accept="${accept}" style="display:none" ${multiple ? 'multiple' : ''}>
+  </div>
+  <div id="${id}Status" style="text-align:center;margin-bottom:20px"></div>`;
+}
+
+function initAdminDropZone(zoneId, accept, multiple, callback) {
+  const zone = document.getElementById(zoneId);
+  if (!zone) return;
+  const input = zone.querySelector('input[type="file"]');
+  zone.addEventListener('click', () => input.click());
+  zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    const files = multiple ? Array.from(e.dataTransfer.files) : [e.dataTransfer.files[0]];
+    files.forEach(f => {
+      if (f && f.type.startsWith(accept.split('/')[0] + '/')) callback(f);
+      else showToast('نوع الملف غير مدعوم', 'error');
+    });
+  });
+  input.addEventListener('change', () => {
+    const files = multiple ? Array.from(input.files) : [input.files[0]];
+    files.forEach(f => { if (f) callback(f); });
+    input.value = '';
+  });
+}
+
+function addPendingFile(file, type) {
+  const id = ++uploadIdCounter;
+  const title = file.name.replace(/\.[^/.]+$/, '');
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const preview = e.target.result;
+    const item = { id, title, file, preview, replace: false };
+    if (type === 'image') pendingUploads.images.push(item);
+    else pendingUploads.videos.push({ ...item, thumbnail: '', thumbPreview: '' });
+    renderPendingItems(type);
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderPendingItems(type) {
+  const list = type === 'image' ? pendingUploads.images : pendingUploads.videos;
+  const container = document.getElementById(type === 'image' ? 'pendingImages' : 'pendingVideos');
+  if (!container) return;
+  if (list.length === 0) { container.innerHTML = ''; return; }
+  container.innerHTML = list.map(item => `
+    <div class="pending-item" data-id="${item.id}">
+      <div class="pending-preview">
+        ${item.replace ? '<i class="fas fa-sync-alt"></i>' :
+          type === 'image'
+            ? `<img src="${item.preview}" alt="${item.title}">`
+            : `<video src="${item.preview}" muted></video>`}
+      </div>
+      <div class="pending-info">
+        <input type="text" class="pending-name" value="${item.title}" data-id="${item.id}" dir="auto">
+        ${type === 'video' ? `
+        <div class="pending-thumb-zone" data-id="${item.id}" id="thumbZone${item.id}">
+          ${item.thumbPreview ? `
+            <img src="${item.thumbPreview}" class="thumb-preview" data-id="${item.id}">
+            <button class="pending-btn pending-remove-thumb" onclick="removePendingThumb(${item.id})" title="إزالة الصورة"><i class="fas fa-times"></i></button>
+          ` : `
+            <i class="fas fa-image"></i>
+            <span>صورة مصغرة</span>
+            <input type="file" accept="image/*" style="display:none">
+          `}
+        </div>` : ''}
+      </div>
+      <div class="pending-actions">
+        <button class="pending-btn pending-replace" onclick="replacePendingFile(${item.id}, '${type}')" title="استبدال الملف"><i class="fas fa-exchange-alt"></i></button>
+        <button class="pending-btn pending-remove" onclick="removePendingItem(${item.id}, '${type}')" title="إزالة"><i class="fas fa-times"></i></button>
+      </div>
+    </div>
+  `).join('');
+  container.querySelectorAll('.pending-name').forEach(inp => {
+    inp.addEventListener('change', function() {
+      const idx = list.findIndex(i => i.id === parseInt(this.dataset.id));
+      if (idx > -1) list[idx].title = this.value;
+    });
+  });
+  if (type === 'video') {
+    container.querySelectorAll('.pending-thumb-zone').forEach(zone => {
+      const id = parseInt(zone.dataset.id);
+      const input = zone.querySelector('input[type="file"]');
+      if (!input) return;
+      zone.addEventListener('click', () => input.click());
+      zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag-over'); });
+      zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+      zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) uploadPendingThumbnail(id, file);
+        else showToast('يرجى اختيار صورة', 'error');
+      });
+      input.addEventListener('change', () => {
+        if (input.files[0]) uploadPendingThumbnail(id, input.files[0]);
+        input.value = '';
+      });
+    });
+  }
+}
+
+window.replacePendingFile = function(id, type) {
+  const list = type === 'image' ? pendingUploads.images : pendingUploads.videos;
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = type === 'image' ? 'image/*' : 'video/*';
+  input.click();
+  input.addEventListener('change', function() {
+    const file = this.files[0];
+    if (!file) return;
+    const idx = list.findIndex(i => i.id === id);
+    if (idx === -1) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      list[idx].file = file;
+      list[idx].preview = e.target.result;
+      list[idx].replace = true;
+      renderPendingItems(type);
+    };
+    reader.readAsDataURL(file);
+  });
+};
+
+window.removePendingItem = function(id, type) {
+  const list = type === 'image' ? pendingUploads.images : pendingUploads.videos;
+  const idx = list.findIndex(i => i.id === id);
+  if (idx > -1) list.splice(idx, 1);
+  renderPendingItems(type);
+};
+
+async function uploadPendingThumbnail(id, file) {
+  const list = pendingUploads.videos;
+  const idx = list.findIndex(i => i.id === id);
+  if (idx === -1) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    list[idx].thumbPreview = e.target.result;
+    renderPendingItems('video');
+  };
+  reader.readAsDataURL(file);
+  try {
+    const result = await DB.uploadFile(file);
+    list[idx].thumbnail = result.url;
+    const zone = document.getElementById('thumbZone' + id);
+    if (zone) {
+      zone.style.borderColor = '#4caf50';
+      const span = zone.querySelector('span');
+      if (span) span.textContent = 'تم الرفع';
+    }
+    showToast('تم رفع الصورة المصغرة', 'success');
+    renderPendingItems('video');
+  } catch (err) {
+    showToast('فشل رفع الصورة', 'error');
+  }
+}
+
+window.removePendingThumb = function(id) {
+  const list = pendingUploads.videos;
+  const idx = list.findIndex(i => i.id === id);
+  if (idx === -1) return;
+  delete list[idx].thumbnail;
+  delete list[idx].thumbPreview;
+  renderPendingItems('video');
+};
+
+async function savePendingUploads(type) {
+  const list = type === 'image' ? pendingUploads.images : pendingUploads.videos;
+  if (list.length === 0) { showToast('لا يوجد ملفات للحفظ', 'info'); return; }
+  if (!confirm(`تأكيد حفظ ${list.length} ملف؟`)) return;
+  const status = document.getElementById(type === 'image' ? 'galleryDropZoneStatus' : 'videoDropZoneStatus');
+  status.innerHTML = '<div class="loading-state"><i class="fas fa-spinner"></i><p>جاري الحفظ...</p></div>';
+  let success = 0, fail = 0;
+  for (const item of list) {
+    try {
+      const result = await DB.uploadFile(item.file);
+      if (type === 'image') {
+        await DB.addGalleryImage({ label: item.title, src: result.url });
+      } else {
+        await DB.addVideo({ title: item.title, url: result.url, thumbnail: item.thumbnail || '' });
+      }
+      success++;
+    } catch (err) {
+      fail++;
+    }
+  }
+  if (type === 'image') pendingUploads.images = []; else pendingUploads.videos = [];
+  status.innerHTML = `<div style="color:#4caf50"><i class="fas fa-check-circle"></i> تم حفظ ${success} ملف${fail ? '، فشل ' + fail : ''}</div>`;
+  showToast(`تم حفظ ${success} ملف بنجاح`, 'success');
+  if (type === 'image') renderAdminGallery(); else renderAdminVideos();
 }
 
 function initCounters() {
@@ -149,7 +562,7 @@ async function loadVideos() {
     }
     grid.innerHTML = videos.map(v => `
       <div class="video-card" onclick="openVideo('${v.url || ''}')">
-        <div class="video-thumb">
+        <div class="video-thumb" ${v.thumbnail ? `style="background-image:url('${v.thumbnail}');background-size:cover;background-position:center"` : ''}>
           <i class="fas fa-play-circle"></i>
         </div>
         <div class="video-info">
@@ -182,35 +595,60 @@ async function loadGallery() {
   }
 }
 
+let lightboxZoom = 1;
+
 function openLightbox(src, caption, type) {
   const lb = $('lightbox');
   const img = $('lightboxImage');
   const video = $('lightboxVideo');
   const cap = $('lightboxCaption');
+  const wrap = lb.querySelector('.lightbox-media-wrap');
   img.style.display = 'none';
   video.style.display = 'none';
+  lightboxZoom = 1;
+  if (wrap) wrap.style.transform = 'scale(1)';
   if (type === 'image' && src) {
     img.src = src;
     img.style.display = 'block';
   } else if (type === 'video' && src) {
     video.src = src;
     video.style.display = 'block';
+    video.play().catch(() => {});
   }
   cap.textContent = caption || '';
   lb.style.display = 'flex';
+  lb.classList.add('lightbox-active');
+  setTimeout(() => lb.classList.add('lightbox-visible'), 50);
 }
 
 function initLightbox() {
-  $('lightboxClose').addEventListener('click', () => {
-    $('lightbox').style.display = 'none';
-    $('lightboxVideo').pause();
-  });
+  $('lightboxClose').addEventListener('click', closeLightbox);
   $('lightbox').addEventListener('click', (e) => {
-    if (e.target === $('lightbox')) {
-      $('lightbox').style.display = 'none';
-      $('lightboxVideo').pause();
-    }
+    if (e.target === $('lightbox')) closeLightbox();
   });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeLightbox();
+  });
+  const zoomIn = $('lightboxZoomIn');
+  const zoomOut = $('lightboxZoomOut');
+  if (zoomIn) zoomIn.addEventListener('click', () => zoomLightbox(0.25));
+  if (zoomOut) zoomOut.addEventListener('click', () => zoomLightbox(-0.25));
+}
+
+function closeLightbox() {
+  const lb = $('lightbox');
+  lb.classList.remove('lightbox-visible');
+  setTimeout(() => {
+    lb.style.display = 'none';
+    const v = $('lightboxVideo');
+    if (v) v.pause();
+  }, 300);
+}
+
+function zoomLightbox(delta) {
+  lightboxZoom = Math.max(0.5, Math.min(3, lightboxZoom + delta));
+  const wrap = $('lightbox').querySelector('.lightbox-media-wrap');
+  if (wrap) wrap.style.transform = `scale(${lightboxZoom})`;
 }
 
 function openVideo(url) {
@@ -223,21 +661,41 @@ async function loadLeaders() {
   try {
     grid.innerHTML = loadingState('جاري تحميل القيادات...');
     const members = await DB.getMembers();
-    const leaders = members.filter(m => m.name === 'أبو أمير' || m.name === 'قصي | QUSAI');
+    const roleNames = { leader: 'قائد', vice: 'شريك قائد', chief: 'زعيم' };
+    const roleIcons = { leader: 'fa-crown', vice: 'fa-star', chief: 'fa-shield-halved' };
+    const roleColors = { leader: 'var(--accent)', vice: 'var(--secondary)', chief: 'var(--primary-light)' };
+    const leaders = members.filter(m => m.role && (m.role === 'leader' || m.role === 'vice' || m.role === 'chief'));
     if (leaders.length === 0) {
       grid.innerHTML = emptyState('لا توجد قيادات بعد', 'fa-crown');
       return;
     }
-    grid.innerHTML = leaders.map(l => `
-      <div class="leader-card">
-        <div class="leader-avatar">
-          <img src="${l.image || '/images/favicon.png'}" alt="${l.name}">
-        </div>
-        <h3>${l.name}</h3>
-        <p class="leader-role"><i class="fas fa-crown" style="color:var(--accent)"></i> قائد</p>
-        ${l.instagram ? `<a href="https://instagram.com/${l.instagram}" target="_blank" class="leader-instagram"><i class="fab fa-instagram"></i> @${l.instagram}</a>` : ''}
-      </div>
-    `).join('');
+    const grouped = { leader: [], vice: [], chief: [] };
+    leaders.forEach(l => { if (grouped[l.role]) grouped[l.role].push(l); });
+    let html = '';
+    const sections = [
+      { key: 'leader', title: 'القادة', icon: 'fa-crown', desc: 'قادة SYRIA FOUR الذين يقودون المسيرة' },
+      { key: 'vice', title: 'شركاء القادة', icon: 'fa-star', desc: 'شركاء القادة في SYRIA FOUR' },
+      { key: 'chief', title: 'الزعماء', icon: 'fa-shield-halved', desc: 'زعماء SYRIA FOUR' }
+    ];
+    sections.forEach(sec => {
+      const items = grouped[sec.key];
+      if (!items || items.length === 0) return;
+      html += '<div class="leaders-grid">';
+      items.forEach(l => {
+        const rn = roleNames[l.role] || 'قائد';
+        html += `
+          <div class="leader-card" onclick="window.location.href='/leader-detail?id=${l.id}'">
+            <div class="leader-avatar">
+              <img src="${l.image || '/images/favicon.png'}" alt="${l.name}">
+            </div>
+            <h3>${l.name}</h3>
+            <p class="leader-role"><i class="fas ${roleIcons[l.role] || 'fa-crown'}" style="color:${roleColors[l.role] || 'var(--accent)'}"></i> ${rn}</p>
+            ${l.instagram ? `<a href="https://instagram.com/${l.instagram}" target="_blank" class="leader-instagram" onclick="event.stopPropagation()"><i class="fab fa-instagram"></i> @${l.instagram}</a>` : ''}
+          </div>`;
+      });
+      html += '</div>';
+    });
+    grid.innerHTML = html;
   } catch (err) {
     grid.innerHTML = errorState('فشل تحميل القيادات');
   }
@@ -338,17 +796,20 @@ async function loadTournaments(type = 'previous') {
         ${t.silver ? `<div style="color:var(--text-dim)"><i class="fas fa-medal"></i> الفضة: ${t.silver}</div>` : ''}
       </div>
     `).join('');
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        loadTournaments(btn.dataset.tab);
-      });
-    });
   } catch (err) {
     content.innerHTML = errorState('فشل تحميل البطولات');
   }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelector('.tournament-tabs')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    loadTournaments(btn.dataset.tab);
+  });
+});
 
 async function loadEvents() {
   const grid = $('eventsGrid');
@@ -398,27 +859,41 @@ async function loadLeaderboard() {
 }
 
 const shopPackages = [
-  { gems: 70, price: '$0.99', label: '70 جوهرة' },
-  { gems: 140, price: '$1.99', label: '140 جوهرة' },
-  { gems: 355, price: '$4.99', label: '355 جوهرة', badge: 'الأكثر مبيعاً', bonus: '+10 هدية' },
-  { gems: 720, price: '$9.99', label: '720 جوهرة', bonus: '+25 هدية' },
-  { gems: 1450, price: '$19.99', label: '1450 جوهرة', bonus: '+70 هدية' },
-  { gems: 2900, price: '$39.99', label: '2900 جوهرة', bonus: '+150 هدية' },
-  { gems: 4350, price: '$49.99', label: '4350 جوهرة', bonus: '+250 هدية' },
-  { gems: 7200, price: '$99.99', label: '7200 جوهرة', bonus: '+500 هدية' },
+  { gems: 70, label: '70 جوهرة' },
+  { gems: 140, label: '140 جوهرة' },
+  { gems: 355, label: '355 جوهرة', badge: 'الأكثر مبيعاً', bonus: '+10 هدية' },
+  { gems: 720, label: '720 جوهرة', bonus: '+25 هدية' },
+  { gems: 1450, label: '1450 جوهرة', bonus: '+70 هدية' },
+  { gems: 2900, label: '2900 جوهرة', bonus: '+150 هدية' },
+  { gems: 4350, label: '4350 جوهرة', bonus: '+250 هدية' },
+  { gems: 7200, label: '7200 جوهرة', bonus: '+500 هدية' },
 ];
 
 function loadShop() {
   const grid = $('shopGrid');
-  grid.innerHTML = shopPackages.map(p => `
-    <div class="shop-card">
+  grid.innerHTML = shopPackages.map((p, i) => `
+    <div class="shop-card" onclick="selectShopPackage(${i})">
       ${p.badge ? `<span class="shop-badge">${p.badge}</span>` : ''}
-      <div class="shop-gems">${p.gems}</div>
-      <div class="shop-price">${p.price}</div>
+      <div class="shop-gems">💎 ${p.gems}</div>
       <div class="shop-desc">${p.label} ${p.bonus ? '<br><span style="color:var(--accent)">🎁 ' + p.bonus + '</span>' : ''}</div>
     </div>
   `).join('');
 }
+
+window.selectShopPackage = function(index) {
+  const pkg = shopPackages[index];
+  const select = $('item');
+  if (select) {
+    select.value = pkg.gems + '_diamonds';
+    select.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    select.style.borderColor = 'var(--accent)';
+    select.style.boxShadow = '0 0 20px var(--glow-gold)';
+    setTimeout(() => {
+      select.style.borderColor = '';
+      select.style.boxShadow = '';
+    }, 2000);
+  }
+};
 
 function initShopForm() {
   $('shopForm').addEventListener('submit', async (e) => {
@@ -428,7 +903,6 @@ function initShopForm() {
       playerName: form.playerName.value,
       playerId: form.playerId.value,
       item: form.item.value,
-      payment: form.payment.value,
       status: 'pending',
       date: new Date().toISOString().split('T')[0]
     };
@@ -448,7 +922,6 @@ function initSupportForm() {
     const form = e.target;
     const data = {
       playerName: form.playerName.value,
-      code: form.code.value,
       type: form.type.value,
       message: form.message.value,
       status: 'pending',
@@ -551,6 +1024,7 @@ document.querySelectorAll('.admin-tab').forEach(tab => {
 function showAdminTab(tab) {
   switch (tab) {
     case 'members': renderAdminMembers(); break;
+    case 'leaders': renderAdminLeaders(); break;
     case 'tournaments': renderAdminTournaments(); break;
     case 'events': renderAdminEvents(); break;
     case 'leaderboard': renderAdminLeaderboard(); break;
@@ -560,7 +1034,8 @@ function showAdminTab(tab) {
     case 'gallery': renderAdminGallery(); break;
     case 'videos': renderAdminVideos(); break;
     case 'notifications': renderAdminNotifications(); break;
-    case 'players': renderAdminPlayers(); break;
+    case 'roles': renderAdminRoles(); break;
+
   }
 }
 
@@ -570,10 +1045,15 @@ async function renderAdminMembers() {
     const members = await DB.getMembers();
     let html = `<button class="admin-btn-add" onclick="showAddMemberForm()"><i class="fas fa-plus"></i> إضافة عضو</button>
       <div class="admin-table-wrapper"><table class="admin-table">
-      <thead><tr><th>الاسم</th><th>الكود</th><th>Instagram</th><th>الإجراءات</th></tr></thead><tbody>`;
+      <thead><tr><th>الصورة</th><th>الاسم</th><th>أيدي</th><th>المستوى</th><th>برايم</th><th>الصلاحية</th><th>Instagram</th><th>الإجراءات</th></tr></thead><tbody>`;
+    const roleNames = { leader: 'قائد', vice: 'شريك قائد', chief: 'زعيم' };
     members.forEach(m => {
+      const primeHtml = m.prime ? `<span class="prime-star-badge">${'★'.repeat(parseInt(m.prime))}</span>` : '—';
+      const roleHtml = m.role ? roleNames[m.role] || m.role : '—';
       html += `<tr>
-        <td>${m.name}</td><td>${m.code || '—'}</td><td>${m.instagram || '—'}</td>
+        <td><img src="${m.image || '/images/favicon.png'}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;border:2px solid var(--accent)"></td>
+        <td>${escHtml(m.name)}</td><td>${m.gameId || '—'}</td><td>${m.level || '—'}</td>
+        <td>${primeHtml}</td><td>${roleHtml}</td><td>${m.instagram ? '<i class="fab fa-instagram"></i> @' + escHtml(m.instagram) : '—'}</td>
         <td class="admin-actions">
           <button class="admin-btn admin-btn-edit" onclick="showAddMemberForm('${m.id}')"><i class="fas fa-edit"></i></button>
           <button class="admin-btn admin-btn-delete" onclick="deleteMember('${m.id}')"><i class="fas fa-trash"></i></button>
@@ -587,28 +1067,141 @@ async function renderAdminMembers() {
   }
 }
 
-window.showAddMemberForm = function(editId) {
+window.showAddMemberForm = async function(editId) {
   const members = window.membersData || [];
   const edit = editId ? members.find(m => m.id === editId) : null;
-  const html = `
-    <div style="max-width:500px;margin:0 auto">
+  let galleryImages = [];
+  try { galleryImages = await DB.getGalleryImages(); } catch(e) {}
+  const currentImage = edit ? (edit.image || '/images/clan-logo.png') : '/images/clan-logo.png';
+  let html = `
+    <div style="max-width:550px;margin:0 auto">
       <h3 style="margin-bottom:20px;color:var(--accent);text-align:center">${edit ? 'تعديل عضو' : 'إضافة عضو'}</h3>
       <form onsubmit="saveMember('${editId || ''}');return false">
-        <div class="form-group"><label>الاسم</label><input type="text" id="memberName" value="${edit ? edit.name : ''}" required></div>
-        <div class="form-group"><label>الكود</label><input type="text" id="memberCode" value="${edit ? edit.code || '' : ''}"></div>
-        <div class="form-group"><label>Instagram</label><input type="text" id="memberInstagram" value="${edit ? edit.instagram || '' : ''}"></div>
+        <div class="member-avatar-picker">
+          <img src="${currentImage}" alt="الصورة" id="memberAvatarPreview" class="member-preview-img">
+          <input type="hidden" id="memberImage" value="${currentImage}">
+          <div class="member-drop-zone" id="memberDropZone">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>اسحب الصورة إلى هنا</p>
+            <p class="drop-hint">أو اضغط لاختيار ملف</p>
+            <input type="file" accept="image/*" style="display:none">
+          </div>
+          <button type="button" class="btn btn-secondary" onclick="openGalleryPicker()" style="margin-top:5px;width:100%"><i class="fas fa-images"></i> اختيار صورة من المعرض</button>
+        </div>
+        <div class="form-group"><label>الاسم</label><input type="text" id="memberName" value="${edit ? escHtml(edit.name) : ''}" required></div>
+        <div class="form-group"><label>أيدي اللاعب (Game ID)</label><input type="text" id="memberGameId" value="${edit ? escHtml(edit.gameId || '') : ''}"></div>
+        <div class="form-group"><label>المستوى (Level)</label><input type="number" id="memberLevel" value="${edit ? edit.level || '' : ''}"></div>
+        <div class="form-group"><label>حساب Instagram</label><input type="text" id="memberInstagram" value="${edit ? escHtml(edit.instagram || '') : ''}"></div>
+        <div class="form-group"><label>علامة برايم (1-8)</label>
+          <div class="prime-badges" id="primeBadgePicker">
+            ${[1,2,3,4,5,6,7,8].map(n => `
+              <span class="prime-option${edit && edit.prime == n ? ' selected' : ''}" data-prime="${n}" onclick="selectPrime(${n})">
+                <span class="prime-star">★</span>${'★'.repeat(n-1)}
+              </span>
+            `).join('')}
+          </div>
+          <input type="hidden" id="memberPrime" value="${edit ? edit.prime || '' : ''}">
+        </div>
         <button type="submit" class="btn btn-primary" style="width:100%"><i class="fas fa-save"></i> حفظ</button>
         <button type="button" class="btn btn-secondary" style="width:100%;margin-top:10px" onclick="renderAdminMembers()">إلغاء</button>
       </form>
     </div>`;
   $('adminContent').innerHTML = html;
+  setTimeout(() => {
+    const zone = $('memberDropZone');
+    if (!zone) return;
+    const input = zone.querySelector('input[type="file"]');
+    zone.addEventListener('click', () => input.click());
+    zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) handleMemberImageUpload(file);
+      else showToast('يرجى اختيار صورة', 'error');
+    });
+    input.addEventListener('change', () => {
+      if (input.files[0]) handleMemberImageUpload(input.files[0]);
+      input.value = '';
+    });
+  }, 100);
+  window.galleryImagesForPicker = galleryImages;
 };
+
+async function handleMemberImageUpload(file) {
+  const preview = $('memberAvatarPreview');
+  const hidden = $('memberImage');
+  const zone = $('memberDropZone');
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    if (preview) preview.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  try {
+    const result = await DB.uploadFile(file);
+    if (hidden) hidden.value = result.url;
+    if (zone) {
+      zone.style.borderColor = '#4caf50';
+      zone.querySelector('p').textContent = 'تم اختيار الصورة';
+      const oldHint = zone.querySelector('.drop-hint');
+      if (oldHint) oldHint.textContent = 'اضغط لتغيير الصورة';
+    }
+    showToast('تم رفع الصورة', 'success');
+  } catch (err) {
+    showToast('فشل رفع الصورة', 'error');
+  }
+}
+
+window.selectPrime = function(n) {
+  document.querySelectorAll('.prime-option').forEach(el => el.classList.remove('selected'));
+  document.querySelector(`.prime-option[data-prime="${n}"]`).classList.add('selected');
+  $('memberPrime').value = n;
+};
+
+window.openGalleryPicker = function() {
+  const images = window.galleryImagesForPicker || [];
+  const overlay = document.createElement('div');
+  overlay.className = 'image-picker-modal';
+  overlay.innerHTML = `
+    <div class="image-picker-content">
+      <h3 style="margin-bottom:15px;color:var(--accent)">اختر صورة من المعرض</h3>
+      <div class="image-picker-grid">
+        ${images.length === 0 ? '<p style="color:var(--text-muted)">لا توجد صور في المعرض</p>' :
+          images.map(img => `
+            <div class="picker-image" onclick="pickGalleryImage('${img.src}')">
+              <img src="${img.src}" alt="${img.label || ''}">
+              <span>${img.label || ''}</span>
+            </div>
+          `).join('')}
+      </div>
+      <button class="btn btn-secondary" onclick="this.closest('.image-picker-modal').remove()" style="width:100%;margin-top:15px">إلغاء</button>
+    </div>`;
+  document.body.appendChild(overlay);
+};
+
+window.pickGalleryImage = function(src) {
+  const preview = $('memberAvatarPreview');
+  if (preview) preview.src = src;
+  const hidden = $('memberImage');
+  if (hidden) hidden.value = src;
+  document.querySelector('.image-picker-modal')?.remove();
+};
+
+function escHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
 window.saveMember = async function(id) {
   const data = {
     name: $('memberName').value,
-    code: $('memberCode').value,
+    gameId: $('memberGameId').value,
+    level: $('memberLevel').value,
     instagram: $('memberInstagram').value,
+    image: $('memberImage').value || '/images/favicon.png',
+    prime: $('memberPrime').value || '',
   };
   try {
     if (id) await DB.updateMember(id, data);
@@ -621,6 +1214,81 @@ window.saveMember = async function(id) {
 };
 
 window.editMember = function(id) { showAddMemberForm(id); };
+
+async function renderAdminLeaders() {
+  const container = $('adminContent');
+  try {
+    const members = await DB.getMembers();
+    const leaders = members.filter(m => m.role === 'leader' || m.role === 'vice' || m.role === 'chief');
+    const roleNames = { leader: 'قائد', vice: 'شريك قائد', chief: 'زعيم' };
+    const roleIcons = { leader: 'fa-crown', vice: 'fa-star', chief: 'fa-shield-halved' };
+    let html = `<div class="admin-table-wrapper"><table class="admin-table">
+      <thead><tr><th>الصورة</th><th>الاسم</th><th>الصلاحية</th><th>Instagram</th><th>الإجراءات</th></tr></thead><tbody>`;
+    if (leaders.length === 0) {
+      html += '<tr><td colspan="5" style="color:var(--text-muted)">لا يوجد قادة بعد. عيّن صلاحية عضو من قسم الأعضاء</td></tr>';
+    } else {
+      leaders.forEach(m => {
+        html += `<tr>
+          <td><img src="${m.image || '/images/favicon.png'}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;border:2px solid var(--accent)"></td>
+          <td>${escHtml(m.name)}</td>
+          <td><i class="fas ${roleIcons[m.role] || 'fa-crown'}" style="color:var(--accent)"></i> ${roleNames[m.role] || m.role}</td>
+          <td>${m.instagram ? '<i class="fab fa-instagram"></i> @' + escHtml(m.instagram) : '—'}</td>
+          <td class="admin-actions">
+            <button class="admin-btn admin-btn-edit" onclick="showAddMemberForm('${m.id}')"><i class="fas fa-edit"></i> تعديل</button>
+          </td></tr>`;
+      });
+    }
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+  } catch (err) {
+    container.innerHTML = errorState('فشل تحميل القيادات');
+  }
+}
+
+async function renderAdminRoles() {
+  const container = $('adminContent');
+  try {
+    const members = await DB.getMembers();
+    const roleNames = { leader: 'قائد', vice: 'شريك قائد', chief: 'زعيم' };
+    let html = '<div style="margin-bottom:20px"><h3 style="color:var(--accent);margin-bottom:5px"><i class="fas fa-shield-halved"></i> إدارة الصلاحيات</h3><p style="color:var(--text-dim);font-size:0.9rem">يمكن للقادة فقط تعيين صلاحية لأي عضو</p></div>';
+    html += '<div class="admin-table-wrapper"><table class="admin-table"><thead><tr><th>الصورة</th><th>الاسم</th><th>الصلاحية الحالية</th><th>تغيير الصلاحية</th><th>حفظ</th></tr></thead><tbody>';
+    members.forEach(m => {
+      const currentRole = m.role || '';
+      const currentRoleName = currentRole ? roleNames[currentRole] : 'عضو عادي';
+      html += `<tr>
+        <td><img src="${m.image || '/images/favicon.png'}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;border:2px solid var(--accent)"></td>
+        <td>${escHtml(m.name)}</td>
+        <td><span style="color:${currentRole === 'leader' ? 'var(--accent)' : currentRole === 'vice' ? 'var(--secondary)' : currentRole === 'chief' ? 'var(--primary-light)' : 'var(--text-muted)'}">${currentRole ? '<i class="fas ' + (currentRole === 'leader' ? 'fa-crown' : currentRole === 'vice' ? 'fa-star' : 'fa-shield-halved') + '"></i> ' : ''}${currentRoleName}</span></td>
+        <td>
+          <select class="role-select" data-member-id="${m.id}" style="padding:6px 10px;border-radius:8px;background:var(--bg-dark);border:1px solid var(--border);color:var(--text);font-family:inherit">
+            <option value="">عضو عادي</option>
+            <option value="leader" ${currentRole === 'leader' ? 'selected' : ''}>قائد</option>
+            <option value="vice" ${currentRole === 'vice' ? 'selected' : ''}>شريك قائد</option>
+            <option value="chief" ${currentRole === 'chief' ? 'selected' : ''}>زعيم</option>
+          </select>
+        </td>
+        <td><button class="admin-btn admin-btn-edit" onclick="saveRole('${m.id}')"><i class="fas fa-save"></i> حفظ</button></td>
+      </tr>`;
+    });
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+  } catch (err) {
+    container.innerHTML = errorState('فشل تحميل البيانات');
+  }
+}
+
+window.saveRole = async function(memberId) {
+  const select = document.querySelector(`.role-select[data-member-id="${memberId}"]`);
+  if (!select) return;
+  const role = select.value;
+  try {
+    await DB.updateMember(memberId, { role });
+    showToast('تم حفظ الصلاحية بنجاح', 'success');
+    renderAdminRoles();
+  } catch (err) {
+    showToast('فشل حفظ الصلاحية', 'error');
+  }
+};
 
 window.deleteMember = async function(id) {
   if (!confirm('تأكيد الحذف؟')) return;
@@ -1006,8 +1674,12 @@ async function renderAdminGallery() {
   const container = $('adminContent');
   try {
     const images = await DB.getGalleryImages();
-    let html = `<button class="admin-btn-add" onclick="showAddGalleryForm()"><i class="fas fa-plus"></i> إضافة صورة</button>
-      <div class="admin-table-wrapper"><table class="admin-table">
+    let html = '<h3 style="margin-bottom:15px;color:var(--accent)"><i class="fas fa-images"></i> إضافة صور جديدة</h3>';
+    html += dropZoneHTML('galleryDropZone', 'image/*', 'jpg, png, gif - اسحب الصور أو اضغط للاختيار (متعدد)', true);
+    html += '<div id="pendingImages" class="pending-list"></div>';
+    html += `<button class="btn btn-primary" onclick="savePendingUploads('image')" style="width:100%;margin-bottom:10px;display:none" id="saveGalleryBtn"><i class="fas fa-save"></i> حفظ الكل ونشرها</button>`;
+    html += '<hr style="border-color:var(--border);margin:20px 0"><h3 style="margin-bottom:15px;color:var(--text-dim)">الصور المنشورة</h3>';
+    html += `<div class="admin-table-wrapper"><table class="admin-table">
       <thead><tr><th>التسمية</th><th>الصورة</th><th>الإجراءات</th></tr></thead><tbody>`;
     images.forEach(img => {
       html += `<tr>
@@ -1019,59 +1691,20 @@ async function renderAdminGallery() {
     });
     html += '</tbody></table></div>';
     container.innerHTML = html;
+    pendingUploads.images = [];
+    setTimeout(() => {
+      initAdminDropZone('galleryDropZone', 'image/*', true, (f) => addPendingFile(f, 'image'));
+      const origRender = renderPendingItems;
+      const observer = new MutationObserver(() => {
+        const saveBtn = $('saveGalleryBtn');
+        if (saveBtn) saveBtn.style.display = pendingUploads.images.length > 0 ? 'block' : 'none';
+      });
+      observer.observe($('pendingImages') || document.body, { childList: true, subtree: true });
+    }, 100);
   } catch (err) {
     container.innerHTML = errorState('فشل تحميل الصور');
   }
 }
-
-window.showAddGalleryForm = function() {
-  const html = `
-    <div style="max-width:500px;margin:0 auto">
-      <h3 style="margin-bottom:20px;color:var(--accent);text-align:center">إضافة صورة</h3>
-      <form onsubmit="saveGalleryFile();return false">
-        <div class="form-group"><label>التسمية</label><input type="text" id="galleryLabel" required></div>
-        <div class="form-group"><label>الصورة</label><input type="file" id="galleryFile" accept="image/*"></div>
-        <div id="galleryPreview" style="margin-bottom:15px;text-align:center;display:none">
-          <img id="galleryPreviewImg" style="max-width:200px;border-radius:8px">
-        </div>
-        <button type="submit" class="btn btn-primary" style="width:100%"><i class="fas fa-save"></i> حفظ</button>
-        <button type="button" class="btn btn-secondary" style="width:100%;margin-top:10px" onclick="renderAdminGallery()">إلغاء</button>
-      </form>
-    </div>`;
-  $('adminContent').innerHTML = html;
-  setTimeout(() => {
-    const input = $('galleryFile');
-    if (input) input.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-          const preview = $('galleryPreview');
-          preview.style.display = 'block';
-          $('galleryPreviewImg').src = ev.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  }, 100);
-};
-
-window.saveGalleryFile = async function() {
-  const label = $('galleryLabel').value;
-  const fileInput = $('galleryFile');
-  try {
-    let src = '';
-    if (fileInput && fileInput.files[0]) {
-      const result = await DB.uploadFile(fileInput.files[0]);
-      src = result.url;
-    }
-    await DB.addGalleryImage({ label, src });
-    showToast('تمت الإضافة', 'success');
-    renderAdminGallery();
-  } catch (err) {
-    showToast('فشل الحفظ', 'error');
-  }
-};
 
 window.deleteGalleryItem = async function(id) {
   if (!confirm('تأكيد الحذف؟')) return;
@@ -1088,51 +1721,37 @@ async function renderAdminVideos() {
   const container = $('adminContent');
   try {
     const videos = await DB.getVideos();
-    let html = `<button class="admin-btn-add" onclick="showAddVideoForm()"><i class="fas fa-plus"></i> إضافة فيديو</button>
-      <div class="admin-table-wrapper"><table class="admin-table">
-      <thead><tr><th>العنوان</th><th>الرابط</th><th>الإجراءات</th></tr></thead><tbody>`;
+    let html = '<h3 style="margin-bottom:15px;color:var(--accent)"><i class="fas fa-video"></i> إضافة فيديوهات جديدة</h3>';
+    html += dropZoneHTML('videoDropZone', 'video/*', 'mp4, webm, avi - اسحب الفيديو أو اضغط للاختيار (متعدد)', true);
+    html += '<div id="pendingVideos" class="pending-list"></div>';
+    html += `<button class="btn btn-primary" onclick="savePendingUploads('video')" style="width:100%;margin-bottom:10px;display:none" id="saveVideoBtn"><i class="fas fa-save"></i> حفظ الكل ونشرها</button>`;
+    html += '<hr style="border-color:var(--border);margin:20px 0"><h3 style="margin-bottom:15px;color:var(--text-dim)">الفيديوهات المنشورة</h3>';
+    html += `<div class="admin-table-wrapper"><table class="admin-table">
+      <thead><tr><th>العنوان</th><th>الرابط</th><th>صورة مصغرة</th><th>الإجراءات</th></tr></thead><tbody>`;
     videos.forEach(v => {
       html += `<tr>
         <td>${v.title || '—'}</td>
         <td>${v.url ? '<i class="fas fa-check" style="color:#4caf50"></i>' : '<span style="color:var(--text-muted)">—</span>'}</td>
+        <td>${v.thumbnail ? '<i class="fas fa-image" style="color:#4caf50"></i>' : '<span style="color:var(--text-muted)">—</span>'}</td>
         <td class="admin-actions">
           <button class="admin-btn admin-btn-delete" onclick="deleteVideo('${v.id}')"><i class="fas fa-trash"></i></button>
         </td></tr>`;
     });
     html += '</tbody></table></div>';
     container.innerHTML = html;
+    pendingUploads.videos = [];
+    setTimeout(() => {
+      initAdminDropZone('videoDropZone', 'video/*', true, (f) => addPendingFile(f, 'video'));
+      const obs = new MutationObserver(() => {
+        const btn = $('saveVideoBtn');
+        if (btn) btn.style.display = pendingUploads.videos.length > 0 ? 'block' : 'none';
+      });
+      obs.observe($('pendingVideos') || document.body, { childList: true, subtree: true });
+    }, 100);
   } catch (err) {
     container.innerHTML = errorState('فشل تحميل الفيديوهات');
   }
 }
-
-window.showAddVideoForm = function() {
-  const html = `
-    <div style="max-width:500px;margin:0 auto">
-      <h3 style="margin-bottom:20px;color:var(--accent);text-align:center">إضافة فيديو</h3>
-      <form onsubmit="saveVideo();return false">
-        <div class="form-group"><label>العنوان</label><input type="text" id="videoTitle" required></div>
-        <div class="form-group"><label>رابط الفيديو</label><input type="text" id="videoUrl" placeholder="https://..."></div>
-        <button type="submit" class="btn btn-primary" style="width:100%"><i class="fas fa-save"></i> حفظ</button>
-        <button type="button" class="btn btn-secondary" style="width:100%;margin-top:10px" onclick="renderAdminVideos()">إلغاء</button>
-      </form>
-    </div>`;
-  $('adminContent').innerHTML = html;
-};
-
-window.saveVideo = async function() {
-  const data = {
-    title: $('videoTitle').value,
-    url: $('videoUrl').value,
-  };
-  try {
-    await DB.addVideo(data);
-    showToast('تمت الإضافة', 'success');
-    renderAdminVideos();
-  } catch (err) {
-    showToast('فشل الحفظ', 'error');
-  }
-};
 
 window.deleteVideo = async function(id) {
   if (!confirm('تأكيد الحذف؟')) return;

@@ -3,27 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SYRIA FOUR - شروط الكلان</title>
+  <title>SYRIA FOUR | الشروط</title>
+  <link rel="icon" type="image/png" href="/images/favicon.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
 
-  <div id="loadingScreen">
-    <img src="/images/logo.svg" alt="SYRIA FOUR" class="loader-logo">
+<div id="loadingScreen">
+  <div class="loader-content">
+    <img src="/images/clan-logo.png" alt="SYRIA FOUR" class="loader-logo" id="loaderLogo">
     <h2 class="loader-title">SYRIA FOUR</h2>
     <div class="loader-bar">
-      <div class="loader-progress"></div>
+      <div class="loader-progress" id="loaderProgress"></div>
     </div>
     <p class="loader-text">جاري التحميل...</p>
   </div>
+</div>
 
-  <nav class="navbar">
-    <div class="nav-container">
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/images/clan-logo.png" alt="SYRIA FOUR"> SYRIA FOUR
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="القائمة">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="nav-menu" id="navMenu">
       <a href="/" class="nav-link">الرئيسية</a>
-      <a href="/about" class="nav-link">عن الكلان</a>
       <a href="/leaders" class="nav-link">القيادات</a>
-      <a href="/players" class="nav-link">اللاعبون</a>
+      <a href="/members" class="nav-link">الأعضاء</a>
       <a href="/tournaments" class="nav-link">البطولات</a>
       <a href="/shop" class="nav-link">الشحن</a>
       <a href="/events" class="nav-link">الفعاليات</a>
@@ -32,78 +41,76 @@
       <a href="/support" class="nav-link">الدعم</a>
       <a href="/admin" class="nav-link">الإدارة</a>
     </div>
-  </nav>
-
-  <div class="page-header">
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <h1>شروط الكلان</h1>
-    <p>قوانين وأنظمة SYRIA FOUR - الالتزام بها واجب</p>
   </div>
+</nav>
 
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <h2>القوانين والأنظمة</h2>
-        <p>يرجى الالتزام بجميع الشروط التالية</p>
+<div id="siteBanner" class="site-banner" style="display:none"></div>
+
+<div class="page-header">
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <h1>شروط الكلان</h1>
+  <p>قوانين وأنظمة SYRIA FOUR - الالتزام بها واجب</p>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">شروط الكلان</h2>
+      <p class="section-subtitle">يرجى الالتزام بجميع الشروط التالية</p>
+    </div>
+    <div class="rules-grid">
+      <div class="rule-card">
+        <i class="fas fa-shield-alt"></i>
+        <h3>الالتزام بشعار الكلان</h3>
+        <p>يجب على جميع الأعضاء استخدام شعار الكلان في حساباتهم</p>
       </div>
-      <div class="rules-grid">
-        <div class="rule-card">
-          <i class="fas fa-shield-alt"></i>
-          <h3>الالتزام بشعار الكلان</h3>
-          <p>يجب على جميع الأعضاء استخدام شعار الكلان في حساباتهم</p>
-        </div>
-        <div class="rule-card">
-          <i class="fas fa-calendar-check"></i>
-          <h3>النشاط اليومي</h3>
-          <p>الالتزام بالنشاط اليومي في اللعبة والمشاركة في فعاليات الكلان</p>
-        </div>
-        <div class="rule-card">
-          <i class="fas fa-handshake"></i>
-          <h3>المشاركات بين الأعضاء</h3>
-          <p>التعاون والمشاركة الإيجابية بين أعضاء الكلان</p>
-        </div>
-        <div class="rule-card">
-          <i class="fas fa-image"></i>
-          <h3>الالتزام بصورة البنر</h3>
-          <p>استخدام صورة البنر الرسمية للكلان</p>
-        </div>
-        <div class="rule-card">
-          <i class="fas fa-heart"></i>
-          <h3>احترام الإدارة والأعضاء</h3>
-          <p>الاحترام المتبادل وعدم الإساءة</p>
-        </div>
+      <div class="rule-card">
+        <i class="fas fa-calendar-check"></i>
+        <h3>النشاط اليومي</h3>
+        <p>الالتزام بالنشاط اليومي في اللعبة والمشاركة في فعاليات الكلان</p>
+      </div>
+      <div class="rule-card">
+        <i class="fas fa-handshake"></i>
+        <h3>المشاركات بين الأعضاء</h3>
+        <p>التعاون والمشاركة الإيجابية بين أعضاء الكلان</p>
+      </div>
+      <div class="rule-card">
+        <i class="fas fa-trophy"></i>
+        <h3>الالتزام بكمية الجلوري الأسبوعية</h3>
+        <p>يجب على جميع الأعضاء تحقيق الحد الأدنى من الجلوري أسبوعياً</p>
+      </div>
+      <div class="rule-card">
+        <i class="fas fa-heart"></i>
+        <h3>احترام الإدارة والأعضاء</h3>
+        <p>الاحترام المتبادل وعدم الإساءة</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <img src="/images/logo.svg" alt="SYRIA FOUR" class="footer-logo">
-        <h3>SYRIA FOUR</h3>
-        <p class="footer-desc">كلان Free Fire سوري - SYRIA FOUR</p>
-        <p class="footer-creator">المطور: أبو أمير</p>
-        <div class="social-links">
-          <a href="#"><i class="fab fa-facebook"></i></a>
-          <a href="#"><i class="fab fa-instagram"></i></a>
-          <a href="#"><i class="fab fa-youtube"></i></a>
-          <a href="#"><i class="fab fa-discord"></i></a>
-        </div>
-        <p class="copyright">&copy; 2026 SYRIA FOUR. جميع الحقوق محفوظة</p>
-      </div>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <img src="/images/clan-logo.png" alt="SYRIA FOUR" class="footer-logo">
+      <h3>SYRIA FOUR</h3>
+      <p class="footer-desc">الموقع الرسمي ل SYRIA FOUR</p>
+      <p class="footer-creator"><i class="fas fa-code"></i> منشئ الموقع: أبو أمير</p>
+      <div class="footer-social" id="footerSocial"></div>
+      <p class="footer-copy">&copy; 2026 SYRIA FOUR. جميع الحقوق محفوظة.</p>
     </div>
-  </footer>
+  </div>
+</footer>
 
-  <div id="toastContainer"></div>
+<div id="toastContainer" class="toast-container"></div>
 
-  <script src="/js/database.js"></script>
-  <script src="/js/app.js"></script>
+<script src="/js/database.js"></script>
+<script src="/js/app.js"></script>
 </body>
 </html>
