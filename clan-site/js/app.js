@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if ($('memberDetail')) loadMemberDetail();
   if ($('leaderDetail')) loadLeaderDetail();
   if ($('tournamentContent')) loadTournaments();
+  if ($('tournamentDetail')) loadTournamentDetail();
   if ($('eventsGrid')) loadEvents();
   if ($('leaderboardBody')) loadLeaderboard();
   if ($('shopGrid')) loadShop();
@@ -62,6 +63,8 @@ window.checkAdmin = function() {
   if (pwd === adminPassword || pwd === adminPassword2) {
     $('adminLogin').style.display = 'none';
     $('adminPanel').style.display = 'block';
+    renderAdminDashboard();
+    updateAdminTabCounts();
     const active = document.querySelector('.admin-tab.active');
     if (active) showAdminTab(active.dataset.admin);
     else showAdminTab('members');
@@ -75,6 +78,8 @@ window.checkChiefAdmin = function() {
   if (pwd === chiefPassword) {
     $('adminLogin').style.display = 'none';
     $('adminPanel').style.display = 'block';
+    renderAdminDashboard();
+    updateAdminTabCounts();
     const active = document.querySelector('.admin-tab.active');
     if (active) showAdminTab(active.dataset.admin);
     else showAdminTab('members');
@@ -190,25 +195,21 @@ async function loadMembers() {
 function renderMemberGrid(members) {
   const grid = $('membersGrid');
   grid.style.display = 'grid';
-  grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(260px, 1fr))';
+  grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(200px, 1fr))';
   grid.style.gap = '20px';
   if (!members || members.length === 0) {
     grid.innerHTML = emptyState('لا توجد نتائج للبحث', 'fa-search');
     return;
   }
   grid.innerHTML = members.map(m => `
-    <div class="member-card" onclick="window.location.href='/member-detail?id=${m.id}'">
-      <div class="member-avatar">
-        <img src="${m.image || '/images/favicon.png'}" alt="${escHtml(m.name)}" loading="lazy">
-        ${m.prime ? `<div class="prime-badge">${'★'.repeat(parseInt(m.prime))}</div>` : ''}
+    <div class="member-enh-card" onclick="window.location.href='/member-detail?id=${m.id}'">
+      <div class="enh-avatar-wrap">
+        <div class="enh-avatar-sm">
+          <img src="${m.image || '/images/favicon.png'}" alt="${escHtml(m.name)}" loading="lazy">
+        </div>
       </div>
-      <div class="member-info">
+      <div class="enh-body-sm">
         <h3>${escHtml(m.name)}</h3>
-        ${m.level ? `<p><i class="fas fa-level-up-alt"></i> المستوى: ${escHtml(m.level)}</p>` : ''}
-        ${m.gameId ? `<p><i class="fas fa-id-card"></i> ID: ${escHtml(m.gameId)}</p>` : ''}
-        ${m.country ? `<p><i class="fas fa-map-marker-alt"></i> ${escHtml(m.country)}</p>` : ''}
-        ${m.role ? `<p><i class="fas fa-shield-alt"></i> ${roleName(m.role)}</p>` : ''}
-        ${m.instagram ? `<p><i class="fab fa-instagram"></i> @${escHtml(m.instagram)}</p>` : ''}
       </div>
     </div>
   `).join('');
@@ -257,38 +258,69 @@ async function loadMemberDetail() {
     const members = await DB.getMembers();
     const m = members.find(x => x.id === id);
     if (!m) { container.innerHTML = errorState('العضو غير موجود'); return; }
-    const primeHtml = m.prime ? `<div class="member-detail-prime">${'★'.repeat(parseInt(m.prime))}</div>` : '';
     const role = m.role || '';
     const roleNames = { leader: 'قائد', vice: 'شريك قائد', chief: 'زعيم' };
     const roleIcons = { leader: 'fa-crown', vice: 'fa-star', chief: 'fa-shield-halved' };
     const roleName = roleNames[role] || '';
     const roleIcon = roleIcons[role] || '';
+    const winsVal = parseInt(m.wins) || 0;
+    // Build 2-column info items
+    const infoItems = [];
+    if (m.gameId) infoItems.push({ label: 'أيدي اللاعب', icon: 'fa-id-card', val: escHtml(m.gameId) });
+    if (m.level) infoItems.push({ label: 'المستوى', icon: 'fa-level-up-alt', val: escHtml(m.level) });
+    if (m.country) infoItems.push({ label: 'الدولة', icon: 'fa-map-marker-alt', val: escHtml(m.country) });
+    if (m.age) infoItems.push({ label: 'العمر', icon: 'fa-birthday-cake', val: escHtml(m.age) });
+    if (m.prime) infoItems.push({ label: 'برايم', icon: 'fa-star', val: '★'.repeat(parseInt(m.prime)) });
+    if (m.joinDate) infoItems.push({ label: 'تاريخ الانضمام', icon: 'fa-calendar-plus', val: escHtml(m.joinDate) });
+    if (m.weapon) infoItems.push({ label: 'السلاح المفضل', icon: 'fa-crosshairs', val: escHtml(m.weapon) });
+    if (winsVal > 0) infoItems.push({ label: 'الانتصارات', icon: 'fa-trophy', val: winsVal });
+    if (m.rank) infoItems.push({ label: 'الرتبة', icon: 'fa-shield-alt', val: escHtml(m.rank) });
+    if (m.instagram) infoItems.push({ label: 'Instagram', icon: 'fab fa-instagram', val: '@' + escHtml(m.instagram) });
+    const gridHtml = infoItems.map(item => `
+      <div class="member-detail-info-item">
+        <span class="label">${item.label}</span>
+        <span class="value"><i class="fas ${item.icon}"></i> ${item.val}</span>
+      </div>`).join('');
     container.innerHTML = `
       <div class="member-detail-card">
         <div class="member-detail-avatar">
           <img src="${m.image || '/images/favicon.png'}" alt="${escHtml(m.name)}" loading="lazy">
-          ${primeHtml}
         </div>
         <h1 class="member-detail-name">${escHtml(m.name)}</h1>
         ${roleName ? `<p class="member-detail-role"><i class="fas ${roleIcon}"></i> ${roleName}</p>` : ''}
         <div class="member-detail-info-grid">
-          ${m.gameId ? `<div class="member-detail-info-item"><span class="label">أيدي اللاعب</span><span class="value"><i class="fas fa-id-card"></i> ${escHtml(m.gameId)}</span></div>` : ''}
-          ${m.level ? `<div class="member-detail-info-item"><span class="label">المستوى</span><span class="value"><i class="fas fa-level-up-alt"></i> ${escHtml(m.level)}</span></div>` : ''}
-          ${m.country ? `<div class="member-detail-info-item"><span class="label">الدولة</span><span class="value"><i class="fas fa-map-marker-alt"></i> ${escHtml(m.country)}</span></div>` : ''}
-          ${m.age ? `<div class="member-detail-info-item"><span class="label">العمر</span><span class="value"><i class="fas fa-birthday-cake"></i> ${escHtml(m.age)}</span></div>` : ''}
-          ${m.joinDate ? `<div class="member-detail-info-item"><span class="label">تاريخ الانضمام</span><span class="value"><i class="fas fa-calendar-plus"></i> ${escHtml(m.joinDate)}</span></div>` : ''}
-          ${m.weapon ? `<div class="member-detail-info-item"><span class="label">السلاح المفضل</span><span class="value"><i class="fas fa-crosshairs"></i> ${escHtml(m.weapon)}</span></div>` : ''}
-          ${m.wins ? `<div class="member-detail-info-item"><span class="label">الانتصارات</span><span class="value"><i class="fas fa-trophy"></i> ${m.wins}</span></div>` : ''}
-          ${m.instagram ? `<div class="member-detail-info-item"><span class="label">Instagram</span><span class="value"><i class="fab fa-instagram"></i> @${escHtml(m.instagram)}</span></div>` : ''}
+          ${gridHtml}
         </div>
         ${m.bio ? `<div class="member-detail-bio"><i class="fas fa-quote-right"></i> ${escHtml(m.bio)}</div>` : ''}
-        <a href="/members" class="btn btn-secondary member-detail-btn"><i class="fas fa-arrow-right"></i> العودة للأعضاء</a>
+        ${m.images && m.images.length > 0 ? `
+        <div class="member-detail-gallery">
+          <h3><i class="fas fa-images"></i> صور العضو</h3>
+          <div class="member-gallery-grid">
+            ${m.images.map(url => `
+              <div class="member-gallery-item" onclick="openMemberImage('${escHtml(url)}')">
+                <img src="${url}" alt="صورة العضو" loading="lazy">
+              </div>`).join('')}
+          </div>
+        </div>` : ''}
+        <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:25px">
+          <a href="/members" class="btn btn-secondary member-detail-btn"><i class="fas fa-arrow-right"></i> العودة للأعضاء</a>
+        </div>
       </div>`;
+    if ($('profileTitle')) $('profileTitle').textContent = escHtml(m.name);
     document.title = `SYRIA FOUR | ${escHtml(m.name)}`;
   } catch (err) {
     container.innerHTML = errorState('فشل تحميل ملف العضو');
   }
 }
+
+window.openMemberImage = function(url) {
+  const overlay = document.createElement('div');
+  overlay.className = 'image-lightbox';
+  overlay.innerHTML = `<div class="lightbox-content" onclick="event.stopPropagation()"><img src="${url}"><button class="lightbox-close" onclick="this.closest('.image-lightbox').remove()"><i class="fas fa-times"></i></button></div>`;
+  overlay.addEventListener('click', () => overlay.remove());
+  document.body.appendChild(overlay);
+  document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', esc); } });
+};
 
 async function loadLeaderDetail() {
   const container = $('leaderDetail');
@@ -309,16 +341,50 @@ async function loadLeaderDetail() {
     const adminPanelLink = isFullAdmin ? '/admin' : '/admin-chief';
     const adminBtnText = isFullAdmin ? 'لوحة الإدارة الكاملة' : 'لوحة إدارة الزعيم';
     const adminBtnColor = isFullAdmin ? 'btn-primary' : 'btn-secondary';
+    const winsVal = parseInt(m.wins) || 0;
+    // Build 2-column info items
+    const infoItems = [];
+    infoItems.push({ label: 'الصلاحية', icon: roleIcon, val: roleName });
+    if (m.gameId) infoItems.push({ label: 'أيدي اللاعب', icon: 'fa-id-card', val: escHtml(m.gameId) });
+    if (m.level) infoItems.push({ label: 'المستوى', icon: 'fa-level-up-alt', val: escHtml(m.level) });
+    if (m.country) infoItems.push({ label: 'الدولة', icon: 'fa-map-marker-alt', val: escHtml(m.country) });
+    if (m.age) infoItems.push({ label: 'العمر', icon: 'fa-birthday-cake', val: escHtml(m.age) });
+    if (m.prime) infoItems.push({ label: 'برايم', icon: 'fa-star', val: '★'.repeat(parseInt(m.prime)) });
+    if (m.joinDate) infoItems.push({ label: 'تاريخ الانضمام', icon: 'fa-calendar-plus', val: escHtml(m.joinDate) });
+    if (m.weapon) infoItems.push({ label: 'السلاح المفضل', icon: 'fa-crosshairs', val: escHtml(m.weapon) });
+    if (winsVal > 0) infoItems.push({ label: 'الانتصارات', icon: 'fa-trophy', val: winsVal });
+    if (m.rank) infoItems.push({ label: 'الرتبة', icon: 'fa-shield-alt', val: escHtml(m.rank) });
+    if (m.instagram) infoItems.push({ label: 'Instagram', icon: 'fab fa-instagram', val: '@' + escHtml(m.instagram) });
+    const gridHtml = infoItems.map(item => `
+      <div class="member-detail-info-item">
+        <span class="label">${item.label}</span>
+        <span class="value"><i class="fas ${item.icon}"></i> ${item.val}</span>
+      </div>`).join('');
     container.innerHTML = `
       <div class="member-detail-card leader-detail-card">
         <div class="member-detail-avatar">
           <img src="${m.image || '/images/favicon.png'}" alt="${escHtml(m.name)}">
-          <div class="leader-role-badge"><i class="fas ${roleIcon}"></i> ${roleName}</div>
         </div>
         <h1 class="member-detail-name">${escHtml(m.name)}</h1>
-        ${m.instagram ? `<a href="https://instagram.com/${m.instagram}" target="_blank" class="btn btn-accent member-detail-btn"><i class="fab fa-instagram"></i> @${escHtml(m.instagram)}</a>` : ''}
-        <a href="${adminPanelLink}" class="btn ${adminBtnColor} member-detail-btn"><i class="fas fa-cog"></i> ${adminBtnText}</a>
-        <a href="/leaders" class="btn btn-secondary member-detail-btn"><i class="fas fa-arrow-right"></i> العودة للقيادات</a>
+        <div class="member-detail-info-grid">
+          ${gridHtml}
+        </div>
+        ${m.bio ? `<div class="member-detail-bio"><i class="fas fa-quote-right"></i> ${escHtml(m.bio)}</div>` : ''}
+        ${m.images && m.images.length > 0 ? `
+        <div class="member-detail-gallery">
+          <h3><i class="fas fa-images"></i> صور العضو</h3>
+          <div class="member-gallery-grid">
+            ${m.images.map(url => `
+              <div class="member-gallery-item" onclick="openMemberImage('${escHtml(url)}')">
+                <img src="${url}" alt="صورة العضو" loading="lazy">
+              </div>`).join('')}
+          </div>
+        </div>` : ''}
+        <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:25px">
+          ${m.instagram ? `<a href="https://instagram.com/${m.instagram}" target="_blank" class="btn btn-accent member-detail-btn"><i class="fab fa-instagram"></i> @${escHtml(m.instagram)}</a>` : ''}
+          <a href="${adminPanelLink}" class="btn ${adminBtnColor} member-detail-btn"><i class="fas fa-cog"></i> ${adminBtnText}</a>
+          <a href="/leaders" class="btn btn-secondary member-detail-btn"><i class="fas fa-arrow-right"></i> العودة للقيادات</a>
+        </div>
       </div>`;
     document.title = `SYRIA FOUR | ${roleName} ${escHtml(m.name)}`;
   } catch (err) {
@@ -909,7 +975,8 @@ function closePlayerModal() {
   $('playerModal').style.display = 'none';
 }
 
-async function loadTournaments(type = 'previous') {
+
+async function loadTournaments(type = 'all') {
   const content = $('tournamentContent');
   try {
     content.innerHTML = loadingState('جاري تحميل البطولات...');
@@ -918,18 +985,19 @@ async function loadTournaments(type = 'previous') {
       content.innerHTML = emptyState('لا توجد بطولات', 'fa-trophy');
       return;
     }
-    const filtered = tournaments.filter(t => t.type === type);
+    const filtered = type === 'all' ? tournaments : tournaments.filter(t => t.type === type);
     if (filtered.length === 0) {
       content.innerHTML = emptyState(`لا توجد بطولات ${type === 'previous' ? 'سابقة' : type === 'current' ? 'حالية' : 'قادمة'}`, 'fa-trophy');
       return;
     }
     content.innerHTML = filtered.map(t => `
-      <div class="tournament-card">
+      <div class="tournament-card clickable" onclick="location.href='/tournament-detail?id=${t.id}'">
         <h3><i class="fas fa-trophy" style="color:var(--accent)"></i> ${t.name}</h3>
         <p>${t.description || ''}</p>
         <div class="tournament-date"><i class="far fa-calendar"></i> ${t.date || '—'}</div>
         ${t.gold ? `<div style="margin-top:10px;color:var(--accent)"><i class="fas fa-medal"></i> الذهب: ${t.gold}</div>` : ''}
         ${t.silver ? `<div style="color:var(--text-dim)"><i class="fas fa-medal"></i> الفضة: ${t.silver}</div>` : ''}
+        ${t.type ? `<div style="margin-top:8px"><span class="tournament-type-badge type-${t.type}">${t.type === 'previous' ? 'سابقة' : t.type === 'current' ? 'حالية' : 'قادمة'}</span></div>` : ''}
       </div>
     `).join('');
   } catch (err) {
@@ -946,6 +1014,143 @@ document.addEventListener('DOMContentLoaded', () => {
     loadTournaments(btn.dataset.tab);
   });
 });
+
+async function loadTournamentDetail() {
+  const container = $('tournamentDetail');
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  if (!id) {
+    container.innerHTML = errorState('معرف البطولة غير موجود');
+    return;
+  }
+  try {
+    container.innerHTML = loadingState('جاري تحميل تفاصيل البطولة...');
+    const tournaments = await DB.getTournaments();
+    const t = tournaments.find(t => t.id === id);
+    if (!t) {
+      container.innerHTML = errorState('البطولة غير موجودة');
+      return;
+    }
+    document.title = `SYRIA FOUR | ${t.name}`;
+    if ($('detailTitle')) $('detailTitle').textContent = t.name;
+    if ($('detailSubtitle')) $('detailSubtitle').textContent = t.description || 'معلومات البطولة';
+
+    const modeText = t.mode === 'br' ? 'بربرة' : t.mode === 'headshot' ? 'هيد شوت' : t.mode || '—';
+    const mapTypeText = t.mapType === 'snow' ? 'ثلج' : t.mapType === 'normal' ? 'عادية' : t.mapType || '—';
+    const persistentText = t.persistent === 'permanent' ? 'دائم' : t.persistent === 'temporary' ? 'غير دائم' : t.persistent || '—';
+    const mapDesignText = t.mapDesign === 'ranked' ? 'رانكد' : t.mapDesign === 'clash' ? 'كلاش' : t.mapDesign === 'custom' ? 'خريطة مصممة' : t.mapDesign || '—';
+    const prizeTypeText = t.prizeType === 'diamonds' ? 'جواهر' : t.prizeType === 'account' ? 'حساب' : t.prizeType === 'prime' ? 'هدية برايم' : t.prizeType === 'cash' ? 'نقد' : t.prizeType || '—';
+
+    const participants = Array.isArray(t.participants) ? t.participants : [];
+
+    container.innerHTML = `
+      <div class="detail-card">
+        <div class="detail-header">
+          <span class="tournament-type-badge type-${t.type}">${t.type === 'previous' ? 'سابقة' : t.type === 'current' ? 'حالية' : 'قادمة'}</span>
+          <h2>${escHtml(t.name)}</h2>
+        </div>
+        <div class="detail-info-grid">
+          <div class="detail-info-item">
+            <span class="detail-label"><i class="far fa-calendar-alt"></i> تاريخ البداية</span>
+            <span class="detail-value">${t.startDate || '—'}</span>
+          </div>
+          <div class="detail-info-item">
+            <span class="detail-label"><i class="far fa-calendar-check"></i> تاريخ النهاية</span>
+            <span class="detail-value">${t.endDate || '—'}</span>
+          </div>
+          <div class="detail-info-item">
+            <span class="detail-label"><i class="fas fa-users"></i> عدد اللاعبين</span>
+            <span class="detail-value">${t.maxPlayers || '—'}</span>
+          </div>
+          <div class="detail-info-item">
+            <span class="detail-label"><i class="fas fa-crosshairs"></i> طريقة اللعب</span>
+            <span class="detail-value">${modeText}</span>
+          </div>
+          <div class="detail-info-item">
+            <span class="detail-label"><i class="fas fa-map"></i> نوع الخريطة</span>
+            <span class="detail-value">${mapTypeText}</span>
+          </div>
+          <div class="detail-info-item">
+            <span class="detail-label"><i class="fas fa-clock"></i> النوع</span>
+            <span class="detail-value">${persistentText}</span>
+          </div>
+          <div class="detail-info-item">
+            <span class="detail-label"><i class="fas fa-layer-group"></i> نوع التصميم</span>
+            <span class="detail-value">${mapDesignText}</span>
+          </div>
+          <div class="detail-info-item">
+            <span class="detail-label"><i class="fas fa-crown"></i> عدد الفائزين</span>
+            <span class="detail-value">${t.winners || '—'}</span>
+          </div>
+          <div class="detail-info-item">
+            <span class="detail-label"><i class="fas fa-gift"></i> الجائزة</span>
+            <span class="detail-value">${prizeTypeText}${t.prizeValue ? ' - ' + t.prizeValue : ''}</span>
+          </div>
+          ${t.gold ? `<div class="detail-info-item"><span class="detail-label"><i class="fas fa-medal" style="color:var(--accent)"></i> الذهب</span><span class="detail-value">${escHtml(t.gold)}</span></div>` : ''}
+          ${t.silver ? `<div class="detail-info-item"><span class="detail-label"><i class="fas fa-medal" style="color:silver"></i> الفضة</span><span class="detail-value">${escHtml(t.silver)}</span></div>` : ''}
+        </div>
+        ${t.description ? `<div class="detail-bio"><h3>الوصف</h3><p>${escHtml(t.description)}</p></div>` : ''}
+        <div class="detail-participants">
+          <h3><i class="fas fa-users"></i> اللاعبين المسجلين (${participants.length})</h3>
+          ${participants.length > 0 ? `
+          <div class="approved-players-grid">
+            ${participants.map(p => {
+              const name = typeof p === 'string' ? p : (p.name || '');
+              const gameId = typeof p === 'string' ? '' : (p.gameId || '');
+              return `<div class="approved-player-card"><div class="approved-player-avatar"><i class="fas fa-user"></i></div><span>${escHtml(name)}</span>${gameId ? `<small>${escHtml(gameId)}</small>` : ''}</div>`;
+            }).join('')}
+          </div>` : `<p class="text-muted">لا يوجد لاعبين مسجلين بعد</p>`}
+        </div>
+        ${t.type === 'upcoming' ? `
+        <div style="text-align:center;margin-top:25px">
+          <button class="btn btn-accent" onclick="showJoinRequestForm('${t.id}','${escHtml(t.name)}')"><i class="fas fa-hand-paper"></i> طلب انضمام للبطولة</button>
+        </div>` : ''}
+        <div style="text-align:center;margin-top:15px">
+          <a href="/tournaments" class="btn btn-secondary"><i class="fas fa-arrow-right"></i> عودة إلى البطولات</a>
+        </div>
+      </div>`;
+  } catch (err) {
+    container.innerHTML = errorState('فشل تحميل تفاصيل البطولة');
+  }
+}
+
+window.showJoinRequestForm = function(tournamentId, tournamentName) {
+  const overlay = document.createElement('div');
+  overlay.className = 'join-request-modal';
+  overlay.innerHTML = `
+    <div class="join-request-content">
+      <h3><i class="fas fa-hand-paper"></i> طلب انضمام للبطولة</h3>
+      <p style="color:var(--accent);margin-bottom:15px">${escHtml(tournamentName)}</p>
+      <form onsubmit="submitJoinRequest(event,'${tournamentId}')">
+        <div class="form-group"><label>الاسم في اللعبة *</label><input type="text" id="reqPlayerName" required></div>
+        <div class="form-group"><label>الأيدي (Game ID) *</label><input type="text" id="reqPlayerGameId" required></div>
+        <div class="form-group"><label>سبب الانضمام *</label><textarea id="reqReason" rows="3" required></textarea></div>
+        <div style="display:flex;gap:10px">
+          <button type="submit" class="btn btn-primary" style="flex:1"><i class="fas fa-paper-plane"></i> إرسال</button>
+          <button type="button" class="btn btn-secondary" style="flex:1" onclick="this.closest('.join-request-modal').remove()">إلغاء</button>
+        </div>
+      </form>
+    </div>`;
+  document.body.appendChild(overlay);
+};
+
+window.submitJoinRequest = async function(e, tournamentId) {
+  e.preventDefault();
+  const data = {
+    tournamentId,
+    playerName: $('reqPlayerName').value,
+    playerGameId: $('reqPlayerGameId').value,
+    reason: $('reqReason').value,
+    status: 'pending',
+  };
+  try {
+    await DB.addRequest(data);
+    document.querySelector('.join-request-modal')?.remove();
+    showToast('تم إرسال طلب الانضمام بنجاح، ينتظر الموافقة', 'success');
+  } catch (err) {
+    showToast('فشل إرسال الطلب', 'error');
+  }
+};
 
 async function loadEvents() {
   const grid = $('eventsGrid');
@@ -1138,17 +1343,6 @@ async function loadBanner() {
   }
 }
 
-function checkAdmin() {
-  const pw = $('adminPassword');
-  if (pw.value === adminPassword) {
-    $('adminLogin').style.display = 'none';
-    $('adminPanel').style.display = 'block';
-    showAdminTab('members');
-  } else {
-    showToast('كلمة المرور خاطئة', 'error');
-  }
-}
-
 document.querySelectorAll('.admin-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
@@ -1156,6 +1350,29 @@ document.querySelectorAll('.admin-tab').forEach(tab => {
     showAdminTab(tab.dataset.admin);
   });
 });
+
+async function renderAdminDashboard() {
+  try {
+    const [members, tournaments, orders, support] = await Promise.all([
+      DB.getMembers().catch(() => []),
+      DB.getTournaments().catch(() => []),
+      DB.getOrders().catch(() => []),
+      DB.getSupportRequests().catch(() => [])
+    ]);
+    const statsHtml = `
+    <div class="admin-stats">
+      <div class="admin-stat-card"><i class="fas fa-users"></i><span class="stat-num">${members.length}</span><span class="stat-label">إجمالي الأعضاء</span></div>
+      <div class="admin-stat-card"><i class="fas fa-trophy"></i><span class="stat-num">${tournaments.length}</span><span class="stat-label">البطولات</span></div>
+      <div class="admin-stat-card"><i class="fas fa-shopping-cart"></i><span class="stat-num">${orders.length}</span><span class="stat-label">طلبات الشحن</span></div>
+      <div class="admin-stat-card"><i class="fas fa-headset"></i><span class="stat-num">${support.length}</span><span class="stat-label">رسائل الدعم</span></div>
+    </div>`;
+    const existing = document.querySelector('.admin-stats');
+    if (existing) existing.outerHTML = statsHtml;
+    else $('adminContent').insertAdjacentHTML('beforebegin', statsHtml);
+  } catch(e) {}
+}
+
+async function updateAdminTabCounts() {}
 
 function showAdminTab(tab) {
   switch (tab) {
@@ -1171,6 +1388,9 @@ function showAdminTab(tab) {
     case 'videos': renderAdminVideos(); break;
     case 'notifications': renderAdminNotifications(); break;
     case 'roles': renderAdminRoles(); break;
+    case 'requests': renderAdminRequests(); break;
+    case 'users': renderAdminUsers(); break;
+    case 'audit': renderAdminAuditLogs(); break;
 
   }
 }
@@ -1180,16 +1400,24 @@ async function renderAdminMembers() {
   try {
     const members = await DB.getMembers();
     let html = `<button class="admin-btn-add" onclick="showAddMemberForm()"><i class="fas fa-plus"></i> إضافة عضو</button>
+      <div class="admin-bulk-bar" id="bulkBar"><span>تم تحديد <strong id="bulkCount">0</strong> عضو</span>
+      <button class="admin-btn admin-btn-delete" onclick="bulkDeleteMembers()"><i class="fas fa-trash"></i> حذف المحدد</button>
+      <button class="admin-btn admin-btn-edit" onclick="clearBulkSelection()" style="background:rgba(255,170,0,0.15);color:var(--accent);border:1px solid rgba(255,170,0,0.2)">إلغاء التحديد</button></div>
+      <div class="admin-table-toolbar">
+        <div class="admin-search-box"><i class="fas fa-search"></i><input type="text" id="adminMemberSearch" placeholder="ابحث عن عضو..." oninput="filterAdminMembers(this.value)"></div>
+      </div>
       <div class="admin-table-wrapper"><table class="admin-table">
-      <thead><tr><th>الصورة</th><th>الاسم</th><th>أيدي</th><th>المستوى</th><th>برايم</th><th>الصلاحية</th><th>Instagram</th><th>الإجراءات</th></tr></thead><tbody>`;
+      <thead><tr><th style="width:40px"><input type="checkbox" class="admin-checkbox" id="selectAllMembers" onchange="toggleAllMembers(this.checked)"></th><th>الصورة</th><th>الاسم</th><th>أيدي</th><th>المستوى</th><th>برايم</th><th>الصلاحية</th><th>الدولة</th><th>Instagram</th><th>الإجراءات</th></tr></thead><tbody id="adminMembersBody">`;
     const roleNames = { leader: 'قائد', vice: 'شريك قائد', chief: 'زعيم' };
     members.forEach(m => {
       const primeHtml = m.prime ? `<span class="prime-star-badge">${'★'.repeat(parseInt(m.prime))}</span>` : '—';
       const roleHtml = m.role ? roleNames[m.role] || m.role : '—';
-      html += `<tr>
+      html += `<tr data-id="${m.id}">
+        <td><input type="checkbox" class="admin-checkbox member-check" value="${m.id}" onchange="updateBulkBar()"></td>
         <td><img src="${m.image || '/images/favicon.png'}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;border:2px solid var(--accent)"></td>
         <td>${escHtml(m.name)}</td><td>${m.gameId || '—'}</td><td>${m.level || '—'}</td>
-        <td>${primeHtml}</td><td>${roleHtml}</td><td>${m.instagram ? '<i class="fab fa-instagram"></i> @' + escHtml(m.instagram) : '—'}</td>
+        <td>${primeHtml}</td><td>${roleHtml}</td><td>${m.country || '—'}</td>
+        <td>${m.instagram ? '<i class="fab fa-instagram"></i> @' + escHtml(m.instagram) : '—'}</td>
         <td class="admin-actions">
           <button class="admin-btn admin-btn-edit" onclick="showAddMemberForm('${m.id}')"><i class="fas fa-edit"></i></button>
           <button class="admin-btn admin-btn-delete" onclick="deleteMember('${m.id}')"><i class="fas fa-trash"></i></button>
@@ -1198,10 +1426,57 @@ async function renderAdminMembers() {
     html += '</tbody></table></div>';
     container.innerHTML = html;
     window.membersData = members;
+    window._filteredMembers = members;
   } catch (err) {
     container.innerHTML = errorState('فشل تحميل الأعضاء');
   }
 }
+
+window.filterAdminMembers = function(query) {
+  const q = query.trim().toLowerCase();
+  const body = $('adminMembersBody');
+  if (!body || !window.membersData) return;
+  const rows = body.querySelectorAll('tr');
+  let visible = 0;
+  rows.forEach(row => {
+    const text = row.textContent.toLowerCase();
+    const match = !q || text.includes(q);
+    row.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+};
+
+window.toggleAllMembers = function(checked) {
+  document.querySelectorAll('.member-check').forEach(cb => cb.checked = checked);
+  updateBulkBar();
+};
+
+window.updateBulkBar = function() {
+  const checked = document.querySelectorAll('.member-check:checked').length;
+  const bar = $('bulkBar');
+  const count = $('bulkCount');
+  if (count) count.textContent = checked;
+  if (bar) bar.classList.toggle('show', checked > 0);
+};
+
+window.clearBulkSelection = function() {
+  document.querySelectorAll('.member-check').forEach(cb => cb.checked = false);
+  updateBulkBar();
+};
+
+window.bulkDeleteMembers = async function() {
+  const checked = document.querySelectorAll('.member-check:checked');
+  if (checked.length === 0) return;
+  if (!confirm(`تأكيد حذف ${checked.length} عضو؟`)) return;
+  const ids = Array.from(checked).map(cb => cb.value);
+  try {
+    await Promise.all(ids.map(id => DB.deleteMember(id)));
+    showToast(`تم حذف ${ids.length} عضو`, 'success');
+    renderAdminMembers();
+  } catch (err) {
+    showToast('فشل الحذف', 'error');
+  }
+};
 
 window.showAddMemberForm = async function(editId) {
   const members = window.membersData || [];
@@ -1209,8 +1484,10 @@ window.showAddMemberForm = async function(editId) {
   let galleryImages = [];
   try { galleryImages = await DB.getGalleryImages(); } catch(e) {}
   const currentImage = edit ? (edit.image || '/images/clan-logo.png') : '/images/clan-logo.png';
+  const rankOptions = ['', 'Rookie','Bronze','Silver','Gold','Platinum','Diamond','Master','Grandmaster','Heroic'];
+  const countryOptions = ['', 'سوريا','العراق','مصر','السعودية','الأردن','لبنان','فلسطين','اليمن','ليبيا','تونس','الجزائر','المغرب','السودان','الكويت','قطر','الإمارات','عمان','البحرين'];
   let html = `
-    <div style="max-width:550px;margin:0 auto">
+    <div style="max-width:700px;margin:0 auto">
       <h3 style="margin-bottom:20px;color:var(--accent);text-align:center">${edit ? 'تعديل عضو' : 'إضافة عضو'}</h3>
       <form onsubmit="saveMember('${editId || ''}');return false">
         <div class="member-avatar-picker">
@@ -1224,10 +1501,19 @@ window.showAddMemberForm = async function(editId) {
           </div>
           <button type="button" class="btn btn-secondary" onclick="openGalleryPicker()" style="margin-top:5px;width:100%"><i class="fas fa-images"></i> اختيار صورة من المعرض</button>
         </div>
-        <div class="form-group"><label>الاسم</label><input type="text" id="memberName" value="${edit ? escHtml(edit.name) : ''}" required></div>
-        <div class="form-group"><label>أيدي اللاعب (Game ID)</label><input type="text" id="memberGameId" value="${edit ? escHtml(edit.gameId || '') : ''}"></div>
-        <div class="form-group"><label>المستوى (Level)</label><input type="number" id="memberLevel" value="${edit ? edit.level || '' : ''}"></div>
-        <div class="form-group"><label>حساب Instagram</label><input type="text" id="memberInstagram" value="${edit ? escHtml(edit.instagram || '') : ''}"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px">
+          <div class="form-group"><label>الاسم</label><input type="text" id="memberName" value="${edit ? escHtml(edit.name) : ''}" required></div>
+          <div class="form-group"><label>أيدي اللاعب (Game ID)</label><input type="text" id="memberGameId" value="${edit ? escHtml(edit.gameId || '') : ''}"></div>
+          <div class="form-group"><label>المستوى (Level)</label><input type="number" id="memberLevel" value="${edit ? edit.level || '' : ''}"></div>
+          <div class="form-group"><label>الرتبة (Rank)</label><select id="memberRank">${rankOptions.map(r => `<option value="${r}" ${edit && edit.rank === r ? 'selected' : ''}>${r || '— اختر —'}</option>`).join('')}</select></div>
+          <div class="form-group"><label>الدولة</label><select id="memberCountry">${countryOptions.map(c => `<option value="${c}" ${edit && edit.country === c ? 'selected' : ''}>${c || '— اختر —'}</option>`).join('')}</select></div>
+          <div class="form-group"><label>العمر</label><input type="number" id="memberAge" value="${edit ? edit.age || '' : ''}"></div>
+          <div class="form-group"><label>السلاح المفضل</label><input type="text" id="memberWeapon" value="${edit ? escHtml(edit.weapon || '') : ''}"></div>
+          <div class="form-group"><label>الانتصارات</label><input type="number" id="memberWins" value="${edit ? edit.wins || '' : ''}"></div>
+          <div class="form-group"><label>تاريخ الانضمام</label><input type="date" id="memberJoinDate" value="${edit ? edit.joinDate || '' : ''}"></div>
+          <div class="form-group"><label>حساب Instagram</label><input type="text" id="memberInstagram" value="${edit ? escHtml(edit.instagram || '') : ''}"></div>
+        </div>
+        <div class="form-group"><label>النبذة (Bio)</label><textarea id="memberBio" rows="2">${edit ? escHtml(edit.bio || '') : ''}</textarea></div>
         <div class="form-group"><label>علامة برايم (1-8)</label>
           <div class="prime-badges" id="primeBadgePicker">
             ${[1,2,3,4,5,6,7,8].map(n => `
@@ -1237,6 +1523,17 @@ window.showAddMemberForm = async function(editId) {
             `).join('')}
           </div>
           <input type="hidden" id="memberPrime" value="${edit ? edit.prime || '' : ''}">
+        </div>
+        <div class="form-group" style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
+          <label><i class="fas fa-images"></i> صور العضو</label>
+          <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:10px">قم برفع صور للعضو (إنجازاته، سكريين شوت، إلخ)</p>
+          <div id="memberImagesZone" class="member-images-drop-zone">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>اسحب الصور هنا أو اضغط لاختيارها</p>
+            <input type="file" accept="image/*" multiple style="display:none">
+          </div>
+          <div id="memberImagesPreview" class="member-images-preview">${edit && edit.images && edit.images.length ? edit.images.map(url => `<div class="preview-image-item"><img src="${url}"><span class="remove-image-btn" onclick="removeMemberImage(this,'${url}')"><i class="fas fa-times"></i></span></div>`).join('') : ''}</div>
+          <input type="hidden" id="memberImages" value='${edit && edit.images ? JSON.stringify(edit.images) : '[]'}'>
         </div>
         <button type="submit" class="btn btn-primary" style="width:100%"><i class="fas fa-save"></i> حفظ</button>
         <button type="button" class="btn btn-secondary" style="width:100%;margin-top:10px" onclick="renderAdminMembers()">إلغاء</button>
@@ -1262,7 +1559,70 @@ window.showAddMemberForm = async function(editId) {
       input.value = '';
     });
   }, 100);
+  // Init member images upload
+  setTimeout(() => {
+    const imagesZone = $('memberImagesZone');
+    if (!imagesZone) return;
+    const imagesInput = imagesZone.querySelector('input[type="file"]');
+    imagesZone.addEventListener('click', () => imagesInput.click());
+    imagesZone.addEventListener('dragover', (e) => { e.preventDefault(); imagesZone.classList.add('drag-over'); });
+    imagesZone.addEventListener('dragleave', () => imagesZone.classList.remove('drag-over'));
+    imagesZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      imagesZone.classList.remove('drag-over');
+      const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+      if (files.length > 0) uploadMemberImages(files);
+      else showToast('يرجى اختيار صور', 'error');
+    });
+    imagesInput.addEventListener('change', () => {
+      const files = Array.from(imagesInput.files);
+      if (files.length > 0) uploadMemberImages(files);
+      imagesInput.value = '';
+    });
+  }, 100);
   window.galleryImagesForPicker = galleryImages;
+};
+
+async function uploadMemberImages(files) {
+  const preview = $('memberImagesPreview');
+  const hidden = $('memberImages');
+  const urls = hidden.value ? JSON.parse(hidden.value) : [];
+  for (const file of files) {
+    // show local preview immediately
+    const reader = new FileReader();
+    const readerPromise = new Promise(resolve => { reader.onload = e => resolve(e.target.result); });
+    reader.readAsDataURL(file);
+    const dataUrl = await readerPromise;
+    const div = document.createElement('div');
+    div.className = 'preview-image-item';
+    div.innerHTML = `<img src="${dataUrl}"><span class="loading-spin"></span>`;
+    preview.appendChild(div);
+    try {
+      const result = await DB.uploadFile(file);
+      urls.push(result.url);
+      div.querySelector('.loading-spin')?.remove();
+      const removeBtn = document.createElement('span');
+      removeBtn.className = 'remove-image-btn';
+      removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+      removeBtn.onclick = function() { removeMemberImage(this, result.url); };
+      div.appendChild(removeBtn);
+      div.querySelector('img').src = result.url;
+    } catch (err) {
+      div.remove();
+      showToast('فشل رفع الصورة', 'error');
+    }
+  }
+  hidden.value = JSON.stringify(urls);
+}
+
+window.removeMemberImage = function(el, url) {
+  const preview = $('memberImagesPreview');
+  const hidden = $('memberImages');
+  const urls = hidden.value ? JSON.parse(hidden.value) : [];
+  const index = urls.indexOf(url);
+  if (index > -1) urls.splice(index, 1);
+  hidden.value = JSON.stringify(urls);
+  el.closest('.preview-image-item').remove();
 };
 
 async function handleMemberImageUpload(file) {
@@ -1335,9 +1695,17 @@ window.saveMember = async function(id) {
     name: $('memberName').value,
     gameId: $('memberGameId').value,
     level: $('memberLevel').value,
+    rank: $('memberRank').value,
+    country: $('memberCountry').value,
+    age: $('memberAge').value,
+    weapon: $('memberWeapon').value,
+    wins: $('memberWins').value,
+    joinDate: $('memberJoinDate').value,
     instagram: $('memberInstagram').value,
+    bio: $('memberBio').value,
     image: $('memberImage').value || '/images/favicon.png',
     prime: $('memberPrime').value || '',
+    images: (() => { try { return JSON.parse($('memberImages').value || '[]'); } catch(e) { return []; } })(),
   };
   try {
     if (id) await DB.updateMember(id, data);
@@ -1426,6 +1794,202 @@ window.saveRole = async function(memberId) {
   }
 };
 
+async function renderAdminRequests() {
+  const container = $('adminContent');
+  try {
+    const [requests, tournaments] = await Promise.all([DB.getRequests(), DB.getTournaments()]);
+    const pending = requests.filter(r => r.status === 'pending');
+    const history = requests.filter(r => r.status !== 'pending');
+    let html = `<h3 style="color:var(--accent);margin-bottom:15px"><i class="fas fa-hand-paper"></i> طلبات الانضمام للبطولات</h3>`;
+    if (pending.length === 0) {
+      html += `<p style="color:var(--text-muted);margin-bottom:20px">لا توجد طلبات معلقة</p>`;
+    } else {
+      html += `<p style="color:var(--text-dim);margin-bottom:15px">طلبات معلقة (${pending.length})</p>`;
+      html += `<div class="admin-table-wrapper"><table class="admin-table"><thead><tr><th>البطولة</th><th>الاسم</th><th>الأيدي</th><th>السبب</th><th>الإجراءات</th></tr></thead><tbody>`;
+      pending.forEach(r => {
+        const tn = tournaments.find(t => t.id === r.tournamentId);
+        html += `<tr>
+          <td>${tn ? escHtml(tn.name) : '—'}</td>
+          <td>${escHtml(r.playerName)}</td>
+          <td>${escHtml(r.playerGameId)}</td>
+          <td style="max-width:200px;font-size:0.85rem;color:var(--text-dim)">${escHtml(r.reason)}</td>
+          <td class="admin-actions">
+            <button class="admin-btn admin-btn-edit" onclick="approveRequest('${r.id}','${r.tournamentId}','${escHtml(r.playerName)}','${escHtml(r.playerGameId)}')"><i class="fas fa-check"></i></button>
+            <button class="admin-btn admin-btn-delete" onclick="rejectRequest('${r.id}')"><i class="fas fa-times"></i></button>
+          </td>
+        </tr>`;
+      });
+      html += '</tbody></table></div>';
+    }
+    if (history.length > 0) {
+      html += `<h4 style="color:var(--text-muted);margin:25px 0 10px">السجل</h4>`;
+      html += `<div class="admin-table-wrapper"><table class="admin-table"><thead><tr><th>البطولة</th><th>الاسم</th><th>الأيدي</th><th>الحالة</th></tr></thead><tbody>`;
+      history.forEach(r => {
+        const tn = tournaments.find(t => t.id === r.tournamentId);
+        html += `<tr>
+          <td>${tn ? escHtml(tn.name) : '—'}</td>
+          <td>${escHtml(r.playerName)}</td>
+          <td>${escHtml(r.playerGameId)}</td>
+          <td>${r.status === 'approved' ? '<span style="color:#4caf50">✔ تمت الموافقة</span>' : '<span style="color:var(--text-muted)">✘ مرفوض</span>'}</td>
+        </tr>`;
+      });
+      html += '</tbody></table></div>';
+    }
+    container.innerHTML = html;
+  } catch (err) {
+    container.innerHTML = errorState('فشل تحميل الطلبات');
+  }
+}
+
+window.approveRequest = async function(requestId, tournamentId, playerName, playerGameId) {
+  try {
+    const tournaments = await DB.getTournaments();
+    const t = tournaments.find(x => x.id === tournamentId);
+    if (!t) { showToast('البطولة غير موجودة', 'error'); return; }
+    const participants = Array.isArray(t.participants) ? t.participants : [];
+    participants.push({ name: playerName, gameId: playerGameId });
+    await DB.updateTournament(tournamentId, { participants });
+    await DB.updateRequest(requestId, { status: 'approved' });
+    showToast('تمت الموافقة على الطلب', 'success');
+    renderAdminRequests();
+  } catch (err) {
+    showToast('فشل الموافقة', 'error');
+  }
+};
+
+window.rejectRequest = async function(requestId) {
+  try {
+    await DB.updateRequest(requestId, { status: 'rejected' });
+    showToast('تم رفض الطلب', 'info');
+    renderAdminRequests();
+  } catch (err) {
+    showToast('فشل الرفض', 'error');
+  }
+};
+
+async function renderAdminUsers() {
+  const container = $('adminContent');
+  try {
+    const token = Auth ? Auth.getToken() : localStorage.getItem('syria4_token');
+    if (!token) { container.innerHTML = '<p style="color:var(--text-muted)">يرجى تسجيل الدخول أولاً</p>'; return; }
+    const res = await fetch('/api/admin/users', { headers: { 'Authorization': `Bearer ${token}` } });
+    if (!res.ok) { container.innerHTML = '<p style="color:var(--text-muted)">غير مصرح لك</p>'; return; }
+    const data = await res.json();
+    const users = data.users || [];
+    const roleNames = { owner: 'مالك', admin: 'مدير', moderator: 'مشرف', leader: 'قائد', vice: 'شريك قائد', chief: 'زعيم', elite: 'نخبة', member: 'عضو', guest: 'زائر' };
+    let html = `<h3 style="color:var(--accent);margin-bottom:15px"><i class="fas fa-user-cog"></i> إدارة المستخدمين (${users.length})</h3>`;
+    html += '<div class="admin-table-wrapper"><table class="admin-table"><thead><tr><th>الصورة</th><th>الاسم</th><th>اسم المستخدم</th><th>البريد</th><th>الرتبة</th><th>الحالة</th><th>توثيق</th><th>الإجراءات</th></tr></thead><tbody>';
+    users.forEach(u => {
+      const statusColor = u.status === 'disabled' ? 'var(--primary)' : '#4caf50';
+      const statusText = u.status === 'disabled' ? 'معطل' : u.status === 'pending' ? 'معلق' : 'نشط';
+      html += `<tr>
+        <td><img src="${u.avatar || '/images/favicon.png'}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;border:2px solid var(--accent)"></td>
+        <td>${escHtml(u.name)}</td>
+        <td>@${escHtml(u.username)}</td>
+        <td style="direction:ltr">${u.email}</td>
+        <td>
+          <select class="admin-role-select" data-user="${u.id}" onchange="adminUpdateUser('${u.id}','role',this.value)">
+            ${Object.entries(roleNames).map(([k,v]) => `<option value="${k}" ${u.role === k ? 'selected' : ''}>${v}</option>`).join('')}
+          </select>
+        </td>
+        <td>
+          <select class="admin-status-select" data-user="${u.id}" onchange="adminUpdateUser('${u.id}','status',this.value)">
+            <option value="active" ${u.status === 'active' ? 'selected' : ''}>نشط</option>
+            <option value="pending" ${u.status === 'pending' ? 'selected' : ''}>معلق</option>
+            <option value="disabled" ${u.status === 'disabled' ? 'selected' : ''}>معطل</option>
+          </select>
+        </td>
+        <td><input type="checkbox" ${u.verified ? 'checked' : ''} onchange="adminUpdateUser('${u.id}','verified',this.checked)"></td>
+        <td class="admin-actions">
+          <button class="admin-btn admin-btn-edit" onclick="adminResetPassword('${u.id}')" title="إعادة تعيين كلمة المرور"><i class="fas fa-key"></i></button>
+          <button class="admin-btn admin-btn-delete" onclick="adminDeleteUser('${u.id}')" title="حذف المستخدم"><i class="fas fa-trash"></i></button>
+        </td>
+      </tr>`;
+    });
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+  } catch (err) {
+    container.innerHTML = errorState('فشل تحميل المستخدمين');
+  }
+}
+
+window.adminUpdateUser = async function(userId, field, value) {
+  const token = Auth ? Auth.getToken() : localStorage.getItem('syria4_token');
+  if (field === 'verified') value = value === true || value === 'true';
+  try {
+    await fetch(`/api/admin/users/${userId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ [field]: value }),
+    });
+    showToast('تم التحديث', 'success');
+  } catch (err) {
+    showToast('فشل التحديث', 'error');
+  }
+};
+
+window.adminResetPassword = async function(userId) {
+  const newPass = prompt('أدخل كلمة المرور الجديدة (6 أحرف على الأقل):');
+  if (!newPass || newPass.length < 6) { showToast('كلمة المرور قصيرة جداً', 'error'); return; }
+  const token = Auth ? Auth.getToken() : localStorage.getItem('syria4_token');
+  try {
+    await fetch(`/api/admin/users/${userId}/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ newPassword: newPass }),
+    });
+    showToast('تم إعادة تعيين كلمة المرور', 'success');
+  } catch (err) {
+    showToast('فشل إعادة التعيين', 'error');
+  }
+};
+
+window.adminDeleteUser = async function(userId) {
+  if (!confirm('تأكيد حذف هذا المستخدم؟')) return;
+  const token = Auth ? Auth.getToken() : localStorage.getItem('syria4_token');
+  try {
+    await fetch(`/api/admin/users/${userId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    showToast('تم الحذف', 'success');
+    renderAdminUsers();
+  } catch (err) {
+    showToast('فشل الحذف', 'error');
+  }
+};
+
+async function renderAdminAuditLogs() {
+  const container = $('adminContent');
+  try {
+    const token = Auth ? Auth.getToken() : localStorage.getItem('syria4_token');
+    if (!token) { container.innerHTML = '<p style="color:var(--text-muted)">يرجى تسجيل الدخول</p>'; return; }
+    const res = await fetch('/api/admin/audit-logs', { headers: { 'Authorization': `Bearer ${token}` } });
+    if (!res.ok) { container.innerHTML = '<p style="color:var(--text-muted)">غير مصرح</p>'; return; }
+    const data = await res.json();
+    const logs = data.logs || [];
+    let html = `<h3 style="color:var(--accent);margin-bottom:15px"><i class="fas fa-history"></i> سجل النشاط (${logs.length})</h3>`;
+    if (logs.length === 0) {
+      html += '<p style="color:var(--text-muted)">لا توجد نشاطات</p>';
+    } else {
+      html += '<div class="admin-table-wrapper"><table class="admin-table"><thead><tr><th>التاريخ</th><th>المستخدم</th><th>الإجراء</th><th>التفاصيل</th><th>IP</th></tr></thead><tbody>';
+      logs.slice(0, 200).forEach(l => {
+        html += `<tr>
+          <td style="font-size:0.85rem">${l.createdAt ? new Date(l.createdAt).toLocaleDateString('ar') : '—'}</td>
+          <td>${l.userId ? l.userId.substring(0,8) + '…' : '—'}</td>
+          <td>${l.action || '—'}</td>
+          <td style="font-size:0.85rem;color:var(--text-dim);max-width:250px">${escHtml(l.details || '')}</td>
+          <td style="direction:ltr;font-size:0.85rem">${l.ip || '—'}</td>
+        </tr>`;
+      });
+      html += '</tbody></table></div>';
+    }
+    container.innerHTML = html;
+  } catch (err) {
+    container.innerHTML = errorState('فشل تحميل سجل النشاط');
+  }
+}
+
 window.deleteMember = async function(id) {
   if (!confirm('تأكيد الحذف؟')) return;
   try {
@@ -1461,21 +2025,77 @@ async function renderAdminTournaments() {
 
 window.showAddTournamentForm = function() {
   const html = `
-    <div style="max-width:500px;margin:0 auto">
+    <div style="max-width:600px;margin:0 auto">
       <h3 style="margin-bottom:20px;color:var(--accent);text-align:center">إضافة بطولة</h3>
       <form onsubmit="saveTournament();return false">
-        <div class="form-group"><label>الاسم</label><input type="text" id="tournamentName" required></div>
-        <div class="form-group"><label>النوع</label>
-          <select id="tournamentType">
-            <option value="previous">سابقة</option>
-            <option value="current">حالية</option>
-            <option value="upcoming">قادمة</option>
-          </select>
+        <div class="form-row-2">
+          <div class="form-group"><label>الاسم *</label><input type="text" id="tournamentName" required></div>
+          <div class="form-group"><label>النوع</label>
+            <select id="tournamentType">
+              <option value="previous">سابقة</option>
+              <option value="current">حالية</option>
+              <option value="upcoming">قادمة</option>
+            </select>
+          </div>
         </div>
         <div class="form-group"><label>الوصف</label><textarea id="tournamentDesc" rows="3"></textarea></div>
-        <div class="form-group"><label>التاريخ</label><input type="date" id="tournamentDate"></div>
-        <div class="form-group"><label>الذهب</label><input type="text" id="tournamentGold"></div>
-        <div class="form-group"><label>الفضة</label><input type="text" id="tournamentSilver"></div>
+        <div class="form-row-2">
+          <div class="form-group"><label>تاريخ البداية</label><input type="date" id="tournamentStartDate"></div>
+          <div class="form-group"><label>تاريخ النهاية</label><input type="date" id="tournamentEndDate"></div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group"><label>عدد اللاعبين</label><input type="number" id="tournamentMaxPlayers" min="1"></div>
+          <div class="form-group"><label>طريقة اللعب</label>
+            <select id="tournamentMode">
+              <option value="">اختر</option>
+              <option value="br">بربرة</option>
+              <option value="headshot">هيد شوت</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group"><label>نوع الخريطة</label>
+            <select id="tournamentMapType">
+              <option value="">اختر</option>
+              <option value="snow">ثلج</option>
+              <option value="normal">عادية</option>
+            </select>
+          </div>
+          <div class="form-group"><label>دائم/غير دائم</label>
+            <select id="tournamentPersistent">
+              <option value="">اختر</option>
+              <option value="permanent">دائم</option>
+              <option value="temporary">غير دائم</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group"><label>نوع الخريطة (رانكد/كلاش)</label>
+            <select id="tournamentMapDesign">
+              <option value="">اختر</option>
+              <option value="ranked">رانكد</option>
+              <option value="clash">كلاش</option>
+              <option value="custom">خريطة مصممة</option>
+            </select>
+          </div>
+          <div class="form-group"><label>عدد الفائزين</label><input type="number" id="tournamentWinners" min="1" max="8"></div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group"><label>نوع الجائزة</label>
+            <select id="tournamentPrizeType">
+              <option value="">اختر</option>
+              <option value="diamonds">جواهر</option>
+              <option value="account">حساب</option>
+              <option value="prime">هدية برايم</option>
+              <option value="cash">نقد</option>
+            </select>
+          </div>
+          <div class="form-group"><label>قيمة الجائزة</label><input type="text" id="tournamentPrizeValue"></div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group"><label>الذهب</label><input type="text" id="tournamentGold"></div>
+          <div class="form-group"><label>الفضة</label><input type="text" id="tournamentSilver"></div>
+        </div>
         <button type="submit" class="btn btn-primary" style="width:100%"><i class="fas fa-save"></i> حفظ</button>
         <button type="button" class="btn btn-secondary" style="width:100%;margin-top:10px" onclick="renderAdminTournaments()">إلغاء</button>
       </form>
@@ -1488,9 +2108,20 @@ window.saveTournament = async function() {
     name: $('tournamentName').value,
     type: $('tournamentType').value,
     description: $('tournamentDesc').value,
-    date: $('tournamentDate').value,
-    gold: $('tournamentGold').value,
-    silver: $('tournamentSilver').value,
+    date: $('tournamentStartDate').value || '',
+    startDate: $('tournamentStartDate').value || '',
+    endDate: $('tournamentEndDate').value || '',
+    maxPlayers: $('tournamentMaxPlayers').value || '',
+    mode: $('tournamentMode').value || '',
+    mapType: $('tournamentMapType').value || '',
+    persistent: $('tournamentPersistent').value || '',
+    mapDesign: $('tournamentMapDesign').value || '',
+    winners: $('tournamentWinners').value || '',
+    prizeType: $('tournamentPrizeType').value || '',
+    prizeValue: $('tournamentPrizeValue').value || '',
+    gold: $('tournamentGold').value || '',
+    silver: $('tournamentSilver').value || '',
+    participants: [],
   };
   try {
     await DB.addTournament(data);

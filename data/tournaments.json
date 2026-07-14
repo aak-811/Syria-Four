@@ -3,9 +3,28 @@
     "id": "737c3790-c716-4004-a02b-cd832e60d836",
     "name": "بطولة كأس عصير",
     "type": "upcoming",
-    "description": "",
+    "description": "بطولة تنافسية بين نخبة لاعبي الكلان",
     "date": "",
+    "startDate": "2026-08-01",
+    "endDate": "2026-08-15",
+    "maxPlayers": "16",
+    "mode": "br",
+    "mapType": "snow",
+    "persistent": "temporary",
+    "mapDesign": "ranked",
+    "winners": "3",
+    "prizeType": "diamonds",
+    "prizeValue": "500",
     "gold": "",
-    "silver": ""
+    "silver": "",
+    "participants": [
+      "أبو أمير",
+      "الزعيم",
+      "المحارب",
+      {
+        "name": "amir",
+        "gameId": "9091923183"
+      }
+    ]
   }
 ]

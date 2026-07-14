@@ -39,7 +39,7 @@ async function runSetup() {
   const collections = [
     'members', 'tournaments', 'events', 'leaderboard',
     'orders', 'support', 'instagram', 'gallery', 'videos',
-    'notifications', 'players'
+    'notifications', 'players', 'users', 'sessions', 'audit_logs', 'requests'
   ];
 
   let totalMigrated = 0;

@@ -1,0 +1,34 @@
+[
+  {
+    "id": "07f9980f-49df-4c75-967f-a2fbaffb6084",
+    "userId": "fe3a34a1-f4ed-4109-916a-e6addc6bf900",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImZlM2EzNGExLWY0ZWQtNDEwOS05MTZhLWU2YWRkYzZiZjkwMCIsImVtYWlsIjoidGVzdDFAdGVzdC5jb20iLCJyb2xlIjoibWVtYmVyIiwidXNlcm5hbWUiOiJ0ZXN0dXNlcjEiLCJpYXQiOjE3ODQwNjM5NjIsImV4cCI6MTc4NDY2ODc2Mn0.QGEqw-FJHdK60YYJqSF1U-OVdgPER2B-eKpyBgVf9TQ",
+    "device": "",
+    "ip": "::ffff:127.0.0.1",
+    "lastActivity": "2026-07-14T21:19:22.741Z"
+  },
+  {
+    "id": "a30544ad-e214-4bbf-89fe-13912695969c",
+    "userId": "fe3a34a1-f4ed-4109-916a-e6addc6bf900",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImZlM2EzNGExLWY0ZWQtNDEwOS05MTZhLWU2YWRkYzZiZjkwMCIsImVtYWlsIjoidGVzdDFAdGVzdC5jb20iLCJyb2xlIjoibWVtYmVyIiwidXNlcm5hbWUiOiJ0ZXN0dXNlcjEiLCJpYXQiOjE3ODQwNjM5NzIsImV4cCI6MTc4NDY2ODc3Mn0.7Gs0_OLpD3EhTFC18lbOEMfpnkbPhi_4EywLsRaFFPc",
+    "device": "",
+    "ip": "::ffff:127.0.0.1",
+    "lastActivity": "2026-07-14T21:19:32.644Z"
+  },
+  {
+    "id": "c6bd0cf4-c9b2-48f8-89ab-4270527bc8f4",
+    "userId": "80f7d253-7c38-4518-b8bb-b1fb3fe368e0",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjgwZjdkMjUzLTdjMzgtNDUxOC1iOGJiLWIxZmIzZmUzNjhlMCIsImVtYWlsIjoiY2hlY2sxNzg0MDY2MzI0MDk2QHRlc3QuY29tIiwicm9sZSI6Im1lbWJlciIsInVzZXJuYW1lIjoiY2hlY2sxNzg0MDY2MzI0MDk1IiwiaWF0IjoxNzg0MDY2MzI0LCJleHAiOjE3ODQ2NzExMjR9.nrb5rLs6JluIWo59Fk6mileUEecQUUH60vVmOxf7ml4",
+    "device": "",
+    "ip": "::ffff:127.0.0.1",
+    "lastActivity": "2026-07-14T21:58:44.646Z"
+  },
+  {
+    "id": "ec0f860e-6811-4b32-9089-c46af58884b3",
+    "userId": "80f7d253-7c38-4518-b8bb-b1fb3fe368e0",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjgwZjdkMjUzLTdjMzgtNDUxOC1iOGJiLWIxZmIzZmUzNjhlMCIsImVtYWlsIjoiY2hlY2sxNzg0MDY2MzI0MDk2QHRlc3QuY29tIiwicm9sZSI6Im1lbWJlciIsInVzZXJuYW1lIjoiY2hlY2sxNzg0MDY2MzI0MDk1IiwiaWF0IjoxNzg0MDY2MzI1LCJleHAiOjE3ODQ2NzExMjV9.aa2tH49DtcRldWxqNRMITayBi3U37dpSiAzj0WexyFs",
+    "device": "",
+    "ip": "::ffff:127.0.0.1",
+    "lastActivity": "2026-07-14T21:58:45.156Z"
+  }
+]

@@ -30,6 +30,7 @@ CREATE TABLE members (
   wins INTEGER DEFAULT 0,
   bio TEXT DEFAULT '',
   "rank" TEXT DEFAULT '',
+  images JSONB DEFAULT '[]',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -39,8 +40,19 @@ CREATE TABLE tournaments (
   type TEXT DEFAULT '',
   description TEXT DEFAULT '',
   date TEXT DEFAULT '',
+  "startDate" TEXT DEFAULT '',
+  "endDate" TEXT DEFAULT '',
+  "maxPlayers" TEXT DEFAULT '',
+  mode TEXT DEFAULT '',
+  "mapType" TEXT DEFAULT '',
+  persistent TEXT DEFAULT '',
+  "mapDesign" TEXT DEFAULT '',
+  winners TEXT DEFAULT '',
+  "prizeType" TEXT DEFAULT '',
+  "prizeValue" TEXT DEFAULT '',
   gold TEXT DEFAULT '',
   silver TEXT DEFAULT '',
+  participants JSONB DEFAULT '[]',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -137,4 +149,71 @@ CREATE TABLE players (
   character JSONB DEFAULT '{}',
   gallery JSONB DEFAULT '[]',
   created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+DROP TABLE IF EXISTS requests CASCADE;
+
+CREATE TABLE requests (
+  id TEXT PRIMARY KEY,
+  "tournamentId" TEXT DEFAULT '',
+  "playerName" TEXT DEFAULT '',
+  "playerGameId" TEXT DEFAULT '',
+  reason TEXT DEFAULT '',
+  status TEXT DEFAULT 'pending',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+DROP TABLE IF EXISTS users CASCADE;
+
+CREATE TABLE users (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL DEFAULT '',
+  username TEXT UNIQUE NOT NULL DEFAULT '',
+  email TEXT UNIQUE NOT NULL DEFAULT '',
+  password TEXT NOT NULL DEFAULT '',
+  role TEXT DEFAULT 'member',
+  status TEXT DEFAULT 'active',
+  verified BOOLEAN DEFAULT false,
+  "verificationToken" TEXT DEFAULT '',
+  avatar TEXT DEFAULT '',
+  cover TEXT DEFAULT '',
+  bio TEXT DEFAULT '',
+  phone TEXT DEFAULT '',
+  country TEXT DEFAULT '',
+  age TEXT DEFAULT '',
+  instagram TEXT DEFAULT '',
+  discord TEXT DEFAULT '',
+  "ffUid" TEXT DEFAULT '',
+  "ffIgn" TEXT DEFAULT '',
+  "ffServer" TEXT DEFAULT '',
+  "ffLevel" TEXT DEFAULT '',
+  "ffRank" TEXT DEFAULT '',
+  weapon TEXT DEFAULT '',
+  "joinDate" TEXT DEFAULT '',
+  "lastLogin" TEXT DEFAULT '',
+  "createdAt" TEXT DEFAULT '',
+  "updatedAt" TEXT DEFAULT ''
+);
+
+DROP TABLE IF EXISTS sessions CASCADE;
+
+CREATE TABLE sessions (
+  id TEXT PRIMARY KEY,
+  "userId" TEXT NOT NULL DEFAULT '',
+  token TEXT DEFAULT '',
+  device TEXT DEFAULT '',
+  ip TEXT DEFAULT '',
+  "lastActivity" TEXT DEFAULT '',
+  "createdAt" TEXT DEFAULT ''
+);
+
+DROP TABLE IF EXISTS audit_logs CASCADE;
+
+CREATE TABLE audit_logs (
+  id TEXT PRIMARY KEY,
+  "userId" TEXT DEFAULT '',
+  action TEXT DEFAULT '',
+  details TEXT DEFAULT '',
+  ip TEXT DEFAULT '',
+  "createdAt" TEXT DEFAULT ''
 );

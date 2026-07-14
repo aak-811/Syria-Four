@@ -79,6 +79,12 @@ const DB = {
   deletePlayer(slug) { return this.delete(`${API_BASE}/players/${slug}`); },
   getPlayerBySlug(slug) { return this.get(`${API_BASE}/players/slug/${slug}`); },
 
+  getRequests() { return this.get(`${API_BASE}/requests`); },
+  addRequest(data) { return this.post(`${API_BASE}/requests`, data); },
+  updateRequest(id, data) { return this.put(`${API_BASE}/requests/${id}`, data); },
+  deleteRequest(id) { return this.delete(`${API_BASE}/requests/${id}`); },
+  updateTournament(id, data) { return this.put(`${API_BASE}/tournaments/${id}`, data); },
+
   uploadFile(file) {
     const formData = new FormData();
     formData.append('file', file);

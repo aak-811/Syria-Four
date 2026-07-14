@@ -123,7 +123,85 @@ const fileDB = {
   },
 };
 
-// --- Supabase setup (via pg for schema check) ---
+// --- Auth/User methods for fileDB ---
+fileDB.createUser = function(data) {
+  const users = readCollection('users');
+  const existingEmail = users.find(u => u.email === data.email);
+  if (existingEmail) throw new Error('البريد الإلكتروني مستخدم بالفعل');
+  const existingUsername = users.find(u => u.username === data.username);
+  if (existingUsername) throw new Error('اسم المستخدم مستخدم بالفعل');
+  const newUser = { id: uuidv4(), ...data, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+  users.push(newUser);
+  writeCollection('users', users);
+  return newUser;
+};
+fileDB.getUserByEmail = function(email) {
+  return readCollection('users').find(u => u.email === email) || null;
+};
+fileDB.getUserByUsername = function(username) {
+  return readCollection('users').find(u => u.username === username) || null;
+};
+fileDB.getUserById = function(id) {
+  return readCollection('users').find(u => u.id === id) || null;
+};
+fileDB.updateUser = function(id, updates) {
+  const users = readCollection('users');
+  const idx = users.findIndex(u => u.id === id);
+  if (idx === -1) return null;
+  if (updates.email && updates.email !== users[idx].email) {
+    const dup = users.find(u => u.email === updates.email && u.id !== id);
+    if (dup) throw new Error('البريد الإلكتروني مستخدم بالفعل');
+  }
+  if (updates.username && updates.username !== users[idx].username) {
+    const dup = users.find(u => u.username === updates.username && u.id !== id);
+    if (dup) throw new Error('اسم المستخدم مستخدم بالفعل');
+  }
+  users[idx] = { ...users[idx], ...updates, updatedAt: new Date().toISOString() };
+  writeCollection('users', users);
+  return users[idx];
+};
+fileDB.deleteUser = function(id) {
+  const users = readCollection('users');
+  const idx = users.findIndex(u => u.id === id);
+  if (idx === -1) return false;
+  users.splice(idx, 1);
+  writeCollection('users', users);
+  return true;
+};
+fileDB.getAllUsers = function() {
+  return readCollection('users');
+};
+
+// Sessions
+fileDB.createSession = function(data) {
+  return fileDB.add('sessions', data);
+};
+fileDB.getUserSessions = function(userId) {
+  return readCollection('sessions').filter(s => s.userId === userId);
+};
+fileDB.getSessionByToken = function(token) {
+  return readCollection('sessions').find(s => s.token === token) || null;
+};
+fileDB.deleteSession = function(id) {
+  return fileDB.delete('sessions', id);
+};
+fileDB.deleteUserSessions = function(userId, excludeId) {
+  const sessions = readCollection('sessions');
+  const filtered = sessions.filter(s => s.userId === userId && s.id !== excludeId);
+  writeCollection('sessions', filtered);
+  return true;
+};
+
+// Audit Log
+fileDB.addAuditLog = function(data) {
+  return fileDB.add('audit_logs', data);
+};
+fileDB.getAuditLogs = function(userId) {
+  const logs = readCollection('audit_logs');
+  if (userId) return logs.filter(l => l.userId === userId).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+  return logs.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+};
+
 
 let supabaseClient = null;
 let pgPool = null;
@@ -173,7 +251,7 @@ function sbCol(tableName) {
 }
 
 const sb = {};
-['members','tournaments','events','leaderboard','orders','support','instagram','gallery','videos','notifications','players'].forEach(c => { sb[c] = sbCol(c); });
+['members','tournaments','events','leaderboard','orders','support','instagram','gallery','videos','notifications','players','users','sessions','audit_logs'].forEach(c => { sb[c] = sbCol(c); });
 
 const supabaseDB = {
   getAll(c) { return sb[c].getAll(); },
@@ -240,6 +318,26 @@ const supabaseDB = {
       if (r.error) throw r.error;
       return true;
     });
+  },
+
+  // Auth/User methods for supabase
+  createUser(data) { return sb.users.add(data); },
+  getUserByEmail(email) { return supabaseClient.from('users').select('*').eq('email', email).single().then(r => { if (r.error && r.error.code !== 'PGRST116') throw r.error; return r.data || null; }); },
+  getUserByUsername(username) { return supabaseClient.from('users').select('*').eq('username', username).single().then(r => { if (r.error && r.error.code !== 'PGRST116') throw r.error; return r.data || null; }); },
+  getUserById(id) { return supabaseClient.from('users').select('*').eq('id', id).single().then(r => { if (r.error && r.error.code !== 'PGRST116') throw r.error; return r.data || null; }); },
+  updateUser(id, data) { return sb.users.update(id, data); },
+  deleteUser(id) { return sb.users.delete(id); },
+  getAllUsers() { return supabaseClient.from('users').select('*').order('createdAt', { ascending: false }).then(r => { if (r.error) throw r.error; return r.data || []; }); },
+  createSession(data) { return sb.sessions.add(data); },
+  getUserSessions(userId) { return supabaseClient.from('sessions').select('*').eq('userId', userId).order('lastActivity', { ascending: false }).then(r => { if (r.error) throw r.error; return r.data || []; }); },
+  getSessionByToken(token) { return supabaseClient.from('sessions').select('*').eq('token', token).single().then(r => { if (r.error && r.error.code !== 'PGRST116') throw r.error; return r.data || null; }); },
+  deleteSession(id) { return sb.sessions.delete(id); },
+  deleteUserSessions(userId, excludeId) { return supabaseClient.from('sessions').delete().eq('userId', userId).neq('id', excludeId).then(r => { if (r.error) throw r.error; return true; }); },
+  addAuditLog(data) { return sb.audit_logs.add(data); },
+  getAuditLogs(userId) {
+    let query = supabaseClient.from('audit_logs').select('*').order('createdAt', { ascending: false });
+    if (userId) query = query.eq('userId', userId);
+    return query.then(r => { if (r.error) throw r.error; return r.data || []; });
   },
 };
 
@@ -333,6 +431,24 @@ const DB = {
   getPlayerBySlug: ar(slug => supabaseDB.getPlayerBySlug(slug), slug => fileDB.getPlayerBySlug(slug)),
   updatePlayer: rw((slug, d) => supabaseDB.updatePlayer(slug, d), (slug, d) => fileDB.updatePlayer(slug, d)),
   deletePlayer: rw(slug => supabaseDB.deletePlayer(slug), slug => fileDB.deletePlayer(slug)),
+
+  // Auth/User
+  createUser: rw(d => supabaseDB.createUser(d), d => fileDB.createUser(d)),
+  getUserByEmail: ar(email => supabaseDB.getUserByEmail(email), email => fileDB.getUserByEmail(email)),
+  getUserByUsername: ar(username => supabaseDB.getUserByUsername(username), username => fileDB.getUserByUsername(username)),
+  getUserById: ar(id => supabaseDB.getUserById(id), id => fileDB.getUserById(id)),
+  updateUser: rw((id, d) => supabaseDB.updateUser(id, d), (id, d) => fileDB.updateUser(id, d)),
+  deleteUser: rw(id => supabaseDB.deleteUser(id), id => fileDB.deleteUser(id)),
+  getAllUsers: ar(() => supabaseDB.getAllUsers(), () => fileDB.getAllUsers()),
+
+  createSession: rw(d => supabaseDB.createSession(d), d => fileDB.createSession(d)),
+  getUserSessions: ar(userId => supabaseDB.getUserSessions(userId), userId => fileDB.getUserSessions(userId)),
+  getSessionByToken: ar(token => supabaseDB.getSessionByToken(token), token => fileDB.getSessionByToken(token)),
+  deleteSession: rw(id => supabaseDB.deleteSession(id), id => fileDB.deleteSession(id)),
+  deleteUserSessions: rw((userId, excludeId) => supabaseDB.deleteUserSessions(userId, excludeId), (userId, excludeId) => fileDB.deleteUserSessions(userId, excludeId)),
+
+  addAuditLog: rw(d => supabaseDB.addAuditLog(d), d => fileDB.addAuditLog(d)),
+  getAuditLogs: ar(userId => supabaseDB.getAuditLogs(userId), userId => fileDB.getAuditLogs(userId)),
 };
 
 module.exports = DB;
