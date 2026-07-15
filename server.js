@@ -23,36 +23,34 @@ app.post('/api/admin-login', (req, res) => {
   return res.status(401).json({ error: 'كلمة المرور خاطئة' });
 });
 
-// Serve admin dashboard (Next.js static export) at /admin/
+// Serve Next.js dashboard (static export) at root /
 const dashboardPath = path.join(__dirname, 'admin-dashboard', 'out');
 
-// Serve dashboard static assets (JS, CSS, images) - MUST be before /admin handler
-app.use('/admin/_next', express.static(path.join(dashboardPath, '_next')));
+// Serve dashboard static assets (_next) first
+app.use('/_next', express.static(path.join(dashboardPath, '_next')));
 
-// Serve exact dashboard page HTML files and other static files
-app.use('/admin', (req, res, next) => {
+// Serve dashboard page HTML files for all routes (must be after API routes)
+function serveDashboard(req, res, next) {
   if (req.method !== 'GET') return next();
-  
+
+  if (req.path === '/' || req.path === '') {
+    return res.sendFile(path.join(dashboardPath, 'index.html'));
+  }
+
   let filePath = req.path;
-  
-  // Remove trailing slash (if any)
   if (filePath.endsWith('/') && filePath !== '/') filePath = filePath.slice(0, -1);
-  
-  // Try to serve the actual page HTML: /admin/members -> out/members/index.html
+
   if (filePath && filePath !== '/') {
     const pagePath = path.join(dashboardPath, filePath.slice(1), 'index.html');
     if (fs.existsSync(pagePath)) {
       return res.sendFile(pagePath);
     }
   }
-  
-  // Fallback to root index.html (SPA client-side routing)
+
   res.sendFile(path.join(dashboardPath, 'index.html'));
-});
+}
 
-// Serve main clan site at root /
-app.use(express.static(path.join(__dirname, 'clan-site'), { extensions: ['html'] }));
-
+// Upload storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, path.join(__dirname, 'clan-site', 'uploads'));
@@ -280,7 +278,6 @@ app.put('/api/auth/profile', authMiddleware, async (req, res) => {
     for (const key of allowed) {
       if (req.body[key] !== undefined) updates[key] = req.body[key];
     }
-    // Check username uniqueness
     if (updates.username) {
       const existing = await DB.getUserByUsername(updates.username);
       if (existing && existing.id !== req.user.id) return res.status(409).json({ error: 'اسم المستخدم مستخدم بالفعل' });
@@ -464,10 +461,8 @@ app.put('/api/notifications/read-all', authMiddleware, async (req, res) => {
   }
 });
 
-// Catch-all: serve clan site index for SPA-like behavior
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'clan-site', 'index.html'));
-});
+// Dashboard SPA catch-all (must be last, after all API routes)
+app.use(serveDashboard);
 
 app.listen(PORT, () => {
   console.log(`SYRIA FOUR server running on http://localhost:${PORT}`);

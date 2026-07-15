@@ -4,20 +4,29 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import {
-  LayoutDashboard, Users, Plus, Bell, Settings,
-} from "lucide-react";
+import { LayoutDashboard, Users, Crown, Swords, Image, ShoppingCart, HeadphonesIcon, Hand, Bell, Settings, Plus } from "lucide-react";
 
-const items = [
+type NavItem = { label: string; icon: any; href: string; fab?: boolean };
+
+const publicItems: NavItem[] = [
   { label: "الرئيسية", icon: LayoutDashboard, href: "/" },
   { label: "الأعضاء", icon: Users, href: "/members" },
+  { label: "القيادات", icon: Crown, href: "/leaders" },
+  { label: "البطولات", icon: Swords, href: "/tournaments" },
+];
+
+const adminItems: NavItem[] = [
+  { label: "الرئيسية", icon: LayoutDashboard, href: "/admin" },
+  { label: "الأعضاء", icon: Users, href: "/admin/members" },
   { label: "إضافة", icon: Plus, href: "#", fab: true },
-  { label: "التنبيهات", icon: Bell, href: "/notifications" },
-  { label: "الإعدادات", icon: Settings, href: "/settings" },
+  { label: "الإشعارات", icon: Bell, href: "/admin/notifications" },
+  { label: "الإعدادات", icon: Settings, href: "/admin/settings" },
 ];
 
 export default function MobileNav() {
   const pathname = usePathname();
+  const isAdmin = pathname.startsWith("/admin");
+  const items = isAdmin ? adminItems : publicItems;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">

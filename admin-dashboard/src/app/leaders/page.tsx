@@ -1,12 +1,12 @@
 "use client";
 
-import DashboardLayout from "@/components/layout/DashboardLayout";
-import LeadersPage from "@/components/leaders/LeadersPage";
+import PublicLayout from "@/components/layout/PublicLayout";
+import PublicLeadersPage from "@/components/public/PublicLeadersPage";
 
-export default function Leaders() {
+export default function LeadersPage() {
   return (
-    <DashboardLayout>
-      <LeadersPage />
-    </DashboardLayout>
+    <PublicLayout>
+      <PublicLeadersPage />
+    </PublicLayout>
   );
 }

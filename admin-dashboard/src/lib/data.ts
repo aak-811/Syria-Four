@@ -1,20 +1,32 @@
-export const SIDEBAR_ITEMS = [
-  { label: "لوحة التحكم", icon: "LayoutDashboard", href: "/" },
-  { label: "الأعضاء", icon: "Users", href: "/members" },
+export const ADMIN_SIDEBAR_ITEMS = [
+  { label: "لوحة التحكم", icon: "LayoutDashboard", href: "/admin" },
+  { label: "الأعضاء", icon: "Users", href: "/admin/members" },
+  { label: "القيادات", icon: "Crown", href: "/admin/leaders" },
+  { label: "البطولات", icon: "Swords", href: "/admin/tournaments" },
+  { label: "الفعاليات", icon: "Calendar", href: "/admin/events" },
+  { label: "الترتيب", icon: "Medal", href: "/admin/leaderboard" },
+  { label: "الطلبات", icon: "ShoppingCart", href: "/admin/orders" },
+  { label: "الدعم", icon: "HeadphonesIcon", href: "/admin/support" },
+  { label: "إنستغرام", icon: "Instagram", href: "/admin/instagram" },
+  { label: "المعرض", icon: "Image", href: "/admin/gallery" },
+  { label: "الفيديوهات", icon: "Video", href: "/admin/videos" },
+  { label: "الإشعارات", icon: "Bell", href: "/admin/notifications" },
+  { label: "طلبات الانضمام", icon: "Hand", href: "/admin/requests" },
+  { label: "المستخدمين", icon: "UserCog", href: "/admin/users" },
+  { label: "سجل النشاطات", icon: "History", href: "/admin/audit" },
+  { label: "الإعدادات", icon: "Settings", href: "/admin/settings" },
+];
+
+export const PUBLIC_SIDEBAR_ITEMS = [
+  { label: "الرئيسية", icon: "LayoutDashboard", href: "/" },
   { label: "القيادات", icon: "Crown", href: "/leaders" },
+  { label: "الأعضاء", icon: "Users", href: "/members" },
   { label: "البطولات", icon: "Swords", href: "/tournaments" },
   { label: "الفعاليات", icon: "Calendar", href: "/events" },
-  { label: "الترتيب", icon: "Medal", href: "/leaderboard" },
-  { label: "الطلبات", icon: "ShoppingCart", href: "/orders" },
-  { label: "الدعم", icon: "HeadphonesIcon", href: "/support" },
-  { label: "إنستغرام", icon: "Instagram", href: "/instagram" },
   { label: "المعرض", icon: "Image", href: "/gallery" },
-  { label: "الفيديوهات", icon: "Video", href: "/videos" },
-  { label: "الإشعارات", icon: "Bell", href: "/notifications" },
-  { label: "طلبات الانضمام", icon: "Hand", href: "/requests" },
-  { label: "المستخدمين", icon: "UserCog", href: "/users" },
-  { label: "سجل النشاطات", icon: "History", href: "/audit" },
-  { label: "الإعدادات", icon: "Settings", href: "/settings" },
+  { label: "الشحن", icon: "ShoppingCart", href: "/shop" },
+  { label: "القوانين", icon: "Hand", href: "/rules" },
+  { label: "الدعم", icon: "HeadphonesIcon", href: "/support" },
 ];
 
 export const MOBILE_NAV_ITEMS = [

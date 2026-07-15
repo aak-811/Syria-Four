@@ -1,12 +1,12 @@
 "use client";
 
-import DashboardLayout from "@/components/layout/DashboardLayout";
-import SupportPage from "@/components/support/SupportPage";
+import PublicLayout from "@/components/layout/PublicLayout";
+import PublicSupportPage from "@/components/public/PublicSupportPage";
 
-export default function Support() {
+export default function SupportPage() {
   return (
-    <DashboardLayout>
-      <SupportPage />
-    </DashboardLayout>
+    <PublicLayout>
+      <PublicSupportPage />
+    </PublicLayout>
   );
 }

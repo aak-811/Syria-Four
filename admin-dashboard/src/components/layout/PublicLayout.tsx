@@ -1,32 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import MobileNav from "./MobileNav";
 import { X } from "lucide-react";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function PublicLayout({ children }: { children: React.ReactNode }) {
   const [mobileSidebar, setMobileSidebar] = useState(false);
-  const [checking, setChecking] = useState(true);
-  const router = useRouter();
-
-  useEffect(() => {
-    const authed = localStorage.getItem("dashboard_auth") === "true";
-    if (!authed) router.replace("/admin/login");
-    else setChecking(false);
-  }, [router]);
-
-  if (checking) return null;
 
   return (
     <div className="min-h-screen bg-[#0A0A0A]">
-      {/* Desktop Sidebar */}
       <Sidebar />
-
-      {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
         {mobileSidebar && (
           <motion.div
@@ -59,11 +45,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Topbar */}
       <Topbar onToggleSidebar={() => setMobileSidebar(true)} />
-
-      {/* Main Content */}
       <main className="pt-[70px] pb-24 lg:pb-8 px-4 md:px-8 lg:ml-0 transition-all duration-300"
         style={{ marginRight: "var(--sidebar-width, 260px)" }}
       >
@@ -71,8 +53,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {children}
         </div>
       </main>
-
-      {/* Mobile Bottom Nav */}
       <MobileNav />
     </div>
   );

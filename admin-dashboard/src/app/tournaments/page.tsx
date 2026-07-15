@@ -1,12 +1,12 @@
 "use client";
 
-import DashboardLayout from "@/components/layout/DashboardLayout";
-import TournamentsPage from "@/components/tournaments/TournamentsPage";
+import PublicLayout from "@/components/layout/PublicLayout";
+import PublicTournamentsPage from "@/components/public/PublicTournamentsPage";
 
-export default function Tournaments() {
+export default function TournamentsPage() {
   return (
-    <DashboardLayout>
-      <TournamentsPage />
-    </DashboardLayout>
+    <PublicLayout>
+      <PublicTournamentsPage />
+    </PublicLayout>
   );
 }

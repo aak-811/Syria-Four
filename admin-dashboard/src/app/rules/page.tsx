@@ -1,12 +1,12 @@
 "use client";
 
 import PublicLayout from "@/components/layout/PublicLayout";
-import PublicHomePage from "@/components/public/PublicHomePage";
+import PublicRulesPage from "@/components/public/PublicRulesPage";
 
-export default function HomePage() {
+export default function RulesPage() {
   return (
     <PublicLayout>
-      <PublicHomePage />
+      <PublicRulesPage />
     </PublicLayout>
   );
 }

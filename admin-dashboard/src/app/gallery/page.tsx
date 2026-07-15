@@ -1,12 +1,12 @@
 "use client";
 
-import DashboardLayout from "@/components/layout/DashboardLayout";
-import GalleryPage from "@/components/gallery/GalleryPage";
+import PublicLayout from "@/components/layout/PublicLayout";
+import PublicGalleryPage from "@/components/public/PublicGalleryPage";
 
-export default function Gallery() {
+export default function GalleryPage() {
   return (
-    <DashboardLayout>
-      <GalleryPage />
-    </DashboardLayout>
+    <PublicLayout>
+      <PublicGalleryPage />
+    </PublicLayout>
   );
 }

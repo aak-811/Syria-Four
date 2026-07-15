@@ -63,6 +63,8 @@ export const api = {
 
   // Support
   getSupport: () => request<any[]>("/api/support"),
+  addSupportRequest: (data: any) =>
+    request<any>("/api/support", { method: "POST", body: JSON.stringify(data) }),
   updateSupport: (id: string, data: any) =>
     request<any>(`/api/support/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   deleteSupport: (id: string) =>

@@ -1,12 +1,12 @@
 "use client";
 
-import DashboardLayout from "@/components/layout/DashboardLayout";
-import MembersPage from "@/components/members/MembersPage";
+import PublicLayout from "@/components/layout/PublicLayout";
+import PublicMembersPage from "@/components/public/PublicMembersPage";
 
-export default function Members() {
+export default function MembersPage() {
   return (
-    <DashboardLayout>
-      <MembersPage />
-    </DashboardLayout>
+    <PublicLayout>
+      <PublicMembersPage />
+    </PublicLayout>
   );
 }

@@ -1,29 +1,12 @@
 [
   {
-    "id": "ac8bda92-f323-4bac-9a9c-11d55d8817d1",
-    "name": "ابو امير",
-    "gameId": "684588859",
-    "level": 80,
-    "rank": "Bronze",
-    "role": "member",
-    "country": "سوريا",
-    "age": 20,
-    "weapon": "",
-    "wins": 268,
-    "joinDate": "2026-07-15",
-    "instagram": "aak.811",
-    "bio": "",
-    "image": "",
-    "prime": 8
-  },
-  {
-    "id": "ac1bc6b0-b241-4d97-9ca4-0f832780aeaa",
-    "name": "rdxtrcjk",
-    "gameId": "577658576579568",
-    "level": 75,
+    "id": "37919ad3-d804-43fc-8c86-10e41ee6007d",
+    "name": "رثيصلص ",
+    "gameId": "ثر ",
+    "level": 1,
     "rank": "",
     "role": "member",
-    "country": "سوريا",
+    "country": "",
     "age": 0,
     "weapon": "",
     "wins": 0,
@@ -32,22 +15,5 @@
     "bio": "",
     "image": "",
     "prime": 1
-  },
-  {
-    "id": "7360f260-5267-4550-b496-fdfa3ebb9f76",
-    "name": "لسي",
-    "gameId": "سل",
-    "level": 17,
-    "rank": "بلاتين",
-    "role": "member",
-    "country": "مصر",
-    "age": 32,
-    "weapon": "قل",
-    "wins": 24,
-    "joinDate": "2026-07-15",
-    "instagram": "",
-    "bio": "",
-    "image": "",
-    "prime": 8
   }
 ]
