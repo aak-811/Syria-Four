@@ -9,7 +9,6 @@ export const ADMIN_SIDEBAR_ITEMS = [
   { label: "الدعم", icon: "HeadphonesIcon", href: "/admin/support" },
   { label: "إنستغرام", icon: "Instagram", href: "/admin/instagram" },
   { label: "المعرض", icon: "Image", href: "/admin/gallery" },
-  { label: "الفيديوهات", icon: "Video", href: "/admin/videos" },
   { label: "الإشعارات", icon: "Bell", href: "/admin/notifications" },
   { label: "طلبات الانضمام", icon: "Hand", href: "/admin/requests" },
   { label: "المستخدمين", icon: "UserCog", href: "/admin/users" },

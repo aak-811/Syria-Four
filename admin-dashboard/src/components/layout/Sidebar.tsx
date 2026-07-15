@@ -8,7 +8,7 @@ import { ADMIN_SIDEBAR_ITEMS, PUBLIC_SIDEBAR_ITEMS } from "@/lib/data";
 import { useAuth } from "@/lib/auth-context";
 import {
   LayoutDashboard, Users, Crown, Swords, Calendar, Medal, ShoppingCart,
-  HeadphonesIcon, Camera, Image, Video, Bell, Hand, UserCog, History, Settings, LogOut,
+  HeadphonesIcon, Camera, Image, Bell, Hand, UserCog, History, Settings, LogOut,
   Shield,
 } from "lucide-react";
 
@@ -23,7 +23,6 @@ const iconMap: Record<string, React.ReactNode> = {
   HeadphonesIcon: <HeadphonesIcon size={20} />,
   Instagram: <Camera size={20} />,
   Image: <Image size={20} />,
-  Video: <Video size={20} />,
   Bell: <Bell size={20} />,
   Hand: <Hand size={20} />,
   UserCog: <UserCog size={20} />,
