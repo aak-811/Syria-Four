@@ -12,6 +12,36 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+// Admin login redirect
+app.post('/api/admin-login', (req, res) => {
+  const { password } = req.body;
+  if (password === 'syria2026' || password === 'aak1qusai7' || password === 'Za3im1syria') {
+    return res.json({ redirect: '/dashboard/' });
+  }
+  return res.status(401).json({ error: 'كلمة المرور خاطئة' });
+});
+
+// Serve admin dashboard (Next.js static export)
+const dashboardPath = path.join(__dirname, 'admin-dashboard', 'out');
+
+// Direct route handler as primary method
+app.get('/dashboard/', (req, res) => {
+  res.sendFile(path.join(dashboardPath, 'index.html'));
+});
+
+// Static fallback for sub-routes
+app.use('/dashboard', (req, res, next) => {
+  if (req.path === '/' && !req.originalUrl.endsWith('/')) {
+    return res.redirect('/dashboard/');
+  }
+  next();
+}, express.static(dashboardPath, {
+  extensions: ['html'],
+  redirect: true
+}));
+
+// Serve main site static files (must be after /dashboard)
 app.use(express.static(path.join(__dirname, 'clan-site'), { extensions: ['html'] }));
 
 const storage = multer.diskStorage({

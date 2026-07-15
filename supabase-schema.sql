@@ -192,7 +192,8 @@ CREATE TABLE users (
   "joinDate" TEXT DEFAULT '',
   "lastLogin" TEXT DEFAULT '',
   "createdAt" TEXT DEFAULT '',
-  "updatedAt" TEXT DEFAULT ''
+  "updatedAt" TEXT DEFAULT '',
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 DROP TABLE IF EXISTS sessions CASCADE;
@@ -204,7 +205,8 @@ CREATE TABLE sessions (
   device TEXT DEFAULT '',
   ip TEXT DEFAULT '',
   "lastActivity" TEXT DEFAULT '',
-  "createdAt" TEXT DEFAULT ''
+  "createdAt" TEXT DEFAULT '',
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 DROP TABLE IF EXISTS audit_logs CASCADE;
@@ -215,5 +217,6 @@ CREATE TABLE audit_logs (
   action TEXT DEFAULT '',
   details TEXT DEFAULT '',
   ip TEXT DEFAULT '',
-  "createdAt" TEXT DEFAULT ''
+  "createdAt" TEXT DEFAULT '',
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );

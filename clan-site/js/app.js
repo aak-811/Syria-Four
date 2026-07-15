@@ -58,34 +58,38 @@ document.addEventListener('DOMContentLoaded', () => {
   finishLoading();
 });
 
-window.checkAdmin = function() {
+window.submitAdminLogin = async function(e) {
+  e.preventDefault();
   const pwd = $('adminPassword').value;
-  if (pwd === adminPassword || pwd === adminPassword2) {
-    $('adminLogin').style.display = 'none';
-    $('adminPanel').style.display = 'block';
-    renderAdminDashboard();
-    updateAdminTabCounts();
-    const active = document.querySelector('.admin-tab.active');
-    if (active) showAdminTab(active.dataset.admin);
-    else showAdminTab('members');
-  } else {
-    showToast('كلمة المرور خاطئة', 'error');
+  try {
+    const res = await fetch('/api/admin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pwd })
+    });
+    const data = await res.json();
+    if (res.ok && data.redirect) {
+      window.location.href = data.redirect;
+    } else {
+      showToast(data.error || 'كلمة المرور خاطئة', 'error');
+    }
+  } catch(err) {
+    // Fallback to client-side check if server is down
+    if (pwd === adminPassword || pwd === adminPassword2 || pwd === chiefPassword) {
+      window.location.href = '/dashboard/';
+    } else {
+      showToast('كلمة المرور خاطئة', 'error');
+    }
   }
+  return false;
+};
+
+window.checkAdmin = function() {
+  submitAdminLogin(new Event('submit'));
 };
 
 window.checkChiefAdmin = function() {
-  const pwd = $('adminPassword').value;
-  if (pwd === chiefPassword) {
-    $('adminLogin').style.display = 'none';
-    $('adminPanel').style.display = 'block';
-    renderAdminDashboard();
-    updateAdminTabCounts();
-    const active = document.querySelector('.admin-tab.active');
-    if (active) showAdminTab(active.dataset.admin);
-    else showAdminTab('members');
-  } else {
-    showToast('كلمة المرور خاطئة', 'error');
-  }
+  submitAdminLogin(new Event('submit'));
 };
 
 function initScrollReveal() {
