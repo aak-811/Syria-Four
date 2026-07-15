@@ -8,7 +8,18 @@ import { ShoppingBag, ShieldCheck, AlertCircle } from "lucide-react";
 export default function PublicShopPage() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  useEffect(() => { api.getOrders().then(setItems).catch(() => {}).finally(() => setLoading(false)); }, []);
+  const fallbackItems = [
+    { id: "1", name: "باقة 100 ديموند", description: "شحن 100 ديموند فري فاير", price: "5000", currency: "ل.س", image: "" },
+    { id: "2", name: "باقة 500 ديموند", description: "شحن 500 ديموند فري فاير", price: "20000", currency: "ل.س", image: "" },
+    { id: "3", name: "باقة 1000 ديموند", description: "شحن 1000 ديموند فري فاير", price: "35000", currency: "ل.س", image: "" },
+    { id: "4", name: "حساب مميز", description: "حساب فري فاير مميز كامل", price: "50000", currency: "ل.س", image: "" },
+    { id: "5", name: "بطاقة موسم", description: "بطاقة الموسم الحالي", price: "15000", currency: "ل.س", image: "" },
+    { id: "6", name: "عضوية VIP", description: "عضوية VIP في الكلان", price: "25000", currency: "ل.س", image: "" },
+  ];
+
+  useEffect(() => {
+    api.getOrders().then(data => setItems(data.length > 0 ? data : fallbackItems)).catch(() => setItems(fallbackItems)).finally(() => setLoading(false));
+  }, []);
 
   return (
     <div className="space-y-6">

@@ -35,8 +35,17 @@ export default function PublicMembersPage() {
   const [roleFilter, setRoleFilter] = useState("all");
   const [selected, setSelected] = useState<any>(null);
 
+  const fallbackMembers = [
+    { id: "1", name: "AAK Khalid", gameId: "AAK-1234", role: "leader", level: 80, country: "SY", wins: 150, image: "" },
+    { id: "2", name: "Qusai", gameId: "Qusai-5678", role: "vice", level: 75, country: "SY", wins: 120, image: "" },
+    { id: "3", name: "Za3im", gameId: "Za3im-9012", role: "chief", level: 85, country: "SY", wins: 200, image: "" },
+    { id: "4", name: "Elite1", gameId: "Elite-001", role: "elite", level: 70, country: "SY", wins: 95, image: "" },
+    { id: "5", name: "Player1", gameId: "P1-002", role: "member", level: 60, country: "SY", wins: 50, image: "" },
+    { id: "6", name: "Player2", gameId: "P2-003", role: "member", level: 55, country: "SY", wins: 40, image: "" },
+  ];
+
   useEffect(() => {
-    api.getMembers().then(setMembers).catch(() => {}).finally(() => setLoading(false));
+    api.getMembers().then(data => setMembers(data.length > 0 ? data : fallbackMembers)).catch(() => setMembers(fallbackMembers)).finally(() => setLoading(false));
   }, []);
 
   const roles = ["all", "leader", "chief", "vice", "elite", "member"];

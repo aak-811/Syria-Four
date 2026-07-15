@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
@@ -12,12 +12,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [mobileSidebar, setMobileSidebar] = useState(false);
   const [checking, setChecking] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const authed = localStorage.getItem("dashboard_auth") === "true";
-    if (!authed) router.replace("/admin/login");
+    if (!authed && pathname !== "/admin/login") router.replace("/admin/login");
     else setChecking(false);
-  }, [router]);
+  }, [router, pathname]);
 
   if (checking) return null;
 

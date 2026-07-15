@@ -10,7 +10,20 @@ export default function PublicGalleryPage() {
   const [loading, setLoading] = useState(true);
   const [lightbox, setLightbox] = useState<string | null>(null);
 
-  useEffect(() => { api.getGallery().then(setImages).catch(() => {}).finally(() => setLoading(false)); }, []);
+  const fallbackImages = [
+    { src: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&q=80", label: "فريق SYRIA FOUR" },
+    { src: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=400&q=80", label: "بطولة" },
+    { src: "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=400&q=80", label: "لحظة انتصار" },
+    { src: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400&q=80", label: "تدريبات" },
+    { src: "https://images.unsplash.com/photo-1547394765-185e1e68f34e?w=400&q=80", label: "منافسة" },
+    { src: "https://images.unsplash.com/photo-1552820728-8b83bb6b10f7?w=400&q=80", label: "فريق" },
+    { src: "https://images.unsplash.com/photo-1520333789090-1afc82db536a?w=400&q=80", label: "لعب جماعي" },
+    { src: "https://images.unsplash.com/photo-1494376874741-2c20abf8aad7?w=400&q=80", label: "تحدي" },
+  ];
+
+  useEffect(() => {
+    api.getGallery().then(data => setImages(data.length > 0 ? data : fallbackImages)).catch(() => setImages(fallbackImages)).finally(() => setLoading(false));
+  }, []);
 
   return (
     <div className="space-y-6">

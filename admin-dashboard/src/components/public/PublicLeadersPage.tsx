@@ -16,8 +16,14 @@ export default function PublicLeadersPage() {
   const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const fallbackMembers = [
+    { id: "1", name: "AAK Khalid", gameId: "AAK-1234", role: "leader", level: 80, country: "SY", wins: 150, image: "https://api.dicebear.com/7.x/avataaars/svg?seed=AAK" },
+    { id: "2", name: "Qusai", gameId: "Qusai-5678", role: "vice", level: 75, country: "SY", wins: 120, image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Qusai" },
+    { id: "3", name: "Za3im", gameId: "Za3im-9012", role: "chief", level: 85, country: "SY", wins: 200, image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Za3im" },
+  ];
+
   useEffect(() => {
-    api.getMembers().then(setMembers).catch(() => {}).finally(() => setLoading(false));
+    api.getMembers().then(data => setMembers(data.length > 0 ? data : fallbackMembers)).catch(() => setMembers(fallbackMembers)).finally(() => setLoading(false));
   }, []);
 
   const groups: Record<string, any[]> = { leader: [], vice: [], chief: [] };

@@ -29,6 +29,10 @@ const dashboardPath = path.join(__dirname, 'admin-dashboard', 'out');
 // Serve dashboard static assets (_next) first
 app.use('/_next', express.static(path.join(dashboardPath, '_next')));
 
+// Serve clan-site images and uploads
+app.use('/images', express.static(path.join(__dirname, 'clan-site', 'images')));
+app.use('/uploads', express.static(path.join(__dirname, 'clan-site', 'uploads')));
+
 // Serve dashboard page HTML files for all routes (must be after API routes)
 function serveDashboard(req, res, next) {
   if (req.method !== 'GET') return next();

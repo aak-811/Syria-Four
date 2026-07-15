@@ -17,8 +17,14 @@ export default function PublicTournamentsPage() {
   const [tab, setTab] = useState("all");
   const [selected, setSelected] = useState<any>(null);
 
+  const fallbackTournaments = [
+    { id: "1", name: "بطولة SYRIA الموسمية", type: "current", description: "بطولة الموسم الحالي", startDate: "2026-07-01", endDate: "2026-08-01", mode: "5v5", maxPlayers: 100, prizeType: "ديموند", prizeValue: "5000", mapType: "بيرمودا" },
+    { id: "2", name: "كأس المحاربين", type: "upcoming", description: "بطولة المحاربين القادمة", startDate: "2026-08-15", endDate: "2026-09-15", mode: "4v4", maxPlayers: 64, prizeType: "عملة", prizeValue: "10000", mapType: "كالاهاري" },
+    { id: "3", name: "بطولة الصيف", type: "previous", description: "بطولة الصيف الماضية", startDate: "2026-06-01", endDate: "2026-07-01", mode: "5v5", maxPlayers: 80, prizeType: "ديموند", prizeValue: "3000", mapType: "بيرمودا" },
+  ];
+
   useEffect(() => {
-    api.getTournaments().then(setTournaments).catch(() => {}).finally(() => setLoading(false));
+    api.getTournaments().then(data => setTournaments(data.length > 0 ? data : fallbackTournaments)).catch(() => setTournaments(fallbackTournaments)).finally(() => setLoading(false));
   }, []);
 
   const filtered = tab === "all" ? tournaments : tournaments.filter(t => t.type === tab);

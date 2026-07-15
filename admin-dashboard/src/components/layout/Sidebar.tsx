@@ -47,8 +47,13 @@ export default function Sidebar() {
   return (
     <aside className="fixed top-0 right-0 h-screen w-[260px] z-40 hidden lg:flex flex-col bg-[#0A0A0A] border-l border-[rgba(255,255,255,0.06)]">
       <div className="flex items-center gap-3 px-6 h-[70px] border-b border-[rgba(255,255,255,0.06)] shrink-0">
-        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#E50914] to-[#FF6B35] flex items-center justify-center">
-          <span className="text-white font-black text-sm">S4</span>
+        <div className="w-9 h-9 rounded-full overflow-hidden bg-gradient-to-br from-[#E50914] to-[#FF6B35] flex items-center justify-center">
+          <img src="/images/clan-logo.png" alt="S4" className="w-full h-full object-cover"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+              (e.target as HTMLImageElement).parentElement!.innerHTML = '<span class="text-white font-black text-sm">S4</span>';
+            }}
+          />
         </div>
         <div>
           <h1 className="text-base font-bold tracking-tight">SYRIA FOUR</h1>
@@ -105,13 +110,23 @@ export default function Sidebar() {
           </Link>
         )}
         {isAdmin && (
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3 rounded-[14px] text-sm font-medium text-[#6B7280] hover:text-[#FF3B30] hover:bg-[rgba(255,59,48,0.1)] transition-all duration-300 w-full"
-          >
-            <LogOut size={20} />
-            <span>تسجيل الخروج</span>
-          </button>
+          <>
+            <Link href="/">
+              <motion.div whileHover={{ x: -4 }} whileTap={{ scale: 0.98 }}
+                className="flex items-center gap-3 px-4 py-3 rounded-[14px] text-sm font-medium text-[#6B7280] hover:text-white hover:bg-[rgba(255,255,255,0.05)] transition-all duration-300"
+              >
+                <Shield size={20} />
+                <span>الموقع العام</span>
+              </motion.div>
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-3 px-4 py-3 rounded-[14px] text-sm font-medium text-[#6B7280] hover:text-[#FF3B30] hover:bg-[rgba(255,59,48,0.1)] transition-all duration-300 w-full"
+            >
+              <LogOut size={20} />
+              <span>تسجيل الخروج</span>
+            </button>
+          </>
         )}
       </div>
     </aside>
