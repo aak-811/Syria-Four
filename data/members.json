@@ -1,36 +1,19 @@
 [
   {
-    "id": "2",
-    "code": "S4",
-    "name": "قصي | QUSAI",
-    "age": "",
-    "level": "83",
-    "gameId": "77777777",
-    "instagram": "qusai7r",
-    "image": "/images/favicon.png",
-    "prime": "8",
-    "role": "leader",
-    "images": []
-  },
-  {
-    "id": "808b477e-902e-4284-a440-7ad26ed5bd9b",
-    "name": "أبو أمير",
-    "gameId": "11111111",
-    "level": "100",
-    "rank": "Heroic",
+    "id": "ac8bda92-f323-4bac-9a9c-11d55d8817d1",
+    "name": "ابو امير",
+    "gameId": "684588859",
+    "level": 80,
+    "rank": "Bronze",
+    "role": "member",
     "country": "سوريا",
-    "age": "21",
-    "weapon": "شدكن",
-    "wins": "402",
-    "joinDate": "2026-08-15",
+    "age": 20,
+    "weapon": "",
+    "wins": 268,
+    "joinDate": "2026-07-15",
     "instagram": "aak.811",
-    "bio": "مصمم الموقع",
-    "image": "/uploads/1784037379135-137092123.jpg",
-    "prime": "8",
-    "images": [
-      "/uploads/1784036378336-133493535.png",
-      "/uploads/1784036385545-73307419.png"
-    ],
-    "role": "vice"
+    "bio": "",
+    "image": "",
+    "prime": 8
   }
 ]

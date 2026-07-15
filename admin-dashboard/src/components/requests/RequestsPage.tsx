@@ -48,7 +48,7 @@ export default function RequestsPage() {
       setRequests(reqs || []);
       setTournaments(tourns || []);
     } catch (err: any) {
-      setError(err.message || "Failed to load requests");
+      setError(err.message || "فشل تحميل الطلبات");
     } finally {
       setLoading(false);
     }
@@ -70,7 +70,7 @@ export default function RequestsPage() {
         prev.map((r) => (r._id === requestId ? { ...r, status: "approved" } : r))
       );
     } catch (err: any) {
-      setError(err.message || "Failed to approve request");
+      setError(err.message || "فشل قبول الطلب");
     } finally {
       setActionLoading(null);
     }
@@ -84,7 +84,7 @@ export default function RequestsPage() {
         prev.map((r) => (r._id === requestId ? { ...r, status: "rejected" } : r))
       );
     } catch (err: any) {
-      setError(err.message || "Failed to reject request");
+      setError(err.message || "فشل رفض الطلب");
     } finally {
       setActionLoading(null);
     }
@@ -96,7 +96,7 @@ export default function RequestsPage() {
       await api.deleteRequest(requestId);
       setRequests((prev) => prev.filter((r) => r._id !== requestId));
     } catch (err: any) {
-      setError(err.message || "Failed to delete request");
+      setError(err.message || "فشل حذف الطلب");
     } finally {
       setActionLoading(null);
     }
@@ -115,7 +115,7 @@ export default function RequestsPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <Loader2 size={40} className="animate-spin text-[#E50914] mx-auto" />
-          <p className="text-[#9CA3AF] text-sm mt-4">Loading requests...</p>
+          <p className="text-[#9CA3AF] text-sm mt-4">جارٍ تحميل الطلبات...</p>
         </div>
       </div>
     );
@@ -127,7 +127,7 @@ export default function RequestsPage() {
         <div className="text-center">
           <AlertCircle size={40} className="text-[#FF3B30] mx-auto" />
           <p className="text-[#FF3B30] text-sm mt-4">{error}</p>
-          <Button variant="ghost" size="sm" className="mt-4" onClick={loadData}>Retry</Button>
+          <Button variant="ghost" size="sm" className="mt-4" onClick={loadData}>إعادة المحاولة</Button>
         </div>
       </div>
     );
@@ -136,23 +136,23 @@ export default function RequestsPage() {
   return (
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-2xl font-black">Join Requests</h1>
-        <p className="text-[#9CA3AF] text-sm mt-1">Manage tournament join requests</p>
+        <h1 className="text-2xl font-black">طلبات الانضمام</h1>
+        <p className="text-[#9CA3AF] text-sm mt-1">إدارة طلبات الانضمام للبطولات</p>
       </motion.div>
 
       {error && (
         <div className="flex items-center gap-3 bg-[rgba(255,59,48,0.1)] border border-[rgba(255,59,48,0.2)] rounded-[14px] px-4 py-3">
           <AlertCircle size={16} className="text-[#FF3B30] shrink-0" />
           <p className="text-sm text-[#FF3B30]">{error}</p>
-          <button onClick={() => setError("")} className="ml-auto text-[#FF3B30] hover:text-white text-xs font-semibold">Dismiss</button>
+          <button onClick={() => setError("")} className="ml-auto text-[#FF3B30] hover:text-white text-xs font-semibold">تجاهل</button>
         </div>
       )}
 
       <GlassCard className="p-2">
         <div className="flex gap-1">
           {[
-            { id: "pending" as const, label: `Pending (${pendingRequests.length})` },
-            { id: "history" as const, label: "History" },
+            { id: "pending" as const, label: `معلقة (${pendingRequests.length})` },
+            { id: "history" as const, label: "السجل" },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -174,8 +174,8 @@ export default function RequestsPage() {
             <GlassCard>
               <div className="text-center py-10">
                 <Inbox size={48} className="text-[#6B7280] mx-auto mb-4" />
-                <p className="text-[#9CA3AF] font-semibold">No pending requests</p>
-                <p className="text-[#6B7280] text-sm mt-1">All caught up!</p>
+                <p className="text-[#9CA3AF] font-semibold">لا توجد طلبات معلقة</p>
+                <p className="text-[#6B7280] text-sm mt-1">كل شيء محدث!</p>
               </div>
             </GlassCard>
           ) : (
@@ -199,18 +199,18 @@ export default function RequestsPage() {
                           <p className="text-xs text-[#6B7280]">ID: {req.playerGameId}</p>
                         </div>
                       </div>
-                      <Badge variant="warning" size="sm">Pending</Badge>
+                      <Badge variant="warning" size="sm">معلق</Badge>
                     </div>
 
                     <div className="space-y-2 mb-4">
                       <div className="flex items-center gap-2 text-sm">
                         <Hash size={14} className="text-[#6B7280]" />
-                        <span className="text-[#9CA3AF]">Tournament:</span>
+                        <span className="text-[#9CA3AF]">البطولة:</span>
                         <span className="font-semibold">{getTournamentTitle(req.tournamentId)}</span>
                       </div>
                       <div className="flex items-start gap-2 text-sm">
                         <FileText size={14} className="text-[#6B7280] mt-0.5" />
-                        <span className="text-[#9CA3AF]">Reason:</span>
+                        <span className="text-[#9CA3AF]">السبب:</span>
                         <span className="text-white">{req.reason}</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
@@ -227,7 +227,7 @@ export default function RequestsPage() {
                         loading={actionLoading === req._id}
                         onClick={() => handleApprove(req._id)}
                       >
-                        <CheckCircle size={14} /> Approve
+                        <CheckCircle size={14} /> قبول
                       </Button>
                       <Button
                         size="sm"
@@ -236,7 +236,7 @@ export default function RequestsPage() {
                         loading={actionLoading === req._id}
                         onClick={() => handleReject(req._id)}
                       >
-                        <XCircle size={14} /> Reject
+                        <XCircle size={14} /> رفض
                       </Button>
                     </div>
                   </GlassCard>
@@ -253,8 +253,8 @@ export default function RequestsPage() {
             <GlassCard>
               <div className="text-center py-10">
                 <Clock size={48} className="text-[#6B7280] mx-auto mb-4" />
-                <p className="text-[#9CA3AF] font-semibold">No history yet</p>
-                <p className="text-[#6B7280] text-sm mt-1">Processed requests will appear here</p>
+                <p className="text-[#9CA3AF] font-semibold">لا يوجد سجل بعد</p>
+                <p className="text-[#6B7280] text-sm mt-1">الطلبات المعالجة ستظهر هنا</p>
               </div>
             </GlassCard>
           ) : (
@@ -280,7 +280,7 @@ export default function RequestsPage() {
                       <div className="flex items-center gap-2">
                         <span className="font-semibold text-sm">{req.playerName}</span>
                         <Badge variant={req.status === "approved" ? "success" : "danger"} size="sm">
-                          {req.status === "approved" ? "Approved" : "Rejected"}
+                          {req.status === "approved" ? "مقبول" : "مرفوض"}
                         </Badge>
                       </div>
                       <p className="text-xs text-[#6B7280] mt-0.5">

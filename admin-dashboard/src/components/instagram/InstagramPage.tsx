@@ -12,8 +12,8 @@ import { AtSign, Plus, Trash2, Edit3, Crown, Shield, AlertCircle } from "lucide-
 import type { InstagramAccount } from "@/types";
 
 const ICON_OPTIONS = [
-  { value: "crown", label: "Crown", icon: Crown },
-  { value: "knight", label: "Knight", icon: Shield },
+  { value: "crown", label: "تاج", icon: Crown },
+  { value: "knight", label: "فارس", icon: Shield },
 ];
 
 export default function InstagramPage() {
@@ -33,7 +33,7 @@ export default function InstagramPage() {
       const data = await api.getInstagram();
       setAccounts(data);
     } catch {
-      setError("Failed to load Instagram accounts");
+      setError("فشل تحميل حسابات إنستغرام");
     } finally {
       setLoading(false);
     }
@@ -63,8 +63,8 @@ export default function InstagramPage() {
 
   const validate = () => {
     const errors: { name?: string; username?: string } = {};
-    if (!form.name.trim()) errors.name = "Name is required";
-    if (!form.username.trim()) errors.username = "Username is required";
+    if (!form.name.trim()) errors.name = "الاسم مطلوب";
+    if (!form.username.trim()) errors.username = "اسم المستخدم مطلوب";
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -90,7 +90,7 @@ export default function InstagramPage() {
       }
       setShowModal(false);
     } catch {
-      setError("Failed to save account");
+      setError("فشل حفظ الحساب");
     }
   };
 
@@ -100,7 +100,7 @@ export default function InstagramPage() {
       setAccounts((prev) => prev.filter((a) => a.id !== id));
       setConfirmDelete(null);
     } catch {
-      setError("Failed to delete account");
+      setError("فشل حذف الحساب");
     }
   };
 
@@ -112,14 +112,14 @@ export default function InstagramPage() {
         className="flex items-center justify-between"
       >
         <div>
-          <h1 className="text-2xl font-black">Instagram</h1>
+          <h1 className="text-2xl font-black">إنستغرام</h1>
           <p className="text-[#9CA3AF] text-sm mt-1">
-            Manage Instagram accounts
+            إدارة حسابات إنستغرام
           </p>
         </div>
         <Button variant="primary" glow onClick={openAdd}>
-          <Plus size={18} /> Add Account
-        </Button>
+              <Plus size={18} /> إضافة حساب
+            </Button>
       </motion.div>
 
       {error && (
@@ -132,7 +132,7 @@ export default function InstagramPage() {
             onClick={fetchAccounts}
             className="ml-auto"
           >
-            Retry
+            إعادة المحاولة
           </Button>
         </GlassCard>
       )}
@@ -147,9 +147,9 @@ export default function InstagramPage() {
         <GlassCard>
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <AtSign size={48} className="text-[#6B7280] mb-4" />
-            <p className="text-lg font-bold mb-1">No accounts linked</p>
+            <p className="text-lg font-bold mb-1">لا توجد حسابات مرتبطة</p>
             <p className="text-sm text-[#9CA3AF]">
-              Add Instagram accounts to display on the website.
+              أضف حسابات إنستغرام لعرضها على الموقع.
             </p>
             <Button
               variant="primary"
@@ -157,7 +157,7 @@ export default function InstagramPage() {
               onClick={openAdd}
               className="mt-4"
             >
-              <Plus size={18} /> Add Account
+          <Plus size={18} /> إضافة حساب
             </Button>
           </div>
         </GlassCard>
@@ -168,16 +168,16 @@ export default function InstagramPage() {
               <thead>
                 <tr className="border-b border-[rgba(255,255,255,0.06)]">
                   <th className="text-left text-xs font-semibold text-[#6B7280] px-6 py-4">
-                    Icon
+                    الأيقونة
                   </th>
                   <th className="text-left text-xs font-semibold text-[#6B7280] px-6 py-4">
-                    Name
+                    الاسم
                   </th>
                   <th className="text-left text-xs font-semibold text-[#6B7280] px-6 py-4">
-                    Username
+                    اسم المستخدم
                   </th>
                   <th className="text-right text-xs font-semibold text-[#6B7280] px-6 py-4">
-                    Actions
+                    الإجراءات
                   </th>
                 </tr>
               </thead>
@@ -246,12 +246,12 @@ export default function InstagramPage() {
       <Modal
         open={showModal}
         onClose={() => setShowModal(false)}
-        title={editing ? "Edit Account" : "Add Account"}
+        title={editing ? "تعديل الحساب" : "إضافة حساب"}
       >
         <div className="space-y-4">
           <Input
-            label="Name"
-            placeholder="e.g. Syria Four"
+            label="الاسم"
+            placeholder="مثال: Syria Four"
             value={form.name}
             onChange={(e) =>
               setForm((prev) => ({ ...prev, name: e.target.value }))
@@ -259,7 +259,7 @@ export default function InstagramPage() {
             error={formErrors.name}
           />
           <Input
-            label="Username"
+            label="اسم المستخدم"
             placeholder="syria_four"
             value={form.username}
             onChange={(e) =>
@@ -272,7 +272,7 @@ export default function InstagramPage() {
           />
           <div>
             <label className="block text-sm font-medium text-[#9CA3AF] mb-2">
-              Icon
+              الأيقونة
             </label>
             <div className="flex gap-2">
               {ICON_OPTIONS.map((opt) => {
@@ -303,14 +303,14 @@ export default function InstagramPage() {
               className="flex-1"
               onClick={() => setShowModal(false)}
             >
-              Cancel
+              إلغاء
             </Button>
             <Button
               variant="primary"
               className="flex-1"
               onClick={handleSubmit}
             >
-              {editing ? "Save Changes" : "Add Account"}
+              {editing ? "حفظ التغييرات" : "إضافة حساب"}
             </Button>
           </div>
         </div>
@@ -319,11 +319,10 @@ export default function InstagramPage() {
       <Modal
         open={!!confirmDelete}
         onClose={() => setConfirmDelete(null)}
-        title="Delete Account"
+        title="حذف الحساب"
       >
         <p className="text-[#9CA3AF] text-sm">
-          Are you sure you want to delete this Instagram account? This action
-          cannot be undone.
+          هل أنت متأكد من حذف حساب إنستغرام هذا؟ لا يمكن التراجع عن هذا الإجراء.
         </p>
         <div className="flex gap-3 mt-6">
           <Button
@@ -331,7 +330,7 @@ export default function InstagramPage() {
             className="flex-1"
             onClick={() => setConfirmDelete(null)}
           >
-            Cancel
+            إلغاء
           </Button>
           <Button
             variant="danger"
@@ -340,7 +339,7 @@ export default function InstagramPage() {
               confirmDelete && deleteAccount(confirmDelete)
             }
           >
-            Delete
+            حذف
           </Button>
         </div>
       </Modal>

@@ -61,7 +61,7 @@ export default function LeadersPage() {
       const data = await api.getMembers();
       setMembers(data);
     } catch {
-      setError("Failed to load leaders");
+      setError("فشل تحميل القيادات");
     } finally {
       setLoading(false);
     }
@@ -88,7 +88,7 @@ export default function LeadersPage() {
       setMembers((prev) => prev.map((m) => (m.id === editingMember.id ? editingMember : m)));
       setEditingMember(null);
     } catch {
-      setError("Failed to save changes");
+      setError("فشل حفظ التغييرات");
     } finally {
       setSaving(false);
     }
@@ -102,7 +102,7 @@ export default function LeadersPage() {
       setMembers((prev) => prev.map((m) => (m.id === confirmDelete.id ? { ...m, role: "" } : m)));
       setConfirmDelete(null);
     } catch {
-      setError("Failed to remove leader");
+      setError("فشل إزالة القائد");
     } finally {
       setSaving(false);
     }
@@ -113,7 +113,7 @@ export default function LeadersPage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center space-y-4">
           <Loader2 size={40} className="animate-spin text-[#E50914] mx-auto" />
-          <p className="text-[#9CA3AF] text-sm">Loading leaders...</p>
+          <p className="text-[#9CA3AF] text-sm">جارٍ تحميل القيادات...</p>
         </div>
       </div>
     );
@@ -124,7 +124,7 @@ export default function LeadersPage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center space-y-4 max-w-md">
           <AlertCircle size={48} className="text-[#FF3B30] mx-auto" />
-          <h3 className="text-xl font-bold">Failed to load</h3>
+          <h3 className="text-xl font-bold">فشل التحميل</h3>
           <p className="text-[#9CA3AF] text-sm">{error}</p>
           <Button variant="primary" onClick={fetchMembers}>
             <RefreshCw size={16} /> Retry
@@ -139,11 +139,11 @@ export default function LeadersPage() {
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black">Leaders</h1>
-          <p className="text-[#9CA3AF] text-sm mt-1">Manage members with leadership roles</p>
+          <h1 className="text-2xl font-black">القيادات</h1>
+          <p className="text-[#9CA3AF] text-sm mt-1">إدارة الأعضاء ذوي الأدوار القيادية</p>
         </div>
         <Button variant="ghost" onClick={fetchMembers}>
-          <RefreshCw size={16} /> Refresh
+          <RefreshCw size={16} /> تحديث
         </Button>
       </motion.div>
 
@@ -167,7 +167,7 @@ export default function LeadersPage() {
           {items.length === 0 ? (
             <GlassCard className="text-center py-8">
               <Users size={32} className="mx-auto text-[#6B7280] mb-2" />
-              <p className="text-sm text-[#6B7280]">No members with this role</p>
+              <p className="text-sm text-[#6B7280]">لا يوجد أعضاء بهذا الدور</p>
             </GlassCard>
           ) : (
             <motion.div
@@ -194,7 +194,7 @@ export default function LeadersPage() {
                       </div>
                       <div className="text-right shrink-0">
                         <p className="text-lg font-black">{member.wins || "0"}</p>
-                        <p className="text-[10px] text-[#6B7280] font-medium">Wins</p>
+                        <p className="text-[10px] text-[#6B7280] font-medium">فوز</p>
                       </div>
                     </div>
 
@@ -210,20 +210,20 @@ export default function LeadersPage() {
                           {member.instagram}
                         </a>
                       ) : (
-                        <span className="text-xs text-[#6B7280]">No Instagram</span>
+                        <span className="text-xs text-[#6B7280]">لا يوجد إنستغرام</span>
                       )}
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => setEditingMember(member)}
                           className="p-2 rounded-[10px] glass text-[#9CA3AF] hover:text-white transition-colors"
-                          title="Edit leader"
+                          title="تعديل القائد"
                         >
                           <Edit3 size={14} />
                         </button>
                         <button
                           onClick={() => setConfirmDelete(member)}
                           className="p-2 rounded-[10px] glass text-[#FF3B30] hover:bg-[rgba(255,59,48,0.15)] transition-colors"
-                          title="Remove leader"
+                          title="إزالة القائد"
                         >
                           <Trash2 size={14} />
                         </button>
@@ -238,47 +238,47 @@ export default function LeadersPage() {
       ))}
 
       {/* Edit Modal */}
-      <Modal open={!!editingMember} onClose={() => setEditingMember(null)} title="Edit Leader">
+      <Modal open={!!editingMember} onClose={() => setEditingMember(null)} title="تعديل القائد">
         {editingMember && (
           <div className="space-y-4">
             <Input
-              label="Name"
+              label="الاسم"
               value={editingMember.name || ""}
               onChange={(e) => setEditingMember({ ...editingMember, name: e.target.value })}
             />
             <Input
-              label="Game ID"
+              label="معرف اللعبة"
               value={editingMember.gameId || ""}
               onChange={(e) => setEditingMember({ ...editingMember, gameId: e.target.value })}
             />
             <Input
-              label="Role"
+              label="الدور"
               value={editingMember.role || ""}
               onChange={(e) => setEditingMember({ ...editingMember, role: e.target.value })}
             />
             <Input
-              label="Instagram"
+              label="إنستغرام"
               value={editingMember.instagram || ""}
               onChange={(e) => setEditingMember({ ...editingMember, instagram: e.target.value })}
             />
             <Input
-              label="Wins"
+              label="فوز"
               type="number"
               value={editingMember.wins || "0"}
               onChange={(e) => setEditingMember({ ...editingMember, wins: e.target.value })}
             />
             <Input
-              label="Image URL"
+              label="رابط الصورة"
               value={editingMember.image || ""}
               onChange={(e) => setEditingMember({ ...editingMember, image: e.target.value })}
             />
             {error && <p className="text-[#FF3B30] text-sm">{error}</p>}
             <div className="flex gap-3 pt-4 border-t border-[rgba(255,255,255,0.06)]">
               <Button variant="ghost" className="flex-1" onClick={() => setEditingMember(null)}>
-                Cancel
+                إلغاء
               </Button>
               <Button variant="primary" className="flex-1" loading={saving} onClick={handleSave}>
-                <Plus size={16} /> Save Changes
+                <Plus size={16} /> حفظ التغييرات
               </Button>
             </div>
           </div>
@@ -286,26 +286,26 @@ export default function LeadersPage() {
       </Modal>
 
       {/* Delete Confirmation */}
-      <Modal open={!!confirmDelete} onClose={() => setConfirmDelete(null)} title="Remove Leader">
+      <Modal open={!!confirmDelete} onClose={() => setConfirmDelete(null)} title="إزالة القائد">
         {confirmDelete && (
           <div>
             <div className="flex items-center gap-4 mb-4">
               <Avatar src={confirmDelete.image || ""} size="lg" />
               <div>
                 <p className="font-bold">{confirmDelete.name}</p>
-                <p className="text-sm text-[#9CA3AF]">Role: {confirmDelete.role}</p>
+                <p className="text-sm text-[#9CA3AF]">الدور: {confirmDelete.role}</p>
               </div>
             </div>
             <p className="text-[#9CA3AF] text-sm">
-              Are you sure you want to remove this member&apos;s leadership role? This will clear their role.
+              هل أنت متأكد من إزالة الدور القيادي لهذا العضو؟ سيؤدي ذلك إلى مسح دوره.
             </p>
             {error && <p className="text-[#FF3B30] text-sm mt-2">{error}</p>}
             <div className="flex gap-3 mt-6">
               <Button variant="ghost" className="flex-1" onClick={() => setConfirmDelete(null)}>
-                Cancel
+                إلغاء
               </Button>
               <Button variant="danger" className="flex-1" loading={saving} onClick={handleDelete}>
-                <UserX size={16} /> Remove Role
+                <UserX size={16} /> إزالة الدور
               </Button>
             </div>
           </div>

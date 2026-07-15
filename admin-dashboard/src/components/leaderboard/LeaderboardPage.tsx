@@ -41,7 +41,7 @@ export default function LeaderboardPage() {
       const data = await api.getLeaderboard();
       setEntries(data);
     } catch {
-      setError("Failed to load leaderboard");
+      setError("فشل تحميل لوحة الترتيب");
     } finally {
       setLoading(false);
     }
@@ -86,7 +86,7 @@ export default function LeaderboardPage() {
       setForm(defaultForm);
       setEditing(null);
     } catch {
-      setError("Failed to save entry");
+      setError("فشل حفظ الإدخال");
     } finally {
       setSaving(false);
     }
@@ -101,7 +101,7 @@ export default function LeaderboardPage() {
       setEntries((prev) => prev.filter((e) => e.id !== confirmDelete.id));
       setConfirmDelete(null);
     } catch {
-      setError("Failed to delete entry");
+      setError("فشل حذف الإدخال");
     } finally {
       setSaving(false);
     }
@@ -112,7 +112,7 @@ export default function LeaderboardPage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center space-y-4">
           <Loader2 size={40} className="animate-spin text-[#E50914] mx-auto" />
-          <p className="text-[#9CA3AF] text-sm">Loading leaderboard...</p>
+          <p className="text-[#9CA3AF] text-sm">جارٍ تحميل لوحة الترتيب...</p>
         </div>
       </div>
     );
@@ -123,10 +123,10 @@ export default function LeaderboardPage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center space-y-4 max-w-md">
           <AlertCircle size={48} className="text-[#FF3B30] mx-auto" />
-          <h3 className="text-xl font-bold">Failed to load</h3>
+          <h3 className="text-xl font-bold">فشل التحميل</h3>
           <p className="text-[#9CA3AF] text-sm">{error}</p>
           <Button variant="primary" onClick={fetchEntries}>
-            <RefreshCw size={16} /> Retry
+            <RefreshCw size={16} /> إعادة المحاولة
           </Button>
         </div>
       </div>
@@ -138,15 +138,15 @@ export default function LeaderboardPage() {
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black">Leaderboard</h1>
-          <p className="text-[#9CA3AF] text-sm mt-1">Manage leaderboard entries sorted by glory</p>
+          <h1 className="text-2xl font-black">الترتيب</h1>
+          <p className="text-[#9CA3AF] text-sm mt-1">إدارة إدخالات لوحة الترتيب مرتبة حسب المجد</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="ghost" onClick={fetchEntries}>
             <RefreshCw size={16} />
           </Button>
           <Button variant="primary" glow onClick={openAdd}>
-            <Plus size={18} /> Add Entry
+            <Plus size={18} /> إضافة إدخال
           </Button>
         </div>
       </motion.div>
@@ -155,10 +155,10 @@ export default function LeaderboardPage() {
       {sorted.length === 0 ? (
         <GlassCard className="text-center py-16">
           <Trophy size={48} className="mx-auto text-[#6B7280] mb-4" />
-          <h3 className="text-lg font-bold mb-1">No entries yet</h3>
-          <p className="text-[#9CA3AF] text-sm mb-6">Add your first leaderboard entry to get started</p>
+          <h3 className="text-lg font-bold mb-1">لا توجد إدخالات بعد</h3>
+          <p className="text-[#9CA3AF] text-sm mb-6">أضف أول إدخال في لوحة الترتيب للبدء</p>
           <Button variant="primary" glow onClick={openAdd}>
-            <Plus size={18} /> Add Entry
+            <Plus size={18} /> إضافة إدخال
           </Button>
         </GlassCard>
       ) : (
@@ -171,10 +171,10 @@ export default function LeaderboardPage() {
                   <thead>
                     <tr className="border-b border-[rgba(255,255,255,0.06)]">
                       <th className="text-left p-4 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">#</th>
-                      <th className="text-left p-4 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Name</th>
-                      <th className="text-right p-4 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Glory</th>
-                      <th className="text-right p-4 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Wars</th>
-                      <th className="text-right p-4 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Actions</th>
+                      <th className="text-left p-4 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">الاسم</th>
+                      <th className="text-right p-4 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">المجد</th>
+                      <th className="text-right p-4 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">الحروب</th>
+                      <th className="text-right p-4 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">الإجراءات</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -216,14 +216,14 @@ export default function LeaderboardPage() {
                             <button
                               onClick={() => openEdit(entry)}
                               className="p-2 rounded-[10px] glass text-[#9CA3AF] hover:text-white transition-colors"
-                              title="Edit"
+                              title="تعديل"
                             >
                               <Edit3 size={14} />
                             </button>
                             <button
                               onClick={() => setConfirmDelete(entry)}
                               className="p-2 rounded-[10px] glass text-[#FF3B30] hover:bg-[rgba(255,59,48,0.15)] transition-colors"
-                              title="Delete"
+                              title="حذف"
                             >
                               <Trash2 size={14} />
                             </button>
@@ -238,29 +238,29 @@ export default function LeaderboardPage() {
           </motion.div>
 
           <p className="text-xs text-[#6B7280] text-right">
-            Showing {sorted.length} entr{sorted.length === 1 ? "y" : "ies"} · Sorted by glory descending
+            عرض {sorted.length} إدخال{sorted.length === 1 ? "" : "ات"} · مرتب حسب المجد تنازلياً
           </p>
         </>
       )}
 
       {/* Add / Edit Modal */}
-      <Modal open={showForm} onClose={() => { setShowForm(false); setError(""); }} title={editing ? "Edit Entry" : "Add Entry"}>
+      <Modal open={showForm} onClose={() => { setShowForm(false); setError(""); }} title={editing ? "تعديل الإدخال" : "إضافة إدخال"}>
         <div className="space-y-4">
           <Input
-            label="Name"
-            placeholder="Player name"
+            label="الاسم"
+            placeholder="اسم اللاعب"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
           <Input
-            label="Glory"
+            label="المجد"
             type="number"
             placeholder="0"
             value={form.glory}
             onChange={(e) => setForm({ ...form, glory: e.target.value })}
           />
           <Input
-            label="Wars"
+            label="الحروب"
             type="number"
             placeholder="0"
             value={form.wars}
@@ -269,30 +269,30 @@ export default function LeaderboardPage() {
           {error && <p className="text-[#FF3B30] text-sm">{error}</p>}
           <div className="flex gap-3 pt-4 border-t border-[rgba(255,255,255,0.06)]">
             <Button variant="ghost" className="flex-1" onClick={() => { setShowForm(false); setError(""); }}>
-              Cancel
+              إلغاء
             </Button>
             <Button variant="primary" className="flex-1" loading={saving} onClick={handleSave}>
               {editing ? <Edit3 size={16} /> : <Plus size={16} />}
-              {editing ? "Save Changes" : "Add Entry"}
+              {editing ? "حفظ التغييرات" : "إضافة إدخال"}
             </Button>
           </div>
         </div>
       </Modal>
 
       {/* Delete Confirmation */}
-      <Modal open={!!confirmDelete} onClose={() => setConfirmDelete(null)} title="Delete Entry">
+      <Modal open={!!confirmDelete} onClose={() => setConfirmDelete(null)} title="حذف الإدخال">
         {confirmDelete && (
           <div>
             <p className="text-[#9CA3AF] text-sm">
-              Are you sure you want to delete <strong className="text-white">{confirmDelete.name}</strong> from the leaderboard? This cannot be undone.
+              هل أنت متأكد من حذف <strong className="text-white">{confirmDelete.name}</strong> من لوحة الترتيب؟ لا يمكن التراجع عن هذا.
             </p>
             {error && <p className="text-[#FF3B30] text-sm mt-2">{error}</p>}
             <div className="flex gap-3 mt-6">
               <Button variant="ghost" className="flex-1" onClick={() => setConfirmDelete(null)}>
-                Cancel
+                إلغاء
               </Button>
               <Button variant="danger" className="flex-1" loading={saving} onClick={handleDelete}>
-                <Trash2 size={16} /> Delete
+                <Trash2 size={16} /> حذف
               </Button>
             </div>
           </div>

@@ -1,35 +1,35 @@
 export const SIDEBAR_ITEMS = [
-  { label: "Dashboard", icon: "LayoutDashboard", href: "/" },
-  { label: "Members", icon: "Users", href: "/members" },
-  { label: "Leaders", icon: "Crown", href: "/leaders" },
-  { label: "Tournaments", icon: "Swords", href: "/tournaments" },
-  { label: "Events", icon: "Calendar", href: "/events" },
-  { label: "Leaderboard", icon: "Medal", href: "/leaderboard" },
-  { label: "Orders", icon: "ShoppingCart", href: "/orders" },
-  { label: "Support", icon: "HeadphonesIcon", href: "/support" },
-  { label: "Instagram", icon: "Instagram", href: "/instagram" },
-  { label: "Gallery", icon: "Image", href: "/gallery" },
-  { label: "Videos", icon: "Video", href: "/videos" },
-  { label: "Notifications", icon: "Bell", href: "/notifications" },
-  { label: "Requests", icon: "Hand", href: "/requests" },
-  { label: "Users", icon: "UserCog", href: "/users" },
-  { label: "Audit Logs", icon: "History", href: "/audit" },
-  { label: "Settings", icon: "Settings", href: "/settings" },
+  { label: "لوحة التحكم", icon: "LayoutDashboard", href: "/" },
+  { label: "الأعضاء", icon: "Users", href: "/members" },
+  { label: "القيادات", icon: "Crown", href: "/leaders" },
+  { label: "البطولات", icon: "Swords", href: "/tournaments" },
+  { label: "الفعاليات", icon: "Calendar", href: "/events" },
+  { label: "الترتيب", icon: "Medal", href: "/leaderboard" },
+  { label: "الطلبات", icon: "ShoppingCart", href: "/orders" },
+  { label: "الدعم", icon: "HeadphonesIcon", href: "/support" },
+  { label: "إنستغرام", icon: "Instagram", href: "/instagram" },
+  { label: "المعرض", icon: "Image", href: "/gallery" },
+  { label: "الفيديوهات", icon: "Video", href: "/videos" },
+  { label: "الإشعارات", icon: "Bell", href: "/notifications" },
+  { label: "طلبات الانضمام", icon: "Hand", href: "/requests" },
+  { label: "المستخدمين", icon: "UserCog", href: "/users" },
+  { label: "سجل النشاطات", icon: "History", href: "/audit" },
+  { label: "الإعدادات", icon: "Settings", href: "/settings" },
 ];
 
 export const MOBILE_NAV_ITEMS = [
-  { label: "Home", icon: "LayoutDashboard", href: "/" },
-  { label: "Members", icon: "Users", href: "/members" },
-  { label: "Add", icon: "Plus", href: "#", fab: true },
-  { label: "Alerts", icon: "Bell", href: "/notifications" },
-  { label: "Settings", icon: "Settings", href: "/settings" },
+  { label: "الرئيسية", icon: "LayoutDashboard", href: "/" },
+  { label: "الأعضاء", icon: "Users", href: "/members" },
+  { label: "إضافة", icon: "Plus", href: "#", fab: true },
+  { label: "التنبيهات", icon: "Bell", href: "/notifications" },
+  { label: "الإعدادات", icon: "Settings", href: "/settings" },
 ];
 
 export const STATS_DATA = [
-  { label: "Total Members", value: "—", change: 0, icon: "Users", color: "#E50914" },
-  { label: "Tournaments", value: "—", change: 0, icon: "Swords", color: "#FFD700" },
-  { label: "Orders", value: "—", change: 0, icon: "ShoppingCart", color: "#00E676" },
-  { label: "Support", value: "—", change: 0, icon: "HeadphonesIcon", color: "#FF3B30" },
+  { label: "إجمالي الأعضاء", value: "—", change: 0, icon: "Users", color: "#E50914" },
+  { label: "البطولات", value: "—", change: 0, icon: "Swords", color: "#FFD700" },
+  { label: "الطلبات", value: "—", change: 0, icon: "ShoppingCart", color: "#00E676" },
+  { label: "الدعم", value: "—", change: 0, icon: "HeadphonesIcon", color: "#FF3B30" },
 ];
 
 export const CHART_DATA = {
@@ -43,9 +43,9 @@ export const CHART_DATA = {
     { month: "Jul", value: 2847 },
   ],
   matches: [
-    { name: "Wins", value: 12489, color: "#00E676" },
-    { name: "Losses", value: 8720, color: "#FF3B30" },
-    { name: "Draws", value: 3450, color: "#FFD700" },
+    { name: "فوز", value: 12489, color: "#00E676" },
+    { name: "خسارة", value: 8720, color: "#FF3B30" },
+    { name: "تعادل", value: 3450, color: "#FFD700" },
   ],
   weekly: [
     { day: "Mon", active: 1200, new: 45 },

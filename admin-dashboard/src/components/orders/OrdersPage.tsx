@@ -24,7 +24,7 @@ export default function OrdersPage() {
       const data = await api.getOrders();
       setOrders(data);
     } catch {
-      setError("Failed to load orders");
+      setError("فشل تحميل الطلبات");
     } finally {
       setLoading(false);
     }
@@ -41,7 +41,7 @@ export default function OrdersPage() {
         prev.map((o) => (o.id === id ? { ...o, status: "done" } : o))
       );
     } catch {
-      setError("Failed to update order");
+      setError("فشل تحديث الطلب");
     }
   };
 
@@ -51,7 +51,7 @@ export default function OrdersPage() {
       setOrders((prev) => prev.filter((o) => o.id !== id));
       setConfirmDelete(null);
     } catch {
-      setError("Failed to delete order");
+      setError("فشل حذف الطلب");
     }
   };
 
@@ -65,14 +65,14 @@ export default function OrdersPage() {
         className="flex items-center justify-between"
       >
         <div>
-          <h1 className="text-2xl font-black">Orders</h1>
+          <h1 className="text-2xl font-black">الطلبات</h1>
           <p className="text-[#9CA3AF] text-sm mt-1">
-            Manage player orders
+            إدارة طلبات اللاعبين
           </p>
         </div>
         <div className="flex items-center gap-3">
           <Badge variant="warning" size="md">
-            {pendingCount} pending
+            {pendingCount} معلق
           </Badge>
         </div>
       </motion.div>
@@ -82,7 +82,7 @@ export default function OrdersPage() {
           <AlertCircle size={18} />
           <span className="text-sm font-medium">{error}</span>
           <Button size="sm" variant="ghost" onClick={fetchOrders} className="ml-auto">
-            Retry
+            إعادة المحاولة
           </Button>
         </GlassCard>
       )}
@@ -97,9 +97,9 @@ export default function OrdersPage() {
         <GlassCard>
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <ShoppingCart size={48} className="text-[#6B7280] mb-4" />
-            <p className="text-lg font-bold mb-1">No orders yet</p>
+            <p className="text-lg font-bold mb-1">لا توجد طلبات بعد</p>
             <p className="text-sm text-[#9CA3AF]">
-              Orders placed by players will appear here.
+              الطلبات التي يقدمها اللاعبون ستظهر هنا.
             </p>
           </div>
         </GlassCard>
@@ -109,11 +109,11 @@ export default function OrdersPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-[rgba(255,255,255,0.06)]">
-                  <th className="text-left text-xs font-semibold text-[#6B7280] px-6 py-4">Player</th>
-                  <th className="text-left text-xs font-semibold text-[#6B7280] px-6 py-4">Package</th>
-                  <th className="text-left text-xs font-semibold text-[#6B7280] px-6 py-4">Status</th>
-                  <th className="text-left text-xs font-semibold text-[#6B7280] px-6 py-4">Date</th>
-                  <th className="text-right text-xs font-semibold text-[#6B7280] px-6 py-4">Actions</th>
+                  <th className="text-left text-xs font-semibold text-[#6B7280] px-6 py-4">اللاعب</th>
+                  <th className="text-left text-xs font-semibold text-[#6B7280] px-6 py-4">الباقة</th>
+                  <th className="text-left text-xs font-semibold text-[#6B7280] px-6 py-4">الحالة</th>
+                  <th className="text-left text-xs font-semibold text-[#6B7280] px-6 py-4">التاريخ</th>
+                  <th className="text-right text-xs font-semibold text-[#6B7280] px-6 py-4">الإجراءات</th>
                 </tr>
               </thead>
               <tbody>
@@ -152,7 +152,7 @@ export default function OrdersPage() {
                             variant="success"
                             onClick={() => markAsDone(order.id)}
                           >
-                            <Check size={14} /> Done
+                            <Check size={14} /> تم
                           </Button>
                         )}
                         <Button
@@ -176,10 +176,10 @@ export default function OrdersPage() {
       <Modal
         open={!!confirmDelete}
         onClose={() => setConfirmDelete(null)}
-        title="Delete Order"
+        title="حذف الطلب"
       >
         <p className="text-[#9CA3AF] text-sm">
-          Are you sure you want to delete this order? This action cannot be undone.
+          هل أنت متأكد من حذف هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء.
         </p>
         <div className="flex gap-3 mt-6">
           <Button
@@ -187,14 +187,14 @@ export default function OrdersPage() {
             className="flex-1"
             onClick={() => setConfirmDelete(null)}
           >
-            Cancel
+            إلغاء
           </Button>
           <Button
             variant="danger"
             className="flex-1"
             onClick={() => confirmDelete && deleteOrder(confirmDelete)}
           >
-            Delete
+            حذف
           </Button>
         </div>
       </Modal>

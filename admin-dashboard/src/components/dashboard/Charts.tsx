@@ -11,9 +11,9 @@ import {
 import { CHART_DATA } from "@/lib/data";
 
 const tabs = [
-  { id: "members", label: "Member Growth" },
-  { id: "weekly", label: "Weekly Stats" },
-  { id: "matches", label: "Match Ratio" },
+  { id: "members", label: "نمو الأعضاء" },
+  { id: "weekly", label: "إحصائيات أسبوعية" },
+  { id: "matches", label: "نسبة المباريات" },
 ];
 
 export default function Charts() {
@@ -38,7 +38,7 @@ export default function Charts() {
   return (
     <GlassCard>
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-bold">Analytics</h3>
+        <h3 className="text-lg font-bold">التحليلات</h3>
         <div className="flex gap-1 glass rounded-[12px] p-1">
           {tabs.map((tab) => (
             <button
@@ -83,8 +83,8 @@ export default function Charts() {
               <XAxis dataKey="day" stroke="#6B7280" fontSize={12} />
               <YAxis stroke="#6B7280" fontSize={12} />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="active" name="Active" fill="#E50914" radius={[6, 6, 0, 0]} />
-              <Bar dataKey="new" name="New" fill="#FFD700" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="active" name="نشط" fill="#E50914" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="new" name="جديد" fill="#FFD700" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         )}

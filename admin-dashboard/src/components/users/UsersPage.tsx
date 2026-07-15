@@ -51,7 +51,7 @@ export default function UsersPage() {
       const data = await api.getMembers();
       setMembers(data || []);
     } catch (err: any) {
-      setError(err.message || "Failed to load users");
+      setError(err.message || "فشل تحميل المستخدمين");
     } finally {
       setLoading(false);
     }
@@ -72,7 +72,7 @@ export default function UsersPage() {
         return copy;
       });
     } catch (err: any) {
-      setError(err.message || "Failed to update role");
+      setError(err.message || "فشل تحديث الدور");
     } finally {
       setSaving(null);
     }
@@ -85,7 +85,7 @@ export default function UsersPage() {
       setMembers((prev) => prev.filter((m) => m._id !== memberId));
       setConfirmDelete(null);
     } catch (err: any) {
-      setError(err.message || "Failed to delete user");
+      setError(err.message || "فشل حذف المستخدم");
     } finally {
       setSaving(null);
     }
@@ -96,7 +96,7 @@ export default function UsersPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <Loader2 size={40} className="animate-spin text-[#E50914] mx-auto" />
-          <p className="text-[#9CA3AF] text-sm mt-4">Loading users...</p>
+          <p className="text-[#9CA3AF] text-sm mt-4">جارٍ تحميل المستخدمين...</p>
         </div>
       </div>
     );
@@ -108,7 +108,7 @@ export default function UsersPage() {
         <div className="text-center">
           <AlertCircle size={40} className="text-[#FF3B30] mx-auto" />
           <p className="text-[#FF3B30] text-sm mt-4">{error}</p>
-          <Button variant="ghost" size="sm" className="mt-4" onClick={loadMembers}>Retry</Button>
+          <Button variant="ghost" size="sm" className="mt-4" onClick={loadMembers}>إعادة المحاولة</Button>
         </div>
       </div>
     );
@@ -122,12 +122,12 @@ export default function UsersPage() {
         className="flex items-center justify-between"
       >
         <div>
-          <h1 className="text-2xl font-black">Users</h1>
-          <p className="text-[#9CA3AF] text-sm mt-1">Manage user accounts and roles</p>
+          <h1 className="text-2xl font-black">المستخدمين</h1>
+          <p className="text-[#9CA3AF] text-sm mt-1">إدارة حسابات المستخدمين والأدوار</p>
         </div>
         <div className="flex items-center gap-2 text-sm text-[#6B7280]">
           <Users size={16} />
-          <span>{members.length} total</span>
+          <span>{members.length} إجمالي</span>
         </div>
       </motion.div>
 
@@ -135,7 +135,7 @@ export default function UsersPage() {
         <div className="flex items-center gap-3 bg-[rgba(255,59,48,0.1)] border border-[rgba(255,59,48,0.2)] rounded-[14px] px-4 py-3">
           <AlertCircle size={16} className="text-[#FF3B30] shrink-0" />
           <p className="text-sm text-[#FF3B30]">{error}</p>
-          <button onClick={() => setError("")} className="ml-auto text-[#FF3B30] hover:text-white text-xs font-semibold">Dismiss</button>
+          <button onClick={() => setError("")} className="ml-auto text-[#FF3B30] hover:text-white text-xs font-semibold">تجاهل</button>
         </div>
       )}
 
@@ -143,8 +143,8 @@ export default function UsersPage() {
         <GlassCard>
           <div className="text-center py-10">
             <Users size={48} className="text-[#6B7280] mx-auto mb-4" />
-            <p className="text-[#9CA3AF] font-semibold">No users found</p>
-            <p className="text-[#6B7280] text-sm mt-1">Add members to get started</p>
+            <p className="text-[#9CA3AF] font-semibold">لا يوجد مستخدمين</p>
+            <p className="text-[#6B7280] text-sm mt-1">أضف أعضاء للبدء</p>
           </div>
         </GlassCard>
       ) : (
@@ -153,13 +153,13 @@ export default function UsersPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-[rgba(255,255,255,0.06)]">
-                  <th className="text-left text-xs font-semibold text-[#6B7280] px-4 py-3">Name</th>
-                  <th className="text-left text-xs font-semibold text-[#6B7280] px-4 py-3">Game ID</th>
-                  <th className="text-left text-xs font-semibold text-[#6B7280] px-4 py-3">Level</th>
-                  <th className="text-left text-xs font-semibold text-[#6B7280] px-4 py-3">Role</th>
-                  <th className="text-left text-xs font-semibold text-[#6B7280] px-4 py-3">Country</th>
-                  <th className="text-left text-xs font-semibold text-[#6B7280] px-4 py-3">Joined</th>
-                  <th className="text-right text-xs font-semibold text-[#6B7280] px-4 py-3">Actions</th>
+                  <th className="text-left text-xs font-semibold text-[#6B7280] px-4 py-3">الاسم</th>
+                  <th className="text-left text-xs font-semibold text-[#6B7280] px-4 py-3">معرف اللعبة</th>
+                  <th className="text-left text-xs font-semibold text-[#6B7280] px-4 py-3">المستوى</th>
+                  <th className="text-left text-xs font-semibold text-[#6B7280] px-4 py-3">الدور</th>
+                  <th className="text-left text-xs font-semibold text-[#6B7280] px-4 py-3">البلد</th>
+                  <th className="text-left text-xs font-semibold text-[#6B7280] px-4 py-3">تاريخ الانضمام</th>
+                  <th className="text-right text-xs font-semibold text-[#6B7280] px-4 py-3">الإجراءات</th>
                 </tr>
               </thead>
               <tbody>
@@ -203,7 +203,7 @@ export default function UsersPage() {
                           >
                             {roleOptions.map((r) => (
                               <option key={r} value={r} className="bg-[#1a1a2e]">
-                                {r || "No role"}
+                                {r || "بدون دور"}
                               </option>
                             ))}
                           </select>
@@ -237,17 +237,17 @@ export default function UsersPage() {
         </GlassCard>
       )}
 
-      <Modal open={!!confirmDelete} onClose={() => setConfirmDelete(null)} title="Confirm Delete">
-        <p className="text-[#9CA3AF] text-sm">Are you sure you want to delete this user? This action cannot be undone.</p>
+      <Modal open={!!confirmDelete} onClose={() => setConfirmDelete(null)} title="تأكيد الحذف">
+        <p className="text-[#9CA3AF] text-sm">هل أنت متأكد من حذف هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء.</p>
         <div className="flex gap-3 mt-6">
-          <Button variant="ghost" className="flex-1" onClick={() => setConfirmDelete(null)}>Cancel</Button>
+          <Button variant="ghost" className="flex-1" onClick={() => setConfirmDelete(null)}>إلغاء</Button>
           <Button
             variant="danger"
             className="flex-1"
             loading={saving === confirmDelete}
             onClick={() => confirmDelete && handleDelete(confirmDelete)}
           >
-            Delete
+            حذف
           </Button>
         </div>
       </Modal>

@@ -138,15 +138,15 @@ export default function NotificationsPage() {
       <div className="space-y-6">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-black">Notifications</h1>
-            <p className="text-[#9CA3AF] text-sm mt-1">Stay updated with clan activity</p>
+            <h1 className="text-2xl font-black">الإشعارات</h1>
+            <p className="text-[#9CA3AF] text-sm mt-1">ابق على اطلاع بنشاطات الكلان</p>
           </div>
         </motion.div>
         <GlassCard className="p-12 text-center">
           <Bell size={48} className="mx-auto text-[#FF3B30] mb-4" />
-          <p className="text-lg font-bold mb-2">Failed to load notifications</p>
+          <p className="text-lg font-bold mb-2">فشل تحميل الإشعارات</p>
           <p className="text-sm text-[#9CA3AF] mb-4">{error}</p>
-          <Button variant="primary" onClick={fetchNotifications}>Retry</Button>
+          <Button variant="primary" onClick={fetchNotifications}>إعادة المحاولة</Button>
         </GlassCard>
       </div>
     );
@@ -156,15 +156,15 @@ export default function NotificationsPage() {
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black">Notifications</h1>
-          <p className="text-[#9CA3AF] text-sm mt-1">Stay updated with clan activity</p>
+            <h1 className="text-2xl font-black">الإشعارات</h1>
+            <p className="text-[#9CA3AF] text-sm mt-1">ابق على اطلاع بنشاطات الكلان</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" onClick={handleMarkAllRead} loading={marking} disabled={marking}>
-            <CheckCheck size={16} /> Mark All Read
+            <CheckCheck size={16} /> تحديد الكل كمقروء
           </Button>
           <Button variant="primary" glow size="sm" onClick={() => setAddOpen(true)}>
-            <Send size={16} /> Send Notification
+            <Send size={16} /> إرسال إشعار
           </Button>
         </div>
       </motion.div>
@@ -179,9 +179,9 @@ export default function NotificationsPage() {
       <GlassCard className="p-2">
         <div className="flex gap-1">
           {[
-            { id: "all", label: "All" },
-            { id: "active", label: "Active" },
-            { id: "inactive", label: "Inactive" },
+            { id: "all", label: "الكل" },
+            { id: "active", label: "نشط" },
+            { id: "inactive", label: "غير نشط" },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -200,9 +200,9 @@ export default function NotificationsPage() {
       {filtered.length === 0 ? (
         <GlassCard className="p-12 text-center">
           <Bell size={48} className="mx-auto text-[#6B7280] mb-4" />
-          <p className="text-lg font-bold mb-1">No notifications</p>
+          <p className="text-lg font-bold mb-1">لا توجد إشعارات</p>
           <p className="text-sm text-[#9CA3AF]">
-            {activeTab === "all" ? "No notifications yet" : `No ${activeTab} notifications`}
+            {activeTab === "all" ? "لا توجد إشعارات بعد" : `لا توجد إشعارات ${activeTab === "active" ? "نشطة" : "غير نشطة"}`}
           </p>
         </GlassCard>
       ) : (
@@ -264,12 +264,12 @@ export default function NotificationsPage() {
         </div>
       )}
 
-      <Modal open={addOpen} onClose={() => setAddOpen(false)} title="Send Notification">
+      <Modal open={addOpen} onClose={() => setAddOpen(false)} title="إرسال إشعار">
         <div className="space-y-4">
           <div className="w-full">
-            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">Message *</label>
+            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">الرسالة *</label>
             <textarea
-              placeholder="Notification message"
+              placeholder="نص الإشعار"
               value={form.message}
               onChange={(e) => setForm({ ...form, message: e.target.value })}
               rows={4}
@@ -277,7 +277,7 @@ export default function NotificationsPage() {
             />
           </div>
           <div className="w-full">
-            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">Type</label>
+            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">النوع</label>
             <select
               value={form.type}
               onChange={(e) => setForm({ ...form, type: e.target.value })}
@@ -289,19 +289,19 @@ export default function NotificationsPage() {
             </select>
           </div>
           <div className="flex gap-3 justify-end pt-2">
-            <Button variant="ghost" onClick={() => setAddOpen(false)}>Cancel</Button>
+            <Button variant="ghost" onClick={() => setAddOpen(false)}>إلغاء</Button>
             <Button variant="primary" onClick={handleAdd} loading={saving} disabled={!form.message.trim()}>
-              {saving ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />} Send
+              {saving ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />} إرسال
             </Button>
           </div>
         </div>
       </Modal>
 
-      <Modal open={!!deleteId} onClose={() => setDeleteId(null)} title="Delete Notification">
-        <p className="text-[#9CA3AF] mb-6">Are you sure you want to delete this notification? This action cannot be undone.</p>
+      <Modal open={!!deleteId} onClose={() => setDeleteId(null)} title="حذف الإشعار">
+        <p className="text-[#9CA3AF] mb-6">هل أنت متأكد من حذف هذا الإشعار؟ لا يمكن التراجع عن هذا الإجراء.</p>
         <div className="flex gap-3 justify-end">
-          <Button variant="ghost" onClick={() => setDeleteId(null)}>Cancel</Button>
-          <Button variant="danger" onClick={handleDelete}>Delete</Button>
+          <Button variant="ghost" onClick={() => setDeleteId(null)}>إلغاء</Button>
+          <Button variant="danger" onClick={handleDelete}>حذف</Button>
         </div>
       </Modal>
     </div>

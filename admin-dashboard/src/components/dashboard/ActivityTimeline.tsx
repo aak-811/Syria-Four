@@ -21,10 +21,10 @@ export default function ActivityTimeline() {
 
   return (
     <GlassCard>
-      <h3 className="text-lg font-bold mb-6">Recent Activity</h3>
+      <h3 className="text-lg font-bold mb-6">آخر النشاطات</h3>
       <div className="space-y-1">
         {recentMembers.length === 0 ? (
-          <p className="text-sm text-[#6B7280] p-3">No recent activity</p>
+          <p className="text-sm text-[#6B7280] p-3">لا توجد نشاطات حديثة</p>
         ) : (
           recentMembers.map((member, i) => (
             <motion.div
@@ -43,7 +43,7 @@ export default function ActivityTimeline() {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold">
                   <span className="text-white">{member.name}</span>{" "}
-                  <span className="text-[#9CA3AF] font-normal">joined the clan</span>
+                   <span className="text-[#9CA3AF] font-normal">انضم إلى الكلان</span>
                 </p>
                 <p className="text-xs text-[#6B7280]">{timeAgo(member.joinDate)}</p>
               </div>

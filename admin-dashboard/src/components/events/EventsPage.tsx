@@ -45,7 +45,7 @@ export default function EventsPage() {
       const data = await api.getEvents();
       setEvents(data);
     } catch {
-      setError("Failed to load events");
+      setError("فشل تحميل الفعاليات");
     } finally {
       setLoading(false);
     }
@@ -64,7 +64,7 @@ export default function EventsPage() {
       setIcon("clock");
       await load();
     } catch {
-      setError("Failed to add event");
+      setError("فشل إضافة الفعالية");
     } finally {
       setSubmitting(false);
     }
@@ -76,7 +76,7 @@ export default function EventsPage() {
       setConfirmDelete(null);
       await load();
     } catch {
-      setError("Failed to delete event");
+      setError("فشل حذف الفعالية");
     }
   };
 
@@ -88,7 +88,7 @@ export default function EventsPage() {
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
-          <p className="text-sm text-[#9CA3AF]">Loading events...</p>
+          <p className="text-sm text-[#9CA3AF]">جارٍ تحميل الفعاليات...</p>
         </div>
       </div>
     );
@@ -98,11 +98,11 @@ export default function EventsPage() {
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black">Events</h1>
-          <p className="text-[#9CA3AF] text-sm mt-1">Manage in-game events and activities</p>
+          <h1 className="text-2xl font-black">الفعاليات</h1>
+          <p className="text-[#9CA3AF] text-sm mt-1">إدارة الفعاليات والأنشطة داخل اللعبة</p>
         </div>
         <Button variant="primary" glow onClick={() => setShowAdd(true)}>
-          <Plus size={18} /> Add Event
+          <Plus size={18} /> إضافة فعالية
         </Button>
       </motion.div>
 
@@ -111,7 +111,7 @@ export default function EventsPage() {
           <div className="flex items-center gap-3">
             <X size={18} className="text-[#FF3B30]" />
             <p className="text-sm text-[#FF3B30] flex-1">{error}</p>
-            <Button size="sm" variant="ghost" onClick={load}>Retry</Button>
+            <Button size="sm" variant="ghost" onClick={load}>إعادة المحاولة</Button>
           </div>
         </GlassCard>
       )}
@@ -119,9 +119,9 @@ export default function EventsPage() {
       {events.length === 0 ? (
         <GlassCard className="p-12 text-center">
           <Flame size={48} className="mx-auto text-[#6B7280] mb-4" />
-          <h3 className="text-lg font-bold mb-1">No events yet</h3>
-          <p className="text-sm text-[#9CA3AF] mb-4">Create your first event to get started</p>
-          <Button variant="primary" onClick={() => setShowAdd(true)}><Plus size={18} /> Add Event</Button>
+          <h3 className="text-lg font-bold mb-1">لا توجد فعاليات بعد</h3>
+          <p className="text-sm text-[#9CA3AF] mb-4">أنشئ فعاليتك الأولى للبدء</p>
+          <Button variant="primary" onClick={() => setShowAdd(true)}><Plus size={18} /> إضافة فعالية</Button>
         </GlassCard>
       ) : (
         <div className="grid gap-4">
@@ -152,20 +152,20 @@ export default function EventsPage() {
         </div>
       )}
 
-      <Modal open={showAdd} onClose={() => { setShowAdd(false); setTitle(""); setDescription(""); setIcon("clock"); }} title="Add Event">
+      <Modal open={showAdd} onClose={() => { setShowAdd(false); setTitle(""); setDescription(""); setIcon("clock"); }} title="إضافة فعالية">
         <div className="space-y-4">
           <Input
-            label="Event Title"
-            placeholder="Enter event title"
+            label="عنوان الفعالية"
+            placeholder="أدخل عنوان الفعالية"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
 
           <div>
-            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">Description</label>
+            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">الوصف</label>
             <textarea
               rows={3}
-              placeholder="Event description..."
+              placeholder="وصف الفعالية..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="w-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3 text-white placeholder:text-[#6B7280] outline-none focus:border-[#E50914] resize-none"
@@ -173,7 +173,7 @@ export default function EventsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">Icon</label>
+            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">الأيقونة</label>
             <div className="flex gap-2">
               {iconOptions.map((opt) => (
                 <button
@@ -185,26 +185,26 @@ export default function EventsPage() {
                       : "bg-[rgba(255,255,255,0.06)] text-[#9CA3AF] hover:text-white"
                   }`}
                 >
-                  {iconMap[opt]} {opt.charAt(0).toUpperCase() + opt.slice(1)}
+                  {iconMap[opt]} {opt === "clock" ? "ساعة" : opt === "fire" ? "نار" : "حرب"}
                 </button>
               ))}
             </div>
           </div>
 
           <div className="flex items-center gap-3 pt-4 border-t border-[rgba(255,255,255,0.06)]">
-            <Button variant="ghost" onClick={() => { setShowAdd(false); setTitle(""); setDescription(""); setIcon("clock"); }}>Cancel</Button>
+            <Button variant="ghost" onClick={() => { setShowAdd(false); setTitle(""); setDescription(""); setIcon("clock"); }}>إلغاء</Button>
             <Button variant="primary" className="ml-auto" loading={submitting} disabled={!title.trim()} onClick={handleSubmit}>
-              <Plus size={16} /> Create Event
+              <Plus size={16} /> إنشاء فعالية
             </Button>
           </div>
         </div>
       </Modal>
 
-      <Modal open={!!confirmDelete} onClose={() => setConfirmDelete(null)} title="Confirm Delete">
-        <p className="text-[#9CA3AF] text-sm">Are you sure you want to delete this event? This action cannot be undone.</p>
+      <Modal open={!!confirmDelete} onClose={() => setConfirmDelete(null)} title="تأكيد الحذف">
+        <p className="text-[#9CA3AF] text-sm">هل أنت متأكد من حذف هذه الفعالية؟ لا يمكن التراجع عن هذا الإجراء.</p>
         <div className="flex gap-3 mt-6">
-          <Button variant="ghost" className="flex-1" onClick={() => setConfirmDelete(null)}>Cancel</Button>
-          <Button variant="danger" className="flex-1" onClick={() => handleDelete(confirmDelete!)}>Delete</Button>
+          <Button variant="ghost" className="flex-1" onClick={() => setConfirmDelete(null)}>إلغاء</Button>
+          <Button variant="danger" className="flex-1" onClick={() => handleDelete(confirmDelete!)}>حذف</Button>
         </div>
       </Modal>
     </div>

@@ -24,7 +24,7 @@ export default function SupportPage() {
       const data = await api.getSupport();
       setRequests(data);
     } catch {
-      setError("Failed to load support requests");
+      setError("فشل تحميل طلبات الدعم");
     } finally {
       setLoading(false);
     }
@@ -41,7 +41,7 @@ export default function SupportPage() {
         prev.map((r) => (r.id === id ? { ...r, status: "read" } : r))
       );
     } catch {
-      setError("Failed to update request");
+      setError("فشل تحديث الطلب");
     }
   };
 
@@ -51,7 +51,7 @@ export default function SupportPage() {
       setRequests((prev) => prev.filter((r) => r.id !== id));
       setConfirmDelete(null);
     } catch {
-      setError("Failed to delete request");
+      setError("فشل حذف الطلب");
     }
   };
 
@@ -67,14 +67,14 @@ export default function SupportPage() {
         className="flex items-center justify-between"
       >
         <div>
-          <h1 className="text-2xl font-black">Support</h1>
+          <h1 className="text-2xl font-black">الدعم</h1>
           <p className="text-[#9CA3AF] text-sm mt-1">
-            Manage player support requests
+            إدارة طلبات دعم اللاعبين
           </p>
         </div>
         {unreadCount > 0 && (
           <Badge variant="danger" size="md">
-            {unreadCount} unread
+            {unreadCount} غير مقروء
           </Badge>
         )}
       </motion.div>
@@ -89,7 +89,7 @@ export default function SupportPage() {
             onClick={fetchSupport}
             className="ml-auto"
           >
-            Retry
+            إعادة المحاولة
           </Button>
         </GlassCard>
       )}
@@ -104,9 +104,9 @@ export default function SupportPage() {
         <GlassCard>
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <HeadphonesIcon size={48} className="text-[#6B7280] mb-4" />
-            <p className="text-lg font-bold mb-1">All clear</p>
+            <p className="text-lg font-bold mb-1">كل شيء واضح</p>
             <p className="text-sm text-[#9CA3AF]">
-              No support requests at the moment.
+              لا توجد طلبات دعم في الوقت الحالي.
             </p>
           </div>
         </GlassCard>
@@ -117,22 +117,22 @@ export default function SupportPage() {
               <thead>
                 <tr className="border-b border-[rgba(255,255,255,0.06)]">
                   <th className="text-left text-xs font-semibold text-[#6B7280] px-6 py-4">
-                    Player
+                    اللاعب
                   </th>
                   <th className="text-left text-xs font-semibold text-[#6B7280] px-6 py-4">
-                    Type
+                    النوع
                   </th>
                   <th className="text-left text-xs font-semibold text-[#6B7280] px-6 py-4">
-                    Message
+                    الرسالة
                   </th>
                   <th className="text-left text-xs font-semibold text-[#6B7280] px-6 py-4">
-                    Status
+                    الحالة
                   </th>
                   <th className="text-left text-xs font-semibold text-[#6B7280] px-6 py-4">
-                    Date
+                    التاريخ
                   </th>
                   <th className="text-right text-xs font-semibold text-[#6B7280] px-6 py-4">
-                    Actions
+                    الإجراءات
                   </th>
                 </tr>
               </thead>
@@ -167,7 +167,7 @@ export default function SupportPage() {
                         }
                         size="sm"
                       >
-                        {req.status === "read" ? "Read" : "New"}
+                        {req.status === "read" ? "مقروء" : "جديد"}
                       </Badge>
                     </td>
                     <td className="px-6 py-4">
@@ -183,7 +183,7 @@ export default function SupportPage() {
                             variant="primary"
                             onClick={() => markAsRead(req.id)}
                           >
-                            <Check size={14} /> Read
+                            <Check size={14} /> قراءة
                           </Button>
                         )}
                         <Button
@@ -207,11 +207,10 @@ export default function SupportPage() {
       <Modal
         open={!!confirmDelete}
         onClose={() => setConfirmDelete(null)}
-        title="Delete Request"
+        title="حذف الطلب"
       >
         <p className="text-[#9CA3AF] text-sm">
-          Are you sure you want to delete this support request? This action
-          cannot be undone.
+          هل أنت متأكد من حذف طلب الدعم هذا؟ لا يمكن التراجع عن هذا الإجراء.
         </p>
         <div className="flex gap-3 mt-6">
           <Button
@@ -219,7 +218,7 @@ export default function SupportPage() {
             className="flex-1"
             onClick={() => setConfirmDelete(null)}
           >
-            Cancel
+            إلغاء
           </Button>
           <Button
             variant="danger"
@@ -228,7 +227,7 @@ export default function SupportPage() {
               confirmDelete && deleteRequest(confirmDelete)
             }
           >
-            Delete
+            حذف
           </Button>
         </div>
       </Modal>

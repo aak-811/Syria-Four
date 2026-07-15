@@ -9,11 +9,11 @@ import {
 } from "lucide-react";
 
 const items = [
-  { label: "Home", icon: LayoutDashboard, href: "/" },
-  { label: "Members", icon: Users, href: "/members" },
-  { label: "Add", icon: Plus, href: "#", fab: true },
-  { label: "Alerts", icon: Bell, href: "/notifications" },
-  { label: "Settings", icon: Settings, href: "/settings" },
+  { label: "الرئيسية", icon: LayoutDashboard, href: "/" },
+  { label: "الأعضاء", icon: Users, href: "/members" },
+  { label: "إضافة", icon: Plus, href: "#", fab: true },
+  { label: "التنبيهات", icon: Bell, href: "/notifications" },
+  { label: "الإعدادات", icon: Settings, href: "/settings" },
 ];
 
 export default function MobileNav() {

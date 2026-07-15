@@ -52,7 +52,7 @@ export default function NewsPage() {
       const data = await api.getNotifications();
       setItems(data);
     } catch (e: any) {
-      setError(e.message || "Failed to load notifications");
+      setError(e.message || "فشل تحميل الإشعارات");
     } finally {
       setLoading(false);
     }
@@ -61,9 +61,9 @@ export default function NewsPage() {
   useEffect(() => { fetchData(); }, []);
 
   const tabs = [
-    { id: "all", label: "All", count: items.length },
-    { id: "active", label: "Active", count: items.filter(n => n.active).length },
-    { id: "inactive", label: "Inactive", count: items.filter(n => !n.active).length },
+    { id: "all", label: "الكل", count: items.length },
+    { id: "active", label: "نشط", count: items.filter(n => n.active).length },
+    { id: "inactive", label: "غير نشط", count: items.filter(n => !n.active).length },
   ];
 
   const filtered = items.filter(n => {
@@ -81,7 +81,7 @@ export default function NewsPage() {
   };
 
   const handleDelete = (id: string) => {
-    if (!confirm("Are you sure you want to delete this notification?")) return;
+    if (!confirm("هل أنت متأكد من حذف هذا الإشعار؟")) return;
     api.deleteNotification(id).then(() => {
       setItems(prev => prev.filter(n => n.id !== id));
     }).catch(() => {});
@@ -107,11 +107,11 @@ export default function NewsPage() {
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black">News</h1>
-          <p className="text-[#9CA3AF] text-sm mt-1">Create and manage announcements</p>
+          <h1 className="text-2xl font-black">الأخبار</h1>
+          <p className="text-[#9CA3AF] text-sm mt-1">إنشاء وإدارة الإعلانات</p>
         </div>
         <Button variant="primary" glow onClick={() => setShowModal(true)}>
-          <Plus size={18} /> New Article
+          <Plus size={18} /> مقال جديد
         </Button>
       </motion.div>
 
@@ -166,7 +166,7 @@ export default function NewsPage() {
         <GlassCard className="text-center py-12">
           <AlertTriangle size={40} className="mx-auto text-[#FF3B30] mb-4" />
           <p className="text-[#FF3B30] font-semibold mb-2">{error}</p>
-          <Button variant="secondary" onClick={fetchData}>Retry</Button>
+          <Button variant="secondary" onClick={fetchData}>إعادة المحاولة</Button>
         </GlassCard>
       )}
 
@@ -174,9 +174,9 @@ export default function NewsPage() {
       {!loading && !error && filtered.length === 0 && (
         <GlassCard className="text-center py-12">
           <Bell size={40} className="mx-auto text-[#6B7280] mb-4" />
-          <p className="text-[#9CA3AF] font-semibold">No notifications found</p>
+          <p className="text-[#9CA3AF] font-semibold">لا توجد إشعارات</p>
           {activeTab !== "all" && (
-            <p className="text-[#6B7280] text-sm mt-1">Try switching tabs or create a new article</p>
+            <p className="text-[#6B7280] text-sm mt-1">جرب تبديل الألسنة أو إنشاء مقال جديد</p>
           )}
         </GlassCard>
       )}
@@ -201,7 +201,7 @@ export default function NewsPage() {
                     <div className="flex items-center gap-2 mb-1">
                       <Badge variant={typeVariant[item.type]}>{item.type}</Badge>
                       <Badge variant={item.active ? "success" : "warning"}>
-                        {item.active ? "Active" : "Inactive"}
+                        {item.active ? "نشط" : "غير نشط"}
                       </Badge>
                     </div>
                     <p className="text-sm text-white font-medium">{item.message}</p>
@@ -234,20 +234,20 @@ export default function NewsPage() {
       )}
 
       {/* Create Modal */}
-      <Modal open={showModal} onClose={() => setShowModal(false)} title="New Article" className="max-w-xl">
+      <Modal open={showModal} onClose={() => setShowModal(false)} title="مقال جديد" className="max-w-xl">
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">Message</label>
+            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">الرسالة</label>
             <textarea
               rows={4}
               value={newMessage}
               onChange={e => setNewMessage(e.target.value)}
-              placeholder="Enter notification message..."
+              placeholder="أدخل نص الإشعار..."
               className="w-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3 text-white placeholder:text-[#6B7280] outline-none focus:border-[#E50914] resize-none"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">Type</label>
+            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">النوع</label>
             <div className="flex gap-2">
               {(["info", "warning", "success", "error"] as const).map(t => (
                 <button
@@ -266,9 +266,9 @@ export default function NewsPage() {
             </div>
           </div>
           <div className="flex gap-3 pt-4 border-t border-[rgba(255,255,255,0.06)]">
-            <Button variant="ghost" onClick={() => setShowModal(false)}>Cancel</Button>
+            <Button variant="ghost" onClick={() => setShowModal(false)}>إلغاء</Button>
             <Button variant="primary" className="ml-auto" loading={submitting} onClick={handleCreate}>
-              <Plus size={16} /> Create
+              <Plus size={16} /> إنشاء
             </Button>
           </div>
         </div>

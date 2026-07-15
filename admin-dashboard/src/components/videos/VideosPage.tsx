@@ -94,15 +94,15 @@ export default function VideosPage() {
       <div className="space-y-6">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-black">Videos</h1>
-            <p className="text-[#9CA3AF] text-sm mt-1">Manage your clan&apos;s video content</p>
+            <h1 className="text-2xl font-black">الفيديوهات</h1>
+            <p className="text-[#9CA3AF] text-sm mt-1">إدارة محتوى الفيديو للكلان</p>
           </div>
         </motion.div>
         <GlassCard className="p-12 text-center">
           <AlertCircle size={48} className="mx-auto text-[#FF3B30] mb-4" />
-          <p className="text-lg font-bold mb-2">Failed to load videos</p>
+          <p className="text-lg font-bold mb-2">فشل تحميل الفيديوهات</p>
           <p className="text-sm text-[#9CA3AF] mb-4">{error}</p>
-          <Button variant="primary" onClick={fetchVideos}>Retry</Button>
+          <Button variant="primary" onClick={fetchVideos}>إعادة المحاولة</Button>
         </GlassCard>
       </div>
     );
@@ -112,11 +112,11 @@ export default function VideosPage() {
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black">Videos</h1>
-          <p className="text-[#9CA3AF] text-sm mt-1">Manage your clan&apos;s video content</p>
+            <h1 className="text-2xl font-black">الفيديوهات</h1>
+            <p className="text-[#9CA3AF] text-sm mt-1">إدارة محتوى الفيديو للكلان</p>
         </div>
         <Button variant="primary" glow onClick={() => setAddOpen(true)}>
-          <Plus size={18} /> Add Video
+          <Plus size={18} /> إضافة فيديو
         </Button>
       </motion.div>
 
@@ -130,8 +130,8 @@ export default function VideosPage() {
       {videos.length === 0 ? (
         <GlassCard className="p-12 text-center">
           <Video size={48} className="mx-auto text-[#6B7280] mb-4" />
-          <p className="text-lg font-bold mb-1">No videos yet</p>
-          <p className="text-sm text-[#9CA3AF]">Add your first video using the button above</p>
+          <p className="text-lg font-bold mb-1">لا توجد فيديوهات بعد</p>
+          <p className="text-sm text-[#9CA3AF]">أضف فيديو الأول باستخدام الزر أعلاه</p>
         </GlassCard>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -154,7 +154,7 @@ export default function VideosPage() {
                     <Clock size={12} /> {video.duration}
                   </div>
                   <Badge variant="danger" className="absolute top-3 right-3">
-                    <Video size={12} /> YouTube
+                    <Video size={12} /> يوتيوب
                   </Badge>
                 </div>
 
@@ -166,10 +166,10 @@ export default function VideosPage() {
                   </div>
                   <div className="flex gap-2 mt-4 pt-4 border-t border-[rgba(255,255,255,0.06)]">
                     <Button size="sm" variant="ghost" className="flex-1" onClick={() => window.open(video.url, "_blank")}>
-                      <Play size={14} /> Play
+                      <Play size={14} /> تشغيل
                     </Button>
                     <Button size="sm" variant="ghost" className="flex-1" onClick={() => setDeleteId(video.id)}>
-                      <Trash2 size={14} /> Delete
+                      <Trash2 size={14} /> حذف
                     </Button>
                   </div>
                 </div>
@@ -179,40 +179,40 @@ export default function VideosPage() {
         </div>
       )}
 
-      <Modal open={addOpen} onClose={() => setAddOpen(false)} title="Add Video">
+      <Modal open={addOpen} onClose={() => setAddOpen(false)} title="إضافة فيديو">
         <div className="space-y-4">
           <Input
-            label="Title *"
-            placeholder="Video title"
+            label="العنوان *"
+            placeholder="عنوان الفيديو"
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
           />
           <Input
-            label="URL *"
+            label="الرابط *"
             placeholder="https://youtube.com/watch?v=..."
             value={form.url}
             onChange={(e) => setForm({ ...form, url: e.target.value })}
           />
           <Input
-            label="Thumbnail URL"
+            label="رابط الصورة المصغرة"
             placeholder="https://example.com/thumb.jpg"
             value={form.thumbnail}
             onChange={(e) => setForm({ ...form, thumbnail: e.target.value })}
           />
           <div className="flex gap-3 justify-end pt-2">
-            <Button variant="ghost" onClick={() => setAddOpen(false)}>Cancel</Button>
+            <Button variant="ghost" onClick={() => setAddOpen(false)}>إلغاء</Button>
             <Button variant="primary" onClick={handleAdd} loading={saving} disabled={!form.title.trim() || !form.url.trim()}>
-              {saving ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />} Save
+              {saving ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />} حفظ
             </Button>
           </div>
         </div>
       </Modal>
 
-      <Modal open={!!deleteId} onClose={() => setDeleteId(null)} title="Delete Video">
-        <p className="text-[#9CA3AF] mb-6">Are you sure you want to delete this video? This action cannot be undone.</p>
+      <Modal open={!!deleteId} onClose={() => setDeleteId(null)} title="حذف الفيديو">
+        <p className="text-[#9CA3AF] mb-6">هل أنت متأكد من حذف هذا الفيديو؟ لا يمكن التراجع عن هذا الإجراء.</p>
         <div className="flex gap-3 justify-end">
-          <Button variant="ghost" onClick={() => setDeleteId(null)}>Cancel</Button>
-          <Button variant="danger" onClick={handleDelete}>Delete</Button>
+          <Button variant="ghost" onClick={() => setDeleteId(null)}>إلغاء</Button>
+          <Button variant="danger" onClick={handleDelete}>حذف</Button>
         </div>
       </Modal>
     </div>

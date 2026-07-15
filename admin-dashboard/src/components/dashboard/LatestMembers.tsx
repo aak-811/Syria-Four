@@ -31,14 +31,14 @@ export default function LatestMembers() {
   return (
     <GlassCard>
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-bold">Latest Members</h3>
+        <h3 className="text-lg font-bold">آخر الأعضاء</h3>
         <Link href="/members" className="flex items-center gap-1 text-sm text-[#E50914] font-semibold hover:underline">
-          View All <ArrowRight size={16} />
+          عرض الكل <ArrowRight size={16} />
         </Link>
       </div>
       <div className="space-y-3">
         {latestMembers.length === 0 ? (
-          <p className="text-sm text-[#6B7280]">No members yet</p>
+          <p className="text-sm text-[#6B7280]">لا يوجد أعضاء بعد</p>
         ) : (
           latestMembers.map((member, i) => (
             <motion.div
@@ -51,7 +51,7 @@ export default function LatestMembers() {
               <Avatar src={member.avatar || member.image} size="lg" status={member.status === "active" ? "online" : "offline"} />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold">{member.name}</p>
-                <p className="text-xs text-[#6B7280]">UID: {member.uid || member.gameId || "—"} · {member.level || "—"}</p>
+                <p className="text-xs text-[#6B7280]">المعرف: {member.uid || member.gameId || "—"} · المستوى: {member.level || "—"}</p>
               </div>
               <Badge variant={roleColors[member.role] || "default"}>{member.role || "member"}</Badge>
             </motion.div>

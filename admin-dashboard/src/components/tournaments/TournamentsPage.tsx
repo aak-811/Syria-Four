@@ -77,7 +77,7 @@ export default function TournamentsPage() {
       const data = await api.getTournaments();
       setTournaments(data);
     } catch {
-      setError("Failed to load tournaments");
+      setError("فشل تحميل البطولات");
     } finally {
       setLoading(false);
     }
@@ -98,7 +98,7 @@ export default function TournamentsPage() {
       setForm(emptyForm);
       await load();
     } catch {
-      setError("Failed to add tournament");
+      setError("فشل إضافة البطولة");
     } finally {
       setSubmitting(false);
     }
@@ -110,7 +110,7 @@ export default function TournamentsPage() {
       setConfirmDelete(null);
       await load();
     } catch {
-      setError("Failed to delete tournament");
+      setError("فشل حذف البطولة");
     }
   };
 
@@ -136,7 +136,7 @@ export default function TournamentsPage() {
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
-          <p className="text-sm text-[#9CA3AF]">Loading tournaments...</p>
+          <p className="text-sm text-[#9CA3AF]">جارٍ تحميل البطولات...</p>
         </div>
       </div>
     );
@@ -146,11 +146,11 @@ export default function TournamentsPage() {
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black">Tournaments</h1>
-          <p className="text-[#9CA3AF] text-sm mt-1">Create and manage tournaments</p>
+          <h1 className="text-2xl font-black">البطولات</h1>
+          <p className="text-[#9CA3AF] text-sm mt-1">إنشاء وإدارة البطولات</p>
         </div>
         <Button variant="primary" glow onClick={() => setShowAdd(true)}>
-          <Plus size={18} /> Add Tournament
+          <Plus size={18} /> إضافة بطولة
         </Button>
       </motion.div>
 
@@ -159,7 +159,7 @@ export default function TournamentsPage() {
           <div className="flex items-center gap-3">
             <X size={18} className="text-[#FF3B30]" />
             <p className="text-sm text-[#FF3B30] flex-1">{error}</p>
-            <Button size="sm" variant="ghost" onClick={load}>Retry</Button>
+            <Button size="sm" variant="ghost" onClick={load}>إعادة المحاولة</Button>
           </div>
         </GlassCard>
       )}
@@ -167,9 +167,9 @@ export default function TournamentsPage() {
       {tournaments.length === 0 ? (
         <GlassCard className="p-12 text-center">
           <Swords size={48} className="mx-auto text-[#6B7280] mb-4" />
-          <h3 className="text-lg font-bold mb-1">No tournaments yet</h3>
-          <p className="text-sm text-[#9CA3AF] mb-4">Get started by creating your first tournament</p>
-          <Button variant="primary" onClick={() => setShowAdd(true)}><Plus size={18} /> Add Tournament</Button>
+          <h3 className="text-lg font-bold mb-1">لا توجد بطولات بعد</h3>
+          <p className="text-sm text-[#9CA3AF] mb-4">ابدأ بإنشاء أول بطولة لك</p>
+          <Button variant="primary" onClick={() => setShowAdd(true)}><Plus size={18} /> إضافة بطولة</Button>
         </GlassCard>
       ) : (
         <div className="grid gap-4">
@@ -212,21 +212,21 @@ export default function TournamentsPage() {
         </div>
       )}
 
-      <Modal open={showAdd} onClose={() => { setShowAdd(false); setForm(emptyForm); }} title="Add Tournament" className="max-w-2xl">
+      <Modal open={showAdd} onClose={() => { setShowAdd(false); setForm(emptyForm); }} title="إضافة بطولة" className="max-w-2xl">
         <div className="space-y-4">
-          <Input label="Tournament Name" name="name" placeholder="Enter tournament name" value={form.name} onChange={handleChange} />
+          <Input label="اسم البطولة" name="name" placeholder="أدخل اسم البطولة" value={form.name} onChange={handleChange} />
 
           <div className="grid grid-cols-2 gap-4">
-            {renderSelect("Type", "type", typeOptions, form.type)}
-            {renderSelect("Mode", "mode", modeOptions, form.mode)}
+            {renderSelect("النوع", "type", typeOptions, form.type)}
+            {renderSelect("الوضع", "mode", modeOptions, form.mode)}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">Description</label>
+            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">الوصف</label>
             <textarea
               name="description"
               rows={3}
-              placeholder="Tournament description..."
+              placeholder="وصف البطولة..."
               value={form.description}
               onChange={handleChange}
               className="w-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3 text-white placeholder:text-[#6B7280] outline-none focus:border-[#E50914] resize-none"
@@ -234,46 +234,46 @@ export default function TournamentsPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Input label="Start Date" name="startDate" type="date" value={form.startDate} onChange={handleChange} />
-            <Input label="End Date" name="endDate" type="date" value={form.endDate} onChange={handleChange} />
+            <Input label="تاريخ البداية" name="startDate" type="date" value={form.startDate} onChange={handleChange} />
+            <Input label="تاريخ النهاية" name="endDate" type="date" value={form.endDate} onChange={handleChange} />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Input label="Max Players" name="maxPlayers" type="number" placeholder="e.g. 100" value={form.maxPlayers} onChange={handleChange} />
-            {renderSelect("Map Type", "mapType", mapTypeOptions, form.mapType)}
+            <Input label="الحد الأقصى للاعبين" name="maxPlayers" type="number" placeholder="مثال: 100" value={form.maxPlayers} onChange={handleChange} />
+            {renderSelect("نوع الخريطة", "mapType", mapTypeOptions, form.mapType)}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            {renderSelect("Persistent", "persistent", persistentOptions, form.persistent)}
-            {renderSelect("Map Design", "mapDesign", mapDesignOptions, form.mapDesign)}
+            {renderSelect("مستمر", "persistent", persistentOptions, form.persistent)}
+            {renderSelect("تصميم الخريطة", "mapDesign", mapDesignOptions, form.mapDesign)}
           </div>
 
-          <Input label="Winners" name="winners" placeholder="e.g. 1st, 2nd, 3rd" value={form.winners} onChange={handleChange} />
+          <Input label="الفائزون" name="winners" placeholder="مثال: الأول، الثاني، الثالث" value={form.winners} onChange={handleChange} />
 
           <div className="grid grid-cols-3 gap-4">
-            {renderSelect("Prize Type", "prizeType", prizeTypeOptions, form.prizeType)}
-            <Input label="Prize Value" name="prizeValue" placeholder="Value" value={form.prizeValue} onChange={handleChange} />
+            {renderSelect("نوع الجائزة", "prizeType", prizeTypeOptions, form.prizeType)}
+            <Input label="قيمة الجائزة" name="prizeValue" placeholder="القيمة" value={form.prizeValue} onChange={handleChange} />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Input label="Gold" name="gold" placeholder="Gold reward" value={form.gold} onChange={handleChange} />
-            <Input label="Silver" name="silver" placeholder="Silver reward" value={form.silver} onChange={handleChange} />
+            <Input label="ذهب" name="gold" placeholder="مكافأة الذهب" value={form.gold} onChange={handleChange} />
+            <Input label="فضة" name="silver" placeholder="مكافأة الفضة" value={form.silver} onChange={handleChange} />
           </div>
 
           <div className="flex items-center gap-3 pt-4 border-t border-[rgba(255,255,255,0.06)]">
-            <Button variant="ghost" onClick={() => { setShowAdd(false); setForm(emptyForm); }}>Cancel</Button>
+            <Button variant="ghost" onClick={() => { setShowAdd(false); setForm(emptyForm); }}>إلغاء</Button>
             <Button variant="primary" className="ml-auto" loading={submitting} disabled={!form.name.trim()} onClick={handleSubmit}>
-              <Plus size={16} /> Create Tournament
+              <Plus size={16} /> إنشاء بطولة
             </Button>
           </div>
         </div>
       </Modal>
 
-      <Modal open={!!confirmDelete} onClose={() => setConfirmDelete(null)} title="Confirm Delete">
-        <p className="text-[#9CA3AF] text-sm">Are you sure you want to delete this tournament? This action cannot be undone.</p>
+      <Modal open={!!confirmDelete} onClose={() => setConfirmDelete(null)} title="تأكيد الحذف">
+        <p className="text-[#9CA3AF] text-sm">هل أنت متأكد من حذف هذه البطولة؟ لا يمكن التراجع عن هذا الإجراء.</p>
         <div className="flex gap-3 mt-6">
-          <Button variant="ghost" className="flex-1" onClick={() => setConfirmDelete(null)}>Cancel</Button>
-          <Button variant="danger" className="flex-1" onClick={() => handleDelete(confirmDelete!)}>Delete</Button>
+          <Button variant="ghost" className="flex-1" onClick={() => setConfirmDelete(null)}>إلغاء</Button>
+          <Button variant="danger" className="flex-1" onClick={() => handleDelete(confirmDelete!)}>حذف</Button>
         </div>
       </Modal>
     </div>

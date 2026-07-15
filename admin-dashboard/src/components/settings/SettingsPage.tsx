@@ -15,7 +15,7 @@ const STORAGE_KEY = "syria4_settings";
 
 const defaultSettings = {
   siteName: "SYRIA FOUR",
-  siteDescription: "Premium Free Fire Clan",
+  siteDescription: "كلان فري فاير ممتاز",
   contactEmail: "admin@syria4.clan",
   theme: "dark",
   accentColor: "#E50914",
@@ -28,12 +28,12 @@ const defaultSettings = {
 };
 
 const settingTabs = [
-  { id: "general", label: "General", icon: Settings },
-  { id: "appearance", label: "Appearance", icon: Palette },
-  { id: "localization", label: "Localization", icon: Languages },
-  { id: "social", label: "Social Links", icon: Link2 },
-  { id: "api", label: "API & Security", icon: Key },
-  { id: "backup", label: "Backup", icon: Database },
+  { id: "general", label: "عام", icon: Settings },
+  { id: "appearance", label: "المظهر", icon: Palette },
+  { id: "localization", label: "اللغة", icon: Languages },
+  { id: "social", label: "روابط التواصل", icon: Link2 },
+  { id: "api", label: "API والأمان", icon: Key },
+  { id: "backup", label: "النسخ الاحتياطي", icon: Database },
 ];
 
 function loadSettings() {
@@ -110,8 +110,8 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-2xl font-black">Settings</h1>
-        <p className="text-[#9CA3AF] text-sm mt-1">Configure your clan platform</p>
+        <h1 className="text-2xl font-black">الإعدادات</h1>
+        <p className="text-[#9CA3AF] text-sm mt-1">تكوين منصة الكلان الخاصة بك</p>
       </motion.div>
 
       <div className="flex flex-col lg:flex-row gap-6">
@@ -144,21 +144,21 @@ export default function SettingsPage() {
               </div>
               <div>
                 <h2 className="text-lg font-bold">{settingTabs.find(t => t.id === activeTab)?.label}</h2>
-                <p className="text-xs text-[#9CA3AF]">Configure your settings</p>
+                <p className="text-xs text-[#9CA3AF]">تكوين الإعدادات</p>
               </div>
             </div>
 
             {activeTab === "general" && (
               <div className="space-y-5">
-                <Input label="Website Name" value={form.siteName} onChange={(e) => update("siteName", e.target.value)} />
-                <Input label="Website Description" value={form.siteDescription} onChange={(e) => update("siteDescription", e.target.value)} />
-                <Input label="Contact Email" value={form.contactEmail} onChange={(e) => update("contactEmail", e.target.value)} />
+                <Input label="اسم الموقع" value={form.siteName} onChange={(e) => update("siteName", e.target.value)} />
+                <Input label="وصف الموقع" value={form.siteDescription} onChange={(e) => update("siteDescription", e.target.value)} />
+                <Input label="البريد الإلكتروني" value={form.contactEmail} onChange={(e) => update("contactEmail", e.target.value)} />
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-2">Clan Logo</label>
+                  <label className="block text-sm font-medium text-[#9CA3AF] mb-2">شعار الكلان</label>
                   <div className="flex items-center gap-4">
                     <div className="w-20 h-20 rounded-[14px] bg-gradient-to-br from-[#E50914] to-[#FF6B35] flex items-center justify-center text-2xl font-black">S4</div>
-                    <Button variant="ghost" size="sm">Change Logo</Button>
-                    <Button variant="ghost" size="sm" className="text-[#FF3B30]">Remove</Button>
+                    <Button variant="ghost" size="sm">تغيير الشعار</Button>
+                    <Button variant="ghost" size="sm" className="text-[#FF3B30]">إزالة</Button>
                   </div>
                 </div>
               </div>
@@ -166,10 +166,10 @@ export default function SettingsPage() {
 
             {activeTab === "appearance" && (
               <div className="space-y-5">
-                <label className="block text-sm font-medium text-[#9CA3AF] mb-2">Theme</label>
+                <label className="block text-sm font-medium text-[#9CA3AF] mb-2">السمة</label>
                 <div className="grid grid-cols-3 gap-4">
                   {["dark", "light", "oled"].map((theme) => {
-                    const label = theme === "dark" ? "Dark (Default)" : theme === "light" ? "Light" : "OLED Black";
+                    const label = theme === "dark" ? "داكن (افتراضي)" : theme === "light" ? "فاتح" : "OLED أسود";
                     return (
                       <div
                         key={theme}
@@ -185,7 +185,7 @@ export default function SettingsPage() {
                   })}
                 </div>
                 <div className="flex items-center gap-2 mt-2">
-                  <label className="text-sm font-medium text-[#9CA3AF]">Accent Color</label>
+                  <label className="text-sm font-medium text-[#9CA3AF]">اللون المميز</label>
                   <div className="flex gap-2">
                     {["#E50914", "#FFD700", "#00E676", "#FF3B30", "#7C3AED"].map((c) => (
                       <button
@@ -202,18 +202,18 @@ export default function SettingsPage() {
 
             {activeTab === "localization" && (
               <div className="space-y-5">
-                <Input label="Default Language" value={form.language} onChange={(e) => update("language", e.target.value)} />
-                <Input label="RTL Support" value="Enabled" disabled />
+                <Input label="اللغة الافتراضية" value={form.language} onChange={(e) => update("language", e.target.value)} />
+                <Input label="دعم RTL" value="مفعل" disabled />
                 <div>
-                  <label className="block text-sm font-medium text-[#9CA3AF] mb-2">Available Languages</label>
+                  <label className="block text-sm font-medium text-[#9CA3AF] mb-2">اللغات المتاحة</label>
                   <div className="flex flex-wrap gap-2">
-                    {["Arabic", "English", "Turkish", "French"].map((lang) => (
+                    {["العربية", "الإنجليزية", "التركية", "الفرنسية"].map((lang) => (
                       <span key={lang} className="px-3 py-1.5 rounded-[10px] text-xs font-semibold bg-[rgba(255,255,255,0.06)] text-white flex items-center gap-2">
                         {lang}
                         <button className="text-[#6B7280] hover:text-[#FF3B30]">&times;</button>
                       </span>
                     ))}
-                    <Button variant="ghost" size="sm">+ Add Language</Button>
+                    <Button variant="ghost" size="sm">+ إضافة لغة</Button>
                   </div>
                 </div>
               </div>
@@ -224,7 +224,7 @@ export default function SettingsPage() {
                 {["discord", "youtube", "instagram", "telegram", "tiktok"].map((platform) => (
                   <Input
                     key={platform}
-                    label={platform.charAt(0).toUpperCase() + platform.slice(1)}
+                    label={platform === "discord" ? "ديسكورد" : platform === "youtube" ? "يوتيوب" : platform === "instagram" ? "إنستغرام" : platform === "telegram" ? "تيليغرام" : platform === "tiktok" ? "تيك توك" : platform.charAt(0).toUpperCase() + platform.slice(1)}
                     placeholder={`${platform}.com/syria4`}
                     value={(form as any)[platform] || ""}
                     onChange={(e) => update(platform, e.target.value)}
@@ -238,11 +238,11 @@ export default function SettingsPage() {
                 <div className="p-4 rounded-[14px] bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)]">
                   <div className="flex items-center gap-3 mb-2">
                     <Shield size={20} className="text-[#9CA3AF]" />
-                    <p className="text-sm font-semibold">Server-Side Configuration</p>
+                    <p className="text-sm font-semibold">إعدادات الخادم</p>
                   </div>
                   <p className="text-xs text-[#9CA3AF] leading-relaxed">
-                    API keys, secrets, and security settings are configured server-side for safety.
-                    Contact your server administrator to update these values.
+                    مفاتيح API والأسرار وإعدادات الأمان تم تكوينها من جانب الخادم للسلامة.
+                    اتصل بمسؤول الخادم لتحديث هذه القيم.
                   </p>
                 </div>
               </div>
@@ -252,19 +252,19 @@ export default function SettingsPage() {
               <div className="space-y-5">
                 <div className="glass rounded-[14px] p-6 text-center">
                   <Database size={40} className="mx-auto text-[#6B7280] mb-3" />
-                  <p className="text-lg font-bold mb-1">Export Data</p>
-                  <p className="text-sm text-[#9CA3AF] mb-4">Download all platform data as a JSON file</p>
+                  <p className="text-lg font-bold mb-1">تصدير البيانات</p>
+                  <p className="text-sm text-[#9CA3AF] mb-4">تنزيل جميع بيانات المنصة كملف JSON</p>
                   <div className="flex justify-center gap-3">
-                    <Button variant="primary" onClick={exportData}><Database size={16} /> Export Data</Button>
+                    <Button variant="primary" onClick={exportData}><Database size={16} /> تصدير البيانات</Button>
                   </div>
                 </div>
               </div>
             )}
 
             <div className="flex items-center justify-between pt-6 mt-6 border-t border-[rgba(255,255,255,0.06)]">
-              <Button variant="ghost" className="text-[#FF3B30]" onClick={resetDefaults}>Reset to Defaults</Button>
+              <Button variant="ghost" className="text-[#FF3B30]" onClick={resetDefaults}>إعادة إلى الافتراضي</Button>
               <Button variant="primary" glow onClick={handleSave}>
-                {saved ? "✓ Saved!" : <><Save size={16} /> Save Changes</>}
+                {saved ? "✓ تم الحفظ!" : <><Save size={16} /> حفظ التغييرات</>}
               </Button>
             </div>
           </GlassCard>

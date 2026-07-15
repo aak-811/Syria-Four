@@ -100,15 +100,15 @@ export default function GalleryPage() {
       <div className="space-y-6">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-black">Gallery</h1>
-            <p className="text-[#9CA3AF] text-sm mt-1">Manage your clan&apos;s visual media</p>
+            <h1 className="text-2xl font-black">المعرض</h1>
+            <p className="text-[#9CA3AF] text-sm mt-1">إدارة الوسائط المرئية للكلان</p>
           </div>
         </motion.div>
         <GlassCard className="p-12 text-center">
           <AlertCircle size={48} className="mx-auto text-[#FF3B30] mb-4" />
-          <p className="text-lg font-bold mb-2">Failed to load gallery</p>
+          <p className="text-lg font-bold mb-2">فشل تحميل المعرض</p>
           <p className="text-sm text-[#9CA3AF] mb-4">{error}</p>
-          <Button variant="primary" onClick={fetchGallery}>Retry</Button>
+          <Button variant="primary" onClick={fetchGallery}>إعادة المحاولة</Button>
         </GlassCard>
       </div>
     );
@@ -118,8 +118,8 @@ export default function GalleryPage() {
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black">Gallery</h1>
-          <p className="text-[#9CA3AF] text-sm mt-1">Manage your clan&apos;s visual media</p>
+            <h1 className="text-2xl font-black">المعرض</h1>
+            <p className="text-[#9CA3AF] text-sm mt-1">إدارة الوسائط المرئية للكلان</p>
         </div>
       </motion.div>
 
@@ -147,16 +147,16 @@ export default function GalleryPage() {
         ) : (
           <Upload size={40} className="mx-auto text-[#6B7280] mb-3" />
         )}
-        <p className="text-lg font-bold mb-1">{uploading ? "Uploading..." : "Drop images here"}</p>
-        <p className="text-sm text-[#9CA3AF] mb-4">or click to browse (PNG, JPG, WEBP up to 10MB)</p>
-        <Button variant="ghost" disabled={uploading}><Image size={16} /> Browse Files</Button>
+        <p className="text-lg font-bold mb-1">{uploading ? "جارٍ الرفع..." : "أسقط الصور هنا"}</p>
+        <p className="text-sm text-[#9CA3AF] mb-4">أو انقر للتصفح (PNG, JPG, WEBP حتى 10 ميجابايت)</p>
+        <Button variant="ghost" disabled={uploading}><Image size={16} /> تصفح الملفات</Button>
       </GlassCard>
 
       {images.length === 0 ? (
         <GlassCard className="p-12 text-center">
           <Image size={48} className="mx-auto text-[#6B7280] mb-4" />
-          <p className="text-lg font-bold mb-1">No images yet</p>
-          <p className="text-sm text-[#9CA3AF]">Upload your first image using the zone above</p>
+          <p className="text-lg font-bold mb-1">لا توجد صور بعد</p>
+          <p className="text-sm text-[#9CA3AF]">ارفع صورتك الأولى باستخدام المنطقة أعلاه</p>
         </GlassCard>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -191,11 +191,11 @@ export default function GalleryPage() {
         )}
       </Modal>
 
-      <Modal open={!!deleteId} onClose={() => setDeleteId(null)} title="Delete Image">
-        <p className="text-[#9CA3AF] mb-6">Are you sure you want to delete this image? This action cannot be undone.</p>
+      <Modal open={!!deleteId} onClose={() => setDeleteId(null)} title="حذف الصورة">
+        <p className="text-[#9CA3AF] mb-6">هل أنت متأكد من حذف هذه الصورة؟ لا يمكن التراجع عن هذا الإجراء.</p>
         <div className="flex gap-3 justify-end">
-          <Button variant="ghost" onClick={() => setDeleteId(null)}>Cancel</Button>
-          <Button variant="danger" onClick={handleDelete}>Delete</Button>
+          <Button variant="ghost" onClick={() => setDeleteId(null)}>إلغاء</Button>
+          <Button variant="danger" onClick={handleDelete}>حذف</Button>
         </div>
       </Modal>
     </div>

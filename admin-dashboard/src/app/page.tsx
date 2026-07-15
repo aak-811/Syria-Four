@@ -37,10 +37,10 @@ export default function DashboardPage() {
   }, []);
 
   const stats = [
-    { label: "Total Members", value: formatNumber(members.length), change: 0, icon: "Users", color: "#E50914" },
-    { label: "Tournaments", value: formatNumber(tournaments.length), change: 0, icon: "Swords", color: "#FFD700" },
-    { label: "Orders", value: formatNumber(orders.length), change: 0, icon: "ShoppingCart", color: "#00E676" },
-    { label: "Support", value: formatNumber(support.length), change: 0, icon: "HeadphonesIcon", color: "#FF3B30" },
+    { label: "إجمالي الأعضاء", value: formatNumber(members.length), change: 0, icon: "Users", color: "#E50914" },
+    { label: "البطولات", value: formatNumber(tournaments.length), change: 0, icon: "Swords", color: "#FFD700" },
+    { label: "الطلبات", value: formatNumber(orders.length), change: 0, icon: "ShoppingCart", color: "#00E676" },
+    { label: "الدعم", value: formatNumber(support.length), change: 0, icon: "HeadphonesIcon", color: "#FF3B30" },
   ];
 
   const upcomingEvents = tournaments.filter((t) => t.type === "upcoming");
@@ -92,12 +92,12 @@ export default function DashboardPage() {
           </div>
           <GlassCard>
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold">Upcoming Events</h3>
+              <h3 className="text-lg font-bold">الفعاليات القادمة</h3>
               <Calendar size={20} className="text-[#6B7280]" />
             </div>
             <div className="space-y-4">
               {upcomingEvents.length === 0 ? (
-                <p className="text-sm text-[#6B7280]">No upcoming events</p>
+                <p className="text-sm text-[#6B7280]">لا توجد فعاليات قادمة</p>
               ) : (
                 upcomingEvents.map((event, i) => (
                   <motion.div
@@ -109,14 +109,14 @@ export default function DashboardPage() {
                   >
                     <p className="font-semibold text-sm">{event.name}</p>
                     <div className="flex items-center gap-4 mt-2 text-xs text-[#6B7280]">
-                      <span>{event.startDate ? new Date(event.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "TBD"}</span>
-                      <span>{event.maxPlayers || "?"} players</span>
+                      <span>{event.startDate ? new Date(event.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "غير محدد"}</span>
+                      <span>{event.maxPlayers || "?"} لاعب</span>
                     </div>
                   </motion.div>
                 ))
               )}
               <button className="flex items-center gap-1 text-sm text-[#E50914] font-semibold hover:underline mt-2">
-                View Calendar <ArrowRight size={16} />
+                عرض التقويم <ArrowRight size={16} />
               </button>
             </div>
           </GlassCard>

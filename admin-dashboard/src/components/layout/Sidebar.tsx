@@ -50,7 +50,7 @@ export default function Sidebar() {
         </div>
         <div>
           <h1 className="text-base font-bold tracking-tight">SYRIA FOUR</h1>
-          <p className="text-[10px] text-[#9CA3AF] font-medium">Control Center</p>
+          <p className="text-[10px] text-[#9CA3AF] font-medium">مركز التحكم</p>
         </div>
       </div>
 
@@ -97,7 +97,7 @@ export default function Sidebar() {
           className="flex items-center gap-3 px-4 py-3 rounded-[14px] text-sm font-medium text-[#6B7280] hover:text-[#FF3B30] hover:bg-[rgba(255,59,48,0.1)] transition-all duration-300 w-full"
         >
           <LogOut size={20} />
-          <span>Logout</span>
+          <span>تسجيل الخروج</span>
         </button>
       </div>
     </aside>

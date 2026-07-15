@@ -66,7 +66,7 @@ const COUNTRIES = [
   "السودان", "الكويت", "قطر", "الإمارات", "عمان", "البحرين",
 ];
 
-const RANKS = ["Bronze", "Silver", "Gold", "Platinum", "Diamond", "Master", "Grandmaster", "Legendary"];
+const RANKS = ["برونز", "فضة", "ذهب", "بلاتين", "ألماس", "ماستر", "غراندماستر", "أسطوري"];
 const ROLES = ["", "leader", "vice", "chief", "elite", "member"];
 
 const defaultForm: FormData = {
@@ -129,7 +129,7 @@ export default function MembersPage() {
       const data = await api.getMembers();
       setMembers(data);
     } catch (err: any) {
-      setError(err.message || "Failed to load members");
+      setError(err.message || "فشل تحميل الأعضاء");
     } finally {
       setLoading(false);
     }
@@ -203,7 +203,7 @@ export default function MembersPage() {
       setShowFormModal(false);
       await fetchMembers();
     } catch (err: any) {
-      alert(err.message || "Failed to save member");
+      alert(err.message || "فشل حفظ العضو");
     } finally {
       setSaving(false);
     }
@@ -217,7 +217,7 @@ export default function MembersPage() {
       setSelectedIds((prev) => { const n = new Set(prev); n.delete(id); return n; });
       await fetchMembers();
     } catch (err: any) {
-      alert(err.message || "Failed to delete member");
+      alert(err.message || "فشل حذف العضو");
     } finally {
       setDeleting(false);
     }
@@ -231,7 +231,7 @@ export default function MembersPage() {
       setSelectedIds(new Set());
       await fetchMembers();
     } catch (err: any) {
-      alert(err.message || "Failed to delete members");
+      alert(err.message || "فشل حذف الأعضاء");
     } finally {
       setDeleting(false);
     }
@@ -245,11 +245,11 @@ export default function MembersPage() {
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black">Members</h1>
-          <p className="text-[#9CA3AF] text-sm mt-1">Manage your clan members</p>
+          <h1 className="text-2xl font-black">الأعضاء</h1>
+          <p className="text-[#9CA3AF] text-sm mt-1">إدارة أعضاء الكلان</p>
         </div>
         <Button variant="primary" onClick={openAddModal}>
-          <Plus size={18} /> Add Member
+          <Plus size={18} /> إضافة عضو
         </Button>
       </motion.div>
 
@@ -258,7 +258,7 @@ export default function MembersPage() {
         <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
           <div className="flex-1 w-full md:w-auto">
             <Input
-              placeholder="Search by name, game ID or level..."
+              placeholder="البحث بالاسم أو معرف اللعبة أو المستوى..."
               icon={<Search size={18} />}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -276,7 +276,7 @@ export default function MembersPage() {
                     : "glass text-[#9CA3AF] hover:text-white"
                 )}
               >
-                {role === "all" ? "All" : role.charAt(0).toUpperCase() + role.slice(1)}
+                {role === "all" ? "الكل" : role === "leader" ? "قائد" : role === "chief" ? "زعيم" : role === "vice" ? "نائب" : role === "elite" ? "نخبة" : role === "member" ? "عضو" : role.charAt(0).toUpperCase() + role.slice(1)}
               </button>
             ))}
           </div>
@@ -290,27 +290,27 @@ export default function MembersPage() {
           className="flex items-center gap-1.5 hover:text-white transition-colors"
         >
           {allSelected ? <CheckSquare size={16} /> : <Square size={16} />}
-          Select All
+          تحديد الكل
         </button>
         {selectedIds.size > 0 && (
           <Button size="sm" variant="danger" onClick={handleBulkDelete} loading={deleting}>
-            <Trash2 size={14} /> Delete ({selectedIds.size})
+            <Trash2 size={14} /> حذف ({selectedIds.size})
           </Button>
         )}
         <span className="text-[#6B7280]">|</span>
-        <span>Sort by:</span>
+        <span>ترتيب حسب:</span>
         {["name", "level", "wins"].map((s) => (
           <button
             key={s}
             onClick={() => { setSortBy(s); setSortAsc(sortBy === s ? !sortAsc : true); }}
             className="flex items-center gap-1 hover:text-white transition-colors"
           >
-            {s.charAt(0).toUpperCase() + s.slice(1)}
+            {s === "name" ? "الاسم" : s === "level" ? "المستوى" : "الفوز"}
             {sortBy === s && (sortAsc ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
           </button>
         ))}
         <span className="ml-auto text-[#9CA3AF]">
-          {loading ? "Loading..." : `${filtered.length} members`}
+          {loading ? "جارٍ التحميل..." : `${filtered.length} عضو`}
         </span>
       </div>
 
@@ -329,10 +329,10 @@ export default function MembersPage() {
       {!loading && error && (
         <GlassCard className="p-12 text-center">
           <AlertCircle size={48} className="mx-auto text-[#FF3B30] mb-4" />
-          <h3 className="text-lg font-bold mb-2">Failed to load members</h3>
+          <h3 className="text-lg font-bold mb-2">فشل تحميل الأعضاء</h3>
           <p className="text-[#9CA3AF] text-sm mb-6">{error}</p>
           <Button variant="primary" onClick={fetchMembers}>
-            <Loader2 size={16} /> Retry
+            <Loader2 size={16} /> إعادة المحاولة
           </Button>
         </GlassCard>
       )}
@@ -341,9 +341,9 @@ export default function MembersPage() {
       {!loading && !error && filtered.length === 0 && (
         <GlassCard className="p-12 text-center">
           <Users size={48} className="mx-auto text-[#6B7280] mb-4" />
-          <h3 className="text-lg font-bold mb-2">No members found</h3>
+          <h3 className="text-lg font-bold mb-2">لا يوجد أعضاء</h3>
           <p className="text-[#9CA3AF] text-sm">
-            {search || roleFilter !== "all" ? "Try adjusting your search or filters." : "Click \"Add Member\" to get started."}
+            {search || roleFilter !== "all" ? "حاول تعديل البحث أو الفلاتر." : "انقر \"إضافة عضو\" للبدء."}
           </p>
         </GlassCard>
       )}
@@ -382,31 +382,31 @@ export default function MembersPage() {
                   </div>
                   <div className="text-right shrink-0">
                     <p className="text-lg font-black">{formatNumber(member.wins)}</p>
-                    <p className="text-[10px] text-[#6B7280] font-medium">Wins</p>
+                    <p className="text-[10px] text-[#6B7280] font-medium">فوز</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-[rgba(255,255,255,0.06)]">
                   <div>
-                    <p className="text-[10px] text-[#6B7280] font-medium">Game ID</p>
+                    <p className="text-[10px] text-[#6B7280] font-medium">معرف اللعبة</p>
                     <p className="text-xs font-semibold truncate">{member.gameId || "—"}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-[#6B7280] font-medium">Rank</p>
+                    <p className="text-[10px] text-[#6B7280] font-medium">الرتبة</p>
                     <p className="text-xs font-semibold">{member.rank || "—"}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-[#6B7280] font-medium">Level</p>
+                    <p className="text-[10px] text-[#6B7280] font-medium">المستوى</p>
                     <p className="text-xs font-semibold">{member.level ?? "—"}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 mt-4 pt-3 border-t border-[rgba(255,255,255,0.06)] opacity-0 group-hover:opacity-100 transition-opacity">
                   <Button size="sm" variant="ghost" onClick={() => setSelectedMember(member)} className="flex-1">
-                    <Eye size={14} /> View
+                    <Eye size={14} /> عرض
                   </Button>
                   <Button size="sm" variant="ghost" onClick={() => openEditModal(member)} className="flex-1">
-                    <Edit3 size={14} /> Edit
+                    <Edit3 size={14} /> تعديل
                   </Button>
                   <Button size="sm" variant="ghost" className="flex-1 text-[#FF3B30]" onClick={() => setConfirmDelete(member.id)}>
                     <Trash2 size={14} />
@@ -419,7 +419,7 @@ export default function MembersPage() {
       )}
 
       {/* View Modal */}
-      <Modal open={!!selectedMember} onClose={() => setSelectedMember(null)} title="Member Details">
+      <Modal open={!!selectedMember} onClose={() => setSelectedMember(null)} title="تفاصيل العضو">
         {selectedMember && (
           <div className="text-center">
             <Avatar src={selectedMember.image || "/placeholder.svg"} size="xl" className="mx-auto mb-4" />
@@ -431,16 +431,16 @@ export default function MembersPage() {
             </div>
             <div className="grid grid-cols-2 gap-4 mt-6">
               {[
-                { label: "Code", value: selectedMember.code },
-                { label: "Rank", value: selectedMember.rank || "—" },
-                { label: "Level", value: selectedMember.level ?? "—" },
-                { label: "Wins", value: formatNumber(selectedMember.wins) },
-                { label: "Country", value: selectedMember.country || "—" },
-                { label: "Age", value: selectedMember.age ?? "—" },
-                { label: "Weapon", value: selectedMember.weapon || "—" },
-                { label: "Joined", value: selectedMember.joinDate ? new Date(selectedMember.joinDate).toLocaleDateString() : "—" },
-                { label: "Instagram", value: selectedMember.instagram || "—" },
-                { label: "Prime", value: selectedMember.prime ? `#${selectedMember.prime}` : "—" },
+                { label: "الكود", value: selectedMember.code },
+                { label: "الرتبة", value: selectedMember.rank || "—" },
+                { label: "المستوى", value: selectedMember.level ?? "—" },
+                { label: "فوز", value: formatNumber(selectedMember.wins) },
+                { label: "البلد", value: selectedMember.country || "—" },
+                { label: "العمر", value: selectedMember.age ?? "—" },
+                { label: "السلاح", value: selectedMember.weapon || "—" },
+                { label: "تاريخ الانضمام", value: selectedMember.joinDate ? new Date(selectedMember.joinDate).toLocaleDateString() : "—" },
+                { label: "إنستغرام", value: selectedMember.instagram || "—" },
+                { label: "برايم", value: selectedMember.prime ? `#${selectedMember.prime}` : "—" },
               ].map((f) => (
                 <div key={f.label} className="glass rounded-[14px] p-3">
                   <p className="text-[10px] text-[#6B7280] font-medium">{f.label}</p>
@@ -450,13 +450,13 @@ export default function MembersPage() {
             </div>
             {selectedMember.bio && (
               <div className="glass rounded-[14px] p-3 mt-4">
-                <p className="text-[10px] text-[#6B7280] font-medium">Bio</p>
+                <p className="text-[10px] text-[#6B7280] font-medium">السيرة</p>
                 <p className="text-sm mt-0.5">{selectedMember.bio}</p>
               </div>
             )}
             <div className="flex gap-3 mt-6">
               <Button variant="primary" className="flex-1" onClick={() => { setSelectedMember(null); openEditModal(selectedMember); }}>
-                <Edit3 size={16} /> Edit Member
+                <Edit3 size={16} /> تعديل العضو
               </Button>
             </div>
           </div>
@@ -467,57 +467,57 @@ export default function MembersPage() {
       <Modal
         open={showFormModal}
         onClose={() => setShowFormModal(false)}
-        title={editingMember ? "Edit Member" : "Add Member"}
+        title={editingMember ? "تعديل العضو" : "إضافة عضو"}
         className="max-w-2xl"
       >
         <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
-          <Input label="Name *" value={formData.name} onChange={(e) => updateForm("name", e.target.value)} placeholder="Full name" />
-          <Input label="Game ID" value={formData.gameId} onChange={(e) => updateForm("gameId", e.target.value)} placeholder="In-game username" />
+          <Input label="الاسم *" value={formData.name} onChange={(e) => updateForm("name", e.target.value)} placeholder="الاسم الكامل" />
+          <Input label="معرف اللعبة" value={formData.gameId} onChange={(e) => updateForm("gameId", e.target.value)} placeholder="اسم المستخدم في اللعبة" />
           <div className="grid grid-cols-2 gap-4">
-            <Input label="Level" type="number" value={formData.level} onChange={(e) => updateForm("level", Number(e.target.value))} />
-            <Input label="Wins" type="number" value={formData.wins} onChange={(e) => updateForm("wins", Number(e.target.value))} />
+            <Input label="المستوى" type="number" value={formData.level} onChange={(e) => updateForm("level", Number(e.target.value))} />
+            <Input label="فوز" type="number" value={formData.wins} onChange={(e) => updateForm("wins", Number(e.target.value))} />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#9CA3AF] mb-2">Rank</label>
+              <label className="block text-sm font-medium text-[#9CA3AF] mb-2">الرتبة</label>
               <select
                 value={formData.rank}
                 onChange={(e) => updateForm("rank", e.target.value)}
                 className="w-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3 text-white transition-all duration-300 outline-none focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914]"
               >
-                <option value="">Select rank</option>
+                <option value="">اختر الرتبة</option>
                 {RANKS.map((r) => <option key={r} value={r}>{r}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#9CA3AF] mb-2">Country</label>
+              <label className="block text-sm font-medium text-[#9CA3AF] mb-2">البلد</label>
               <select
                 value={formData.country}
                 onChange={(e) => updateForm("country", e.target.value)}
                 className="w-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3 text-white transition-all duration-300 outline-none focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914]"
               >
-                <option value="">Select country</option>
+                <option value="">اختر البلد</option>
                 {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <Input label="Age" type="number" value={formData.age} onChange={(e) => updateForm("age", Number(e.target.value))} />
-            <Input label="Weapon" value={formData.weapon} onChange={(e) => updateForm("weapon", e.target.value)} placeholder="Main weapon" />
+            <Input label="العمر" type="number" value={formData.age} onChange={(e) => updateForm("age", Number(e.target.value))} />
+            <Input label="السلاح" value={formData.weapon} onChange={(e) => updateForm("weapon", e.target.value)} placeholder="السلاح الرئيسي" />
           </div>
-          <Input label="Join Date" type="date" value={formData.joinDate} onChange={(e) => updateForm("joinDate", e.target.value)} />
-          <Input label="Instagram" value={formData.instagram} onChange={(e) => updateForm("instagram", e.target.value)} placeholder="@username" />
+          <Input label="تاريخ الانضمام" type="date" value={formData.joinDate} onChange={(e) => updateForm("joinDate", e.target.value)} />
+          <Input label="إنستغرام" value={formData.instagram} onChange={(e) => updateForm("instagram", e.target.value)} placeholder="@اسم_المستخدم" />
           <div>
-            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">Bio</label>
+            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">السيرة</label>
             <textarea
               value={formData.bio}
               onChange={(e) => updateForm("bio", e.target.value)}
               rows={3}
-              placeholder="Short biography..."
+              placeholder="سيرة قصيرة..."
               className="w-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3 text-white placeholder:text-[#6B7280] transition-all duration-300 outline-none focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] resize-none"
             />
           </div>
-          <Input label="Image URL" value={formData.image} onChange={(e) => updateForm("image", e.target.value)} placeholder="https://..." />
+          <Input label="رابط الصورة" value={formData.image} onChange={(e) => updateForm("image", e.target.value)} placeholder="https://..." />
           {formData.image && (
             <div className="flex justify-center">
               <img src={formData.image} alt="Preview" className="w-20 h-20 rounded-full object-cover border-2 border-[rgba(255,255,255,0.08)]" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
@@ -525,18 +525,18 @@ export default function MembersPage() {
           )}
           {/* Role */}
           <div>
-            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">Role</label>
+            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">الدور</label>
             <select
               value={formData.role}
               onChange={(e) => updateForm("role", e.target.value)}
               className="w-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3 text-white transition-all duration-300 outline-none focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914]"
             >
-              {ROLES.map((r) => <option key={r} value={r}>{r || "No role"}</option>)}
+              {ROLES.map((r) => <option key={r} value={r}>{r || "بدون دور"}</option>)}
             </select>
           </div>
           {/* Prime visual selector */}
           <div>
-            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">Prime</label>
+            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">برايم</label>
             <div className="flex gap-2">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
                 <button
@@ -558,21 +558,21 @@ export default function MembersPage() {
         </div>
         <div className="flex gap-3 mt-6 pt-4 border-t border-[rgba(255,255,255,0.08)]">
           <Button variant="ghost" className="flex-1" onClick={() => setShowFormModal(false)}>
-            Cancel
+            إلغاء
           </Button>
           <Button variant="primary" className="flex-1" onClick={handleSave} loading={saving} disabled={!formData.name.trim()}>
-            <Save size={16} /> {editingMember ? "Update" : "Add"} Member
+            <Save size={16} /> {editingMember ? "تحديث" : "إضافة"} العضو
           </Button>
         </div>
       </Modal>
 
       {/* Delete Confirm Modal */}
-      <Modal open={!!confirmDelete} onClose={() => setConfirmDelete(null)} title="Confirm Delete">
-        <p className="text-[#9CA3AF] text-sm">Are you sure you want to delete this member? This action cannot be undone.</p>
+      <Modal open={!!confirmDelete} onClose={() => setConfirmDelete(null)} title="تأكيد الحذف">
+        <p className="text-[#9CA3AF] text-sm">هل أنت متأكد من حذف هذا العضو؟ لا يمكن التراجع عن هذا الإجراء.</p>
         <div className="flex gap-3 mt-6">
-          <Button variant="ghost" className="flex-1" onClick={() => setConfirmDelete(null)} disabled={deleting}>Cancel</Button>
+          <Button variant="ghost" className="flex-1" onClick={() => setConfirmDelete(null)} disabled={deleting}>إلغاء</Button>
           <Button variant="danger" className="flex-1" onClick={() => confirmDelete && handleDelete(confirmDelete)} loading={deleting}>
-            <Trash2 size={16} /> Delete
+            <Trash2 size={16} /> حذف
           </Button>
         </div>
       </Modal>
