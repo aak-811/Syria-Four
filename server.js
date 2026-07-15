@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const multer = require('multer');
+const fs = require('fs');
 const rateLimit = require('express-rate-limit');
 const DB = require('./db');
 const { hashPassword, comparePassword, generateToken, authMiddleware } = require('./auth');
@@ -25,12 +26,27 @@ app.post('/api/admin-login', (req, res) => {
 // Serve admin dashboard (Next.js static export) at /admin/
 const dashboardPath = path.join(__dirname, 'admin-dashboard', 'out');
 
-// Serve dashboard static assets (JS, CSS, images)
+// Serve dashboard static assets (JS, CSS, images) - MUST be before /admin handler
 app.use('/admin/_next', express.static(path.join(dashboardPath, '_next')));
 
-// SPA fallback for ALL /admin/* routes - always serve index.html
+// Serve exact dashboard page HTML files and other static files
 app.use('/admin', (req, res, next) => {
   if (req.method !== 'GET') return next();
+  
+  let filePath = req.path;
+  
+  // Remove trailing slash (if any)
+  if (filePath.endsWith('/') && filePath !== '/') filePath = filePath.slice(0, -1);
+  
+  // Try to serve the actual page HTML: /admin/members -> out/members/index.html
+  if (filePath && filePath !== '/') {
+    const pagePath = path.join(dashboardPath, filePath.slice(1), 'index.html');
+    if (fs.existsSync(pagePath)) {
+      return res.sendFile(pagePath);
+    }
+  }
+  
+  // Fallback to root index.html (SPA client-side routing)
   res.sendFile(path.join(dashboardPath, 'index.html'));
 });
 
@@ -448,11 +464,8 @@ app.put('/api/notifications/read-all', authMiddleware, async (req, res) => {
   }
 });
 
-// Catch-all: serve clan site for unknown routes
+// Catch-all: serve clan site index for SPA-like behavior
 app.get('*', (req, res) => {
-  if (req.path.startsWith('/admin')) {
-    return res.sendFile(path.join(dashboardPath, 'index.html'));
-  }
   res.sendFile(path.join(__dirname, 'clan-site', 'index.html'));
 });
 
