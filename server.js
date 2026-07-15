@@ -25,17 +25,14 @@ app.post('/api/admin-login', (req, res) => {
 // Serve admin dashboard (Next.js static export) at /admin/
 const dashboardPath = path.join(__dirname, 'admin-dashboard', 'out');
 
-app.get('/admin', (req, res) => {
-  res.redirect('/admin/');
-});
-app.get('/admin/', (req, res) => {
+// Serve dashboard static assets (JS, CSS, images)
+app.use('/admin/_next', express.static(path.join(dashboardPath, '_next')));
+
+// SPA fallback for ALL /admin/* routes - always serve index.html
+app.use('/admin', (req, res, next) => {
+  if (req.method !== 'GET') return next();
   res.sendFile(path.join(dashboardPath, 'index.html'));
 });
-
-app.use('/admin', express.static(dashboardPath, {
-  extensions: ['html'],
-  redirect: true
-}));
 
 // Serve main clan site at root /
 app.use(express.static(path.join(__dirname, 'clan-site'), { extensions: ['html'] }));
@@ -451,12 +448,11 @@ app.put('/api/notifications/read-all', authMiddleware, async (req, res) => {
   }
 });
 
-// Catch-all: for admin sub-routes, serve dashboard index.html (SPA routing)
+// Catch-all: serve clan site for unknown routes
 app.get('*', (req, res) => {
   if (req.path.startsWith('/admin')) {
     return res.sendFile(path.join(dashboardPath, 'index.html'));
   }
-  // For everything else, serve clan site index
   res.sendFile(path.join(__dirname, 'clan-site', 'index.html'));
 });
 
