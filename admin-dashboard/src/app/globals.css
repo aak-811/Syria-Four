@@ -17,8 +17,8 @@
   --success: #00E676;
   --warning: #FFC107;
   --danger: #FF3B30;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(255, 255, 255, 0.15);
+  --border: rgba(255, 255, 255, 0.10);
+  --border-hover: rgba(255, 255, 255, 0.18);
   --radius: 18px;
   --sidebar-width: 260px;
   --topbar-height: 70px;
@@ -26,7 +26,7 @@
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
 }
 
 html {
@@ -123,6 +123,89 @@ body {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+@keyframes inputFocusGlow {
+  0% { box-shadow: 0 0 0 0 rgba(229, 9, 20, 0); }
+  50% { box-shadow: 0 0 20px 4px rgba(229, 9, 20, 0.15); }
+  100% { box-shadow: 0 0 20px 0 rgba(229, 9, 20, 0.1); }
+}
+
+.input-glow {
+  animation: inputFocusGlow 0.6s ease forwards;
+}
+
+@keyframes borderGlow {
+  0%, 100% { border-color: rgba(229, 9, 20, 0.3); }
+  50% { border-color: rgba(229, 9, 20, 0.6); }
+}
+
+.border-glow {
+  animation: borderGlow 2s ease-in-out infinite;
+}
+
+select {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 2px solid rgba(255, 255, 255, 0.12) !important;
+  color: white !important;
+  border-radius: 14px !important;
+  padding: 12px 16px !important;
+  outline: none !important;
+  transition: all 0.4s ease !important;
+  appearance: none !important;
+  cursor: pointer !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: left 16px center !important;
+}
+
+select:hover {
+  background-color: rgba(255, 255, 255, 0.10) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+select:focus {
+  background-color: rgba(229, 9, 20, 0.06) !important;
+  border-color: #E50914 !important;
+  box-shadow: 0 0 20px rgba(229, 9, 20, 0.15), 0 0 40px rgba(229, 9, 20, 0.05) !important;
+}
+
+select option {
+  background: #1a1a1a;
+  color: white;
+  padding: 8px;
+}
+
+textarea {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 2px solid rgba(255, 255, 255, 0.12) !important;
+  color: white !important;
+  border-radius: 14px !important;
+  padding: 12px 16px !important;
+  outline: none !important;
+  transition: all 0.4s ease !important;
+  resize: none !important;
+}
+
+textarea:hover {
+  background-color: rgba(255, 255, 255, 0.10) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+textarea:focus {
+  background-color: rgba(229, 9, 20, 0.06) !important;
+  border-color: #E50914 !important;
+  box-shadow: 0 0 20px rgba(229, 9, 20, 0.15), 0 0 40px rgba(229, 9, 20, 0.05) !important;
+}
+
+textarea::placeholder {
+  color: #6B7280;
+}
+
+input[type="date"],
+input[type="number"],
+input[type="text"] {
+  color-scheme: dark;
 }
 
 @media (max-width: 768px) {

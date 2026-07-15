@@ -27,10 +27,14 @@ export default function GlassCard({ children, className, glow = "none", hover, o
       onDragLeave={onDragLeave}
       onDrop={onDrop}
       className={cn(
-        "glass rounded-[18px] p-6 transition-all duration-300",
+        "rounded-[18px] p-6 transition-all duration-300",
+        "bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.10)]",
+        "hover:bg-[rgba(255,255,255,0.09)] hover:border-[rgba(255,255,255,0.15)]",
+        "hover:shadow-[0_8px_32px_rgba(0,0,0,0.3),0_0_0_1px_rgba(255,255,255,0.05)]",
+        "backdrop-blur-[20px]",
         glow === "red" && "glow-red",
         glow === "gold" && "glow-gold",
-        hover && "cursor-pointer glass-hover",
+        hover && "cursor-pointer",
         onClick && "cursor-pointer",
         className
       )}

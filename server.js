@@ -17,32 +17,27 @@ app.use(express.json());
 app.post('/api/admin-login', (req, res) => {
   const { password } = req.body;
   if (password === 'syria2026' || password === 'aak1qusai7' || password === 'Za3im1syria') {
-    return res.json({ redirect: '/dashboard/' });
+    return res.json({ redirect: '/' });
   }
   return res.status(401).json({ error: 'كلمة المرور خاطئة' });
 });
 
-// Serve admin dashboard (Next.js static export)
+// Serve admin dashboard (Next.js static export) at ROOT
 const dashboardPath = path.join(__dirname, 'admin-dashboard', 'out');
 
-// Direct route handler as primary method
-app.get('/dashboard/', (req, res) => {
+// Direct route handler for dashboard root
+app.get('/', (req, res) => {
   res.sendFile(path.join(dashboardPath, 'index.html'));
 });
 
-// Static fallback for sub-routes
-app.use('/dashboard', (req, res, next) => {
-  if (req.path === '/' && !req.originalUrl.endsWith('/')) {
-    return res.redirect('/dashboard/');
-  }
-  next();
-}, express.static(dashboardPath, {
+// Static files for dashboard (JS/CSS/assets)
+app.use(express.static(dashboardPath, {
   extensions: ['html'],
-  redirect: true
+  index: 'index.html'
 }));
 
-// Serve main site static files (must be after /dashboard)
-app.use(express.static(path.join(__dirname, 'clan-site'), { extensions: ['html'] }));
+// Serve main clan site under /main/
+app.use('/main', express.static(path.join(__dirname, 'clan-site'), { extensions: ['html'] }));
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -455,8 +450,13 @@ app.put('/api/notifications/read-all', authMiddleware, async (req, res) => {
   }
 });
 
+// Catch-all: for dashboard sub-routes, serve dashboard index.html (SPA routing)
 app.get('*', (req, res) => {
-  res.redirect('/');
+  if (req.path.startsWith('/main')) {
+    return res.redirect('/main/');
+  }
+  // For dashboard routes, serve the dashboard index
+  res.sendFile(path.join(dashboardPath, 'index.html'));
 });
 
 app.listen(PORT, () => {

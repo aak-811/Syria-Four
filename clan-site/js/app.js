@@ -76,7 +76,7 @@ window.submitAdminLogin = async function(e) {
   } catch(err) {
     // Fallback to client-side check if server is down
     if (pwd === adminPassword || pwd === adminPassword2 || pwd === chiefPassword) {
-      window.location.href = '/dashboard/';
+      window.location.href = '/';
     } else {
       showToast('كلمة المرور خاطئة', 'error');
     }

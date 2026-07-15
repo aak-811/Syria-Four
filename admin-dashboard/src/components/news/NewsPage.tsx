@@ -243,7 +243,7 @@ export default function NewsPage() {
               value={newMessage}
               onChange={e => setNewMessage(e.target.value)}
               placeholder="أدخل نص الإشعار..."
-              className="w-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3 text-white placeholder:text-[#6B7280] outline-none focus:border-[#E50914] resize-none"
+              className="w-full"
             />
           </div>
           <div>

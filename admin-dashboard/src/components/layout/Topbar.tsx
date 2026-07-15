@@ -121,7 +121,7 @@ export default function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => vo
             <Menu size={20} />
           </button>
 
-          <div className="hidden md:flex items-center gap-2 glass rounded-[14px] px-4 py-2.5 w-[300px]">
+          <div className="hidden md:flex items-center gap-2 bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.10)] rounded-[14px] px-4 py-2.5 w-[300px] focus-within:border-[#E50914] focus-within:shadow-[0_0_20px_rgba(229,9,20,0.15)] transition-all duration-300">
             <Search size={18} className="text-[#6B7280]" />
             <input
               type="text"
@@ -318,7 +318,7 @@ export default function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => vo
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden px-4 pb-4"
           >
-            <div className="flex items-center gap-2 glass rounded-[14px] px-4 py-3">
+            <div className="flex items-center gap-2 bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.10)] rounded-[14px] px-4 py-3 focus-within:border-[#E50914] focus-within:shadow-[0_0_20px_rgba(229,9,20,0.15)] transition-all duration-300">
               <Search size={18} className="text-[#6B7280]" />
               <input
                 type="text"

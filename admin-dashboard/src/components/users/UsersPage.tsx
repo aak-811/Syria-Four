@@ -199,7 +199,7 @@ export default function UsersPage() {
                                 [member._id]: e.target.value,
                               }))
                             }
-                            className="appearance-none bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-[10px] px-3 py-1.5 text-xs text-white outline-none focus:border-[#E50914] cursor-pointer pr-8"
+                            className="rounded-[10px] px-3 py-1.5 text-xs"
                           >
                             {roleOptions.map((r) => (
                               <option key={r} value={r} className="bg-[#1a1a2e]">

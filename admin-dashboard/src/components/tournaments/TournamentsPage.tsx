@@ -121,7 +121,7 @@ export default function TournamentsPage() {
         name={name}
         value={value}
         onChange={handleChange}
-        className="w-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3 text-white outline-none focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] appearance-none cursor-pointer"
+        className="w-full"
       >
         {options.map((o) => <option key={o} value={o}>{o}</option>)}
       </select>
@@ -229,7 +229,7 @@ export default function TournamentsPage() {
               placeholder="وصف البطولة..."
               value={form.description}
               onChange={handleChange}
-              className="w-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3 text-white placeholder:text-[#6B7280] outline-none focus:border-[#E50914] resize-none"
+              className="w-full"
             />
           </div>
 

@@ -273,7 +273,7 @@ export default function NotificationsPage() {
               value={form.message}
               onChange={(e) => setForm({ ...form, message: e.target.value })}
               rows={4}
-              className="w-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3 text-white placeholder:text-[#6B7280] transition-all duration-300 outline-none focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] focus:bg-[rgba(229,9,20,0.05)] resize-none"
+              className="w-full"
             />
           </div>
           <div className="w-full">
@@ -281,7 +281,7 @@ export default function NotificationsPage() {
             <select
               value={form.type}
               onChange={(e) => setForm({ ...form, type: e.target.value })}
-              className="w-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3 text-white transition-all duration-300 outline-none focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] appearance-none cursor-pointer"
+              className="w-full"
             >
               {typeOptions.map((t) => (
                 <option key={t} value={t} className="bg-[#1a1a2e] text-white capitalize">{t}</option>

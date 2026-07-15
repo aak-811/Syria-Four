@@ -483,7 +483,7 @@ export default function MembersPage() {
               <select
                 value={formData.rank}
                 onChange={(e) => updateForm("rank", e.target.value)}
-                className="w-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3 text-white transition-all duration-300 outline-none focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914]"
+                className="w-full"
               >
                 <option value="">اختر الرتبة</option>
                 {RANKS.map((r) => <option key={r} value={r}>{r}</option>)}
@@ -494,7 +494,7 @@ export default function MembersPage() {
               <select
                 value={formData.country}
                 onChange={(e) => updateForm("country", e.target.value)}
-                className="w-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3 text-white transition-all duration-300 outline-none focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914]"
+                className="w-full"
               >
                 <option value="">اختر البلد</option>
                 {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -514,7 +514,7 @@ export default function MembersPage() {
               onChange={(e) => updateForm("bio", e.target.value)}
               rows={3}
               placeholder="سيرة قصيرة..."
-              className="w-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3 text-white placeholder:text-[#6B7280] transition-all duration-300 outline-none focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] resize-none"
+              className="w-full"
             />
           </div>
           <Input label="رابط الصورة" value={formData.image} onChange={(e) => updateForm("image", e.target.value)} placeholder="https://..." />
@@ -529,7 +529,7 @@ export default function MembersPage() {
             <select
               value={formData.role}
               onChange={(e) => updateForm("role", e.target.value)}
-              className="w-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3 text-white transition-all duration-300 outline-none focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914]"
+              className="w-full"
             >
               {ROLES.map((r) => <option key={r} value={r}>{r || "بدون دور"}</option>)}
             </select>
