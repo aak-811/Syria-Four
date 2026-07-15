@@ -1,0 +1,6 @@
+node_modules/
+.env
+*.log
+clan-site/uploads/*
+admin-dashboard/.next/
+admin-dashboard/node_modules/

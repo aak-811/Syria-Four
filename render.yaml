@@ -2,7 +2,7 @@ services:
   - type: web
     name: syria-four
     env: node
-    buildCommand: npm install
+    buildCommand: npm install && cd admin-dashboard && npm install && npm run build && cd ..
     startCommand: node server.js
     envVars:
       - key: NODE_VERSION
