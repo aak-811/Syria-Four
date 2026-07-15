@@ -1,3 +1,0 @@
--keepattributes *Annotation*
--keepattributes SourceFile,LineNumberTable
--keep class com.syriafour.admin.data.model.** { *; }
