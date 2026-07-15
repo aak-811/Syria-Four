@@ -1,66 +1,159 @@
 export interface Member {
   id: string;
   name: string;
-  nickname: string;
-  uid: string;
-  rank: string;
-  role: 'leader' | 'vice' | 'chief' | 'elite' | 'member';
-  status: 'active' | 'inactive' | 'suspended';
-  avatar: string;
-  level: number;
-  wins: number;
-  joinDate: string;
-  country: string;
+  gameId?: string;
+  level?: string;
+  rank?: string;
+  role?: string;
+  country?: string;
+  age?: string;
+  weapon?: string;
+  wins?: string;
+  joinDate?: string;
+  instagram?: string;
+  bio?: string;
+  image?: string;
+  prime?: string;
+  code?: string;
+  images?: string[];
 }
 
-export interface NewsItem {
+export interface Tournament {
+  id: string;
+  name: string;
+  type?: string;
+  description?: string;
+  date?: string;
+  startDate?: string;
+  endDate?: string;
+  maxPlayers?: string;
+  mode?: string;
+  mapType?: string;
+  persistent?: string;
+  mapDesign?: string;
+  winners?: string;
+  prizeType?: string;
+  prizeValue?: string;
+  gold?: string;
+  silver?: string;
+  participants?: any[];
+}
+
+export interface Event {
   id: string;
   title: string;
-  content: string;
-  excerpt: string;
-  image: string;
-  category: string;
-  tags: string[];
-  author: string;
-  publishedAt: string;
-  status: 'draft' | 'published';
-  scheduledFor?: string;
+  description?: string;
+  icon?: string;
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  name: string;
+  glory?: string;
+  wars?: string;
+}
+
+export interface Order {
+  id: string;
+  playerName: string;
+  playerId?: string;
+  item?: string;
+  payment?: string;
+  status?: string;
+  date?: string;
+}
+
+export interface SupportRequest {
+  id: string;
+  playerName: string;
+  type?: string;
+  message?: string;
+  status?: string;
+  date?: string;
+}
+
+export interface InstagramAccount {
+  id: string;
+  name: string;
+  username: string;
+  icon?: string;
 }
 
 export interface GalleryItem {
   id: string;
-  src: string;
   label: string;
-  uploadedAt: string;
-  size: number;
+  src: string;
 }
 
 export interface VideoItem {
   id: string;
   title: string;
   url: string;
-  thumbnail: string;
-  duration: string;
-  views: number;
-  uploadedAt: string;
+  thumbnail?: string;
 }
 
 export interface Notification {
   id: string;
-  title: string;
   message: string;
-  type: 'info' | 'warning' | 'success' | 'error';
-  read: boolean;
-  createdAt: string;
+  type?: string;
+  active?: boolean;
+  date?: string;
+  read?: boolean;
 }
 
-export interface Activity {
+export interface Player {
   id: string;
+  name: string;
+  slug: string;
+  uid?: string;
+  level?: string;
+  rank?: string;
+  rankPoints?: string;
+  country?: string;
+  language?: string;
+  clan?: string;
+  season?: string;
+  joinDate?: string;
+  yearsPlayed?: string;
+  badges?: string;
+  likes?: string;
+  bio?: string;
+  profileImage?: string;
+  weapons?: any[];
+  achievements?: any[];
+  pet?: any;
+  character?: any;
+  gallery?: string[];
+}
+
+export interface JoinRequest {
+  id: string;
+  tournamentId: string;
+  playerName: string;
+  playerGameId: string;
+  reason?: string;
+  status?: string;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  username: string;
+  email: string;
+  role: string;
+  status: string;
+  verified: boolean;
+  avatar?: string;
+  cover?: string;
+}
+
+export interface AuditLog {
+  id: string;
+  userId: string;
   action: string;
-  user: string;
-  avatar: string;
-  timestamp: string;
-  type: 'member' | 'tournament' | 'news' | 'system';
+  details: string;
+  ip: string;
+  createdAt: string;
 }
 
 export interface StatCard {

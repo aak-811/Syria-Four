@@ -1,29 +1,107 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import GlassCard from "@/components/ui/GlassCard";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
-import { NEWS_DATA } from "@/lib/data";
+import { api } from "@/lib/api";
 import { cn, formatDate } from "@/lib/utils";
 import {
-  Plus, Image, Tags, Calendar, Clock, Eye, Edit3, Trash2,
+  Plus, Trash2, Bell, AlertTriangle, Info, CheckCircle,
 } from "lucide-react";
 
+interface NotificationItem {
+  id: string;
+  message: string;
+  type: "info" | "warning" | "success" | "error";
+  active: boolean;
+  createdAt: string;
+}
+
+const typeVariant = {
+  info: "info",
+  warning: "warning",
+  success: "success",
+  error: "danger",
+} as const;
+
+const typeIcon = {
+  info: Info,
+  warning: AlertTriangle,
+  success: CheckCircle,
+  error: Bell,
+} as const;
+
 export default function NewsPage() {
-  const [activeTab, setActiveTab] = useState("published");
-  const [showEditor, setShowEditor] = useState(false);
-  const [preview, setPreview] = useState(false);
+  const [items, setItems] = useState<NotificationItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("all");
+  const [showModal, setShowModal] = useState(false);
+  const [newMessage, setNewMessage] = useState("");
+  const [newType, setNewType] = useState<NotificationItem["type"]>("info");
+  const [submitting, setSubmitting] = useState(false);
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await api.getNotifications();
+      setItems(data);
+    } catch (e: any) {
+      setError(e.message || "Failed to load notifications");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchData(); }, []);
 
   const tabs = [
-    { id: "published", label: "Published", count: NEWS_DATA.filter(n => n.status === "published").length },
-    { id: "drafts", label: "Drafts", count: NEWS_DATA.filter(n => n.status === "draft").length },
+    { id: "all", label: "All", count: items.length },
+    { id: "active", label: "Active", count: items.filter(n => n.active).length },
+    { id: "inactive", label: "Inactive", count: items.filter(n => !n.active).length },
   ];
 
-  const filtered = NEWS_DATA.filter(n => activeTab === "published" ? n.status === "published" : n.status === "draft");
+  const filtered = items.filter(n => {
+    if (activeTab === "all") return true;
+    return activeTab === "active" ? n.active : !n.active;
+  });
+
+  const handleToggle = async (item: NotificationItem) => {
+    try {
+      const updated = await api.updateNotification(item.id, { active: !item.active });
+      setItems(prev => prev.map(n => n.id === item.id ? { ...n, active: updated.active ?? !n.active } : n));
+    } catch {
+      // revert on error
+    }
+  };
+
+  const handleDelete = (id: string) => {
+    if (!confirm("Are you sure you want to delete this notification?")) return;
+    api.deleteNotification(id).then(() => {
+      setItems(prev => prev.filter(n => n.id !== id));
+    }).catch(() => {});
+  };
+
+  const handleCreate = async () => {
+    if (!newMessage.trim()) return;
+    setSubmitting(true);
+    try {
+      const created = await api.addNotification({ message: newMessage, type: newType, active: true });
+      setItems(prev => [...prev, created]);
+      setShowModal(false);
+      setNewMessage("");
+      setNewType("info");
+    } catch {
+      // error feedback could go here
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -32,7 +110,7 @@ export default function NewsPage() {
           <h1 className="text-2xl font-black">News</h1>
           <p className="text-[#9CA3AF] text-sm mt-1">Create and manage announcements</p>
         </div>
-        <Button variant="primary" glow onClick={() => setShowEditor(true)}>
+        <Button variant="primary" glow onClick={() => setShowModal(true)}>
           <Plus size={18} /> New Article
         </Button>
       </motion.div>
@@ -61,91 +139,139 @@ export default function NewsPage() {
         </div>
       </GlassCard>
 
-      {/* Articles */}
-      <div className="grid gap-4">
-        {filtered.map((article, i) => (
-          <motion.div
-            key={article.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-          >
-            <GlassCard hover className="flex flex-col md:flex-row gap-6">
-              <div className="w-full md:w-56 h-40 rounded-[14px] overflow-hidden shrink-0">
-                <img src={article.image} alt={article.title} className="w-full h-full object-cover" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="info">{article.category}</Badge>
-                  <Badge variant={article.status === "published" ? "success" : "warning"}>
-                    {article.status}
-                  </Badge>
+      {/* Loading */}
+      {loading && (
+        <div className="grid gap-4">
+          {[1, 2, 3].map((i) => (
+            <GlassCard key={i}>
+              <div className="animate-pulse space-y-3">
+                <div className="flex gap-2">
+                  <div className="h-5 w-16 rounded-full bg-[rgba(255,255,255,0.06)]" />
+                  <div className="h-5 w-14 rounded-full bg-[rgba(255,255,255,0.06)]" />
                 </div>
-                <h3 className="text-lg font-bold mb-1">{article.title}</h3>
-                <p className="text-sm text-[#9CA3AF] line-clamp-2">{article.excerpt}</p>
-                <div className="flex items-center gap-4 mt-3 text-xs text-[#6B7280]">
-                  <span className="flex items-center gap-1"><Calendar size={12} /> {formatDate(article.publishedAt)}</span>
-                  <span className="flex items-center gap-1"><Clock size={12} /> 5 min read</span>
-                  <span className="flex items-center gap-1"><Eye size={12} /> 1.2k views</span>
+                <div className="h-5 w-3/4 rounded bg-[rgba(255,255,255,0.06)]" />
+                <div className="h-4 w-1/2 rounded bg-[rgba(255,255,255,0.04)]" />
+                <div className="flex items-center justify-between pt-2">
+                  <div className="h-4 w-24 rounded bg-[rgba(255,255,255,0.04)]" />
+                  <div className="h-8 w-8 rounded-full bg-[rgba(255,255,255,0.06)]" />
                 </div>
-                <div className="flex items-center gap-2 mt-4">
-                  {article.tags.map(t => (
-                    <span key={t} className="text-[10px] px-2 py-1 rounded-full bg-[rgba(255,255,255,0.05)] text-[#6B7280]">#{t}</span>
-                  ))}
-                </div>
-              </div>
-              <div className="flex md:flex-col gap-2 items-start md:justify-center">
-                <Button size="sm" variant="ghost"><Edit3 size={14} /></Button>
-                <Button size="sm" variant="ghost" className="text-[#FF3B30]"><Trash2 size={14} /></Button>
               </div>
             </GlassCard>
-          </motion.div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
-      {/* Editor Modal */}
-      <Modal open={showEditor} onClose={() => { setShowEditor(false); setPreview(false); }} title={preview ? "Preview" : "Create Article"} className="max-w-3xl">
-        {!preview ? (
-          <div className="space-y-4">
-            <Input label="Article Title" placeholder="Enter a compelling title..." />
-            <div className="grid grid-cols-2 gap-4">
-              <Input label="Category" placeholder="e.g. Updates, Events" />
-              <Input label="Tags" placeholder="tag1, tag2, tag3" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-[#9CA3AF] mb-2">Featured Image</label>
-              <div className="border-2 border-dashed border-[rgba(255,255,255,0.08)] rounded-[14px] p-8 text-center hover:border-[#E50914] transition-colors cursor-pointer">
-                <Image size={32} className="mx-auto text-[#6B7280] mb-2" />
-                <p className="text-sm text-[#9CA3AF]">Drop an image here or click to browse</p>
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-[#9CA3AF] mb-2">Content</label>
-              <textarea
-                rows={10}
-                placeholder="Write your article content..."
-                className="w-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3 text-white placeholder:text-[#6B7280] outline-none focus:border-[#E50914] resize-none"
-              />
-            </div>
-            <div className="flex items-center gap-3 pt-4 border-t border-[rgba(255,255,255,0.06)]">
-              <Button variant="primary" onClick={() => setPreview(true)}><Eye size={16} /> Preview</Button>
-              <Button variant="secondary"><Clock size={16} /> Schedule</Button>
-              <Button variant="ghost" className="mr-auto">Save as Draft</Button>
-              <Button variant="success">Publish Now</Button>
-            </div>
-          </div>
-        ) : (
+      {/* Error */}
+      {!loading && error && (
+        <GlassCard className="text-center py-12">
+          <AlertTriangle size={40} className="mx-auto text-[#FF3B30] mb-4" />
+          <p className="text-[#FF3B30] font-semibold mb-2">{error}</p>
+          <Button variant="secondary" onClick={fetchData}>Retry</Button>
+        </GlassCard>
+      )}
+
+      {/* Empty */}
+      {!loading && !error && filtered.length === 0 && (
+        <GlassCard className="text-center py-12">
+          <Bell size={40} className="mx-auto text-[#6B7280] mb-4" />
+          <p className="text-[#9CA3AF] font-semibold">No notifications found</p>
+          {activeTab !== "all" && (
+            <p className="text-[#6B7280] text-sm mt-1">Try switching tabs or create a new article</p>
+          )}
+        </GlassCard>
+      )}
+
+      {/* Cards */}
+      {!loading && !error && (
+        <div className="grid gap-4">
+          {filtered.map((item, i) => {
+            const Icon = typeIcon[item.type];
+            return (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+              >
+                <GlassCard hover className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-full bg-[rgba(255,255,255,0.06)] flex items-center justify-center shrink-0 mt-1">
+                    <Icon size={20} className="text-[#9CA3AF]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge variant={typeVariant[item.type]}>{item.type}</Badge>
+                      <Badge variant={item.active ? "success" : "warning"}>
+                        {item.active ? "Active" : "Inactive"}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-white font-medium">{item.message}</p>
+                    <p className="text-xs text-[#6B7280] mt-1">
+                      {item.createdAt ? formatDate(item.createdAt) : ""}
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-2 items-center shrink-0">
+                    <button
+                      onClick={() => handleToggle(item)}
+                      className={cn(
+                        "w-10 h-6 rounded-full transition-colors duration-300 relative",
+                        item.active ? "bg-[#00E676]" : "bg-[rgba(255,255,255,0.12)]"
+                      )}
+                    >
+                      <span className={cn(
+                        "absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform duration-300 shadow",
+                        item.active ? "translate-x-[18px]" : "translate-x-0.5"
+                      )} />
+                    </button>
+                    <Button size="sm" variant="ghost" className="text-[#FF3B30] !p-2" onClick={() => handleDelete(item.id)}>
+                      <Trash2 size={14} />
+                    </Button>
+                  </div>
+                </GlassCard>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Create Modal */}
+      <Modal open={showModal} onClose={() => setShowModal(false)} title="New Article" className="max-w-xl">
+        <div className="space-y-4">
           <div>
-            <div className="rounded-[14px] overflow-hidden h-48 mb-4 bg-[rgba(255,255,255,0.05)]" />
-            <h2 className="text-2xl font-bold mb-2">Article Title</h2>
-            <p className="text-[#9CA3AF] text-sm mb-4">Category · 5 min read</p>
-            <p className="text-[#9CA3AF]">Article content preview...</p>
-            <div className="flex gap-3 mt-6 pt-4 border-t border-[rgba(255,255,255,0.06)]">
-              <Button variant="ghost" onClick={() => setPreview(false)}>Back to Editor</Button>
-              <Button variant="primary" className="mr-auto">Publish</Button>
+            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">Message</label>
+            <textarea
+              rows={4}
+              value={newMessage}
+              onChange={e => setNewMessage(e.target.value)}
+              placeholder="Enter notification message..."
+              className="w-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3 text-white placeholder:text-[#6B7280] outline-none focus:border-[#E50914] resize-none"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">Type</label>
+            <div className="flex gap-2">
+              {(["info", "warning", "success", "error"] as const).map(t => (
+                <button
+                  key={t}
+                  onClick={() => setNewType(t)}
+                  className={cn(
+                    "px-4 py-2 rounded-[12px] text-sm font-semibold transition-all duration-300 capitalize",
+                    newType === t
+                      ? "bg-[#E50914] text-white"
+                      : "bg-[rgba(255,255,255,0.06)] text-[#6B7280] hover:text-white"
+                  )}
+                >
+                  {t}
+                </button>
+              ))}
             </div>
           </div>
-        )}
+          <div className="flex gap-3 pt-4 border-t border-[rgba(255,255,255,0.06)]">
+            <Button variant="ghost" onClick={() => setShowModal(false)}>Cancel</Button>
+            <Button variant="primary" className="ml-auto" loading={submitting} onClick={handleCreate}>
+              <Plus size={16} /> Create
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

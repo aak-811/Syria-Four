@@ -1,17 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Bell, Sun, Moon, Plus, ChevronDown, Menu, X } from "lucide-react";
+import { Search, Bell, Sun, Moon, Plus, ChevronDown, Menu } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
-import { NOTIFICATIONS_DATA } from "@/lib/data";
+import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 export default function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [dark, setDark] = useState(true);
-  const unread = NOTIFICATIONS_DATA.filter((n) => !n.read).length;
+  const [notifications, setNotifications] = useState<any[]>([]);
+
+  useEffect(() => {
+    api.getNotifications().then(setNotifications).catch(() => {});
+  }, []);
+
+  const unread = notifications.filter((n) => n.active === true).length;
 
   return (
     <header className="fixed top-0 right-0 left-0 lg:right-[260px] h-[70px] z-30 bg-[rgba(10,10,10,0.8)] backdrop-blur-xl border-b border-[rgba(255,255,255,0.06)]">
@@ -88,12 +94,12 @@ export default function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => vo
                     <span className="text-[11px] text-[#E50914] font-medium cursor-pointer">Mark all read</span>
                   </div>
                   <div className="max-h-[320px] overflow-y-auto">
-                    {NOTIFICATIONS_DATA.slice(0, 4).map((n) => (
+                    {notifications.slice(0, 4).map((n) => (
                       <div
                         key={n.id}
                         className={cn(
                           "flex items-start gap-3 p-4 border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.03)] transition-colors cursor-pointer",
-                          !n.read && "bg-[rgba(229,9,20,0.04)]"
+                          n.active && "bg-[rgba(229,9,20,0.04)]"
                         )}
                       >
                         <div className={cn("w-2 h-2 rounded-full mt-1.5 shrink-0", {

@@ -1,10 +1,11 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import GlassCard from "@/components/ui/GlassCard";
 import Avatar from "@/components/ui/Avatar";
 import Badge from "@/components/ui/Badge";
-import { MEMBERS_DATA } from "@/lib/data";
+import { api } from "@/lib/api";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
@@ -17,6 +18,16 @@ const roleColors: Record<string, "danger" | "gold" | "success" | "info" | "defau
 };
 
 export default function LatestMembers() {
+  const [members, setMembers] = useState<any[]>([]);
+
+  useEffect(() => {
+    api.getMembers().then((data) => setMembers(data)).catch(() => {});
+  }, []);
+
+  const latestMembers = [...members]
+    .sort((a, b) => new Date(b.joinDate || "").getTime() - new Date(a.joinDate || "").getTime())
+    .slice(0, 4);
+
   return (
     <GlassCard>
       <div className="flex items-center justify-between mb-6">
@@ -26,22 +37,26 @@ export default function LatestMembers() {
         </Link>
       </div>
       <div className="space-y-3">
-        {MEMBERS_DATA.slice(0, 4).map((member, i) => (
-          <motion.div
-            key={member.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: i * 0.08 }}
-            className="flex items-center gap-4 p-3 rounded-[14px] hover:bg-[rgba(255,255,255,0.03)] transition-colors"
-          >
-            <Avatar src={member.avatar} size="lg" status={member.status === "active" ? "online" : "offline"} />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold">{member.name}</p>
-              <p className="text-xs text-[#6B7280]">UID: {member.uid} · {member.rank}</p>
-            </div>
-            <Badge variant={roleColors[member.role]}>{member.role}</Badge>
-          </motion.div>
-        ))}
+        {latestMembers.length === 0 ? (
+          <p className="text-sm text-[#6B7280]">No members yet</p>
+        ) : (
+          latestMembers.map((member, i) => (
+            <motion.div
+              key={member.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: i * 0.08 }}
+              className="flex items-center gap-4 p-3 rounded-[14px] hover:bg-[rgba(255,255,255,0.03)] transition-colors"
+            >
+              <Avatar src={member.avatar || member.image} size="lg" status={member.status === "active" ? "online" : "offline"} />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold">{member.name}</p>
+                <p className="text-xs text-[#6B7280]">UID: {member.uid || member.gameId || "—"} · {member.level || "—"}</p>
+              </div>
+              <Badge variant={roleColors[member.role] || "default"}>{member.role || "member"}</Badge>
+            </motion.div>
+          ))
+        )}
       </div>
     </GlassCard>
   );

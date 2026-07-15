@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
@@ -9,6 +10,16 @@ import { X } from "lucide-react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [mobileSidebar, setMobileSidebar] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const authed = localStorage.getItem("dashboard_auth") === "true";
+    if (!authed) router.replace("/login");
+    else setChecking(false);
+  }, [router]);
+
+  if (checking) return null;
 
   return (
     <div className="min-h-screen bg-[#0A0A0A]">

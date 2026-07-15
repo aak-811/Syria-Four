@@ -2,12 +2,13 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { SIDEBAR_ITEMS } from "@/lib/data";
+import { useAuth } from "@/lib/auth-context";
 import {
-  LayoutDashboard, Users, Crown, Swords, Calendar, Image,
-  Video, Newspaper, MessageSquare, BarChart3, TrendingUp, Settings, LogOut,
+  LayoutDashboard, Users, Crown, Swords, Calendar, Medal, ShoppingCart,
+  HeadphonesIcon, Camera, Image, Video, Bell, Hand, UserCog, History, Settings, LogOut,
 } from "lucide-react";
 
 const sidebarItems = SIDEBAR_ITEMS as (typeof SIDEBAR_ITEMS[number] & { badge?: number })[];
@@ -18,21 +19,31 @@ const iconMap: Record<string, React.ReactNode> = {
   Crown: <Crown size={20} />,
   Swords: <Swords size={20} />,
   Calendar: <Calendar size={20} />,
+  Medal: <Medal size={20} />,
+  ShoppingCart: <ShoppingCart size={20} />,
+  HeadphonesIcon: <HeadphonesIcon size={20} />,
+  Instagram: <Camera size={20} />,
   Image: <Image size={20} />,
   Video: <Video size={20} />,
-  Newspaper: <Newspaper size={20} />,
-  MessageSquare: <MessageSquare size={20} />,
-  BarChart3: <BarChart3 size={20} />,
-  TrendingUp: <TrendingUp size={20} />,
+  Bell: <Bell size={20} />,
+  Hand: <Hand size={20} />,
+  UserCog: <UserCog size={20} />,
+  History: <History size={20} />,
   Settings: <Settings size={20} />,
 };
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
+  };
 
   return (
     <aside className="fixed top-0 right-0 h-screen w-[260px] z-40 hidden lg:flex flex-col bg-[#0A0A0A] border-l border-[rgba(255,255,255,0.06)]">
-      {/* Logo */}
       <div className="flex items-center gap-3 px-6 h-[70px] border-b border-[rgba(255,255,255,0.06)] shrink-0">
         <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#E50914] to-[#FF6B35] flex items-center justify-center">
           <span className="text-white font-black text-sm">S4</span>
@@ -43,7 +54,6 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 overflow-y-auto p-3 space-y-1 scrollbar-hide">
         {sidebarItems.map((item) => {
           const isActive = pathname === item.href;
@@ -81,9 +91,11 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Logout */}
       <div className="p-3 border-t border-[rgba(255,255,255,0.06)]">
-        <button className="flex items-center gap-3 px-4 py-3 rounded-[14px] text-sm font-medium text-[#6B7280] hover:text-[#FF3B30] hover:bg-[rgba(255,59,48,0.1)] transition-all duration-300 w-full">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-4 py-3 rounded-[14px] text-sm font-medium text-[#6B7280] hover:text-[#FF3B30] hover:bg-[rgba(255,59,48,0.1)] transition-all duration-300 w-full"
+        >
           <LogOut size={20} />
           <span>Logout</span>
         </button>
