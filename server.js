@@ -25,9 +25,15 @@ app.post('/api/admin-login', (req, res) => {
 
 // Serve Next.js dashboard (static export) at root /
 const dashboardPath = path.join(__dirname, 'admin-dashboard', 'out');
+const dashboardExists = fs.existsSync(path.join(dashboardPath, 'index.html'));
+if (!dashboardExists) {
+  console.warn('WARNING: Dashboard not built yet. Run: cd admin-dashboard && npm run build');
+}
 
 // Serve dashboard static assets (_next) first
-app.use('/_next', express.static(path.join(dashboardPath, '_next')));
+if (dashboardExists) {
+  app.use('/_next', express.static(path.join(dashboardPath, '_next')));
+}
 
 // Serve clan-site images and uploads
 app.use('/images', express.static(path.join(__dirname, 'clan-site', 'images')));
@@ -36,6 +42,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'clan-site', 'uploads'))
 // Serve dashboard page HTML files for all routes (must be after API routes)
 function serveDashboard(req, res, next) {
   if (req.method !== 'GET') return next();
+  if (!dashboardExists) return next();
 
   if (req.path === '/' || req.path === '') {
     return res.sendFile(path.join(dashboardPath, 'index.html'));
