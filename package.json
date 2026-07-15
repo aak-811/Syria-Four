@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
+    "build": "cd admin-dashboard && npm ci && npm run build",
     "setup": "node setup-supabase.js",
     "migrate": "node setup-supabase.js"
   },
