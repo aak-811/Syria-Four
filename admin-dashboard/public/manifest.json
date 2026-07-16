@@ -1,24 +1,13 @@
 {
-  "name": "SYRIA FOUR Clan",
-  "short_name": "SYRIA FOUR",
-  "description": "كلان فري فاير سوري - SYRIA FOUR",
+  "name": "SYRIA FOUR",
+  "short_name": "S4",
+  "description": "SYRIA FOUR - Free Fire Clan",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#050816",
   "theme_color": "#00E5FF",
-  "orientation": "portrait",
   "icons": [
-    {
-      "src": "/images/clan-logo.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/images/clan-logo.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
 import type { ReactNode, MouseEventHandler } from "react";
 
 interface GlassCardProps {
@@ -17,11 +16,7 @@ interface GlassCardProps {
 
 export default function GlassCard({ children, className, glow = "none", hover, onClick, onDragOver, onDragLeave, onDrop }: GlassCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      whileHover={hover ? { y: -4, scale: 1.01 } : undefined}
+    <div
       onClick={onClick}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
@@ -38,6 +33,8 @@ export default function GlassCard({ children, className, glow = "none", hover, o
         onClick && "cursor-pointer",
         className
       )}
-    />
+    >
+      {children}
+    </div>
   );
 }

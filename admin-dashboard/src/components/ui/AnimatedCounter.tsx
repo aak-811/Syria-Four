@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
 
 interface AnimatedCounterProps {
   from?: number;
@@ -10,17 +9,11 @@ interface AnimatedCounterProps {
   prefix?: string;
   duration?: number;
   className?: string;
-  formatter?: (value: number) => string;
 }
 
 export default function AnimatedCounter({
-  from = 0,
-  to,
-  suffix = "",
-  prefix = "",
-  duration = 2,
-  className = "",
-  formatter,
+  from = 0, to, suffix = "", prefix = "",
+  duration = 2, className = "",
 }: AnimatedCounterProps) {
   const [count, setCount] = useState(from);
   const hasAnimated = useRef(false);
@@ -43,18 +36,9 @@ export default function AnimatedCounter({
     requestAnimationFrame(animate);
   }, [from, to, duration]);
 
-  const display = formatter
-    ? formatter(count)
-    : count.toLocaleString();
-
   return (
-    <motion.span
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className={className}
-    >
-      {prefix}{display}{suffix}
-    </motion.span>
+    <span className={className}>
+      {prefix}{count.toLocaleString()}{suffix}
+    </span>
   );
 }

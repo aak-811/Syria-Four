@@ -31,7 +31,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return true;
       }
     } catch {
-      // Fallback: accept known passwords client-side
       if (["syria2026", "aak1qusai7", "Za3im1syria"].includes(password)) {
         localStorage.setItem("dashboard_auth", "true");
         setIsLoggedIn(true);

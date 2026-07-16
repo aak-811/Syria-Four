@@ -1,122 +1,56 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import WelcomeBanner from "@/components/dashboard/WelcomeBanner";
-import StatsCard from "@/components/dashboard/StatsCard";
-import Charts from "@/components/dashboard/Charts";
-import ActivityTimeline from "@/components/dashboard/ActivityTimeline";
-import LatestMembers from "@/components/dashboard/LatestMembers";
-import GlassCard from "@/components/ui/GlassCard";
-import { Calendar, ArrowRight } from "lucide-react";
+import Card from "@/components/ui/Card";
+import Spinner from "@/components/ui/Spinner";
+import StatsCard from "@/components/admin/StatsCard";
 import { api } from "@/lib/api";
-import { formatNumber } from "@/lib/utils";
+import { Users, Swords, Calendar, Image, Bell, ShoppingBag, MessageSquare } from "lucide-react";
 
-export default function DashboardPage() {
-  const [members, setMembers] = useState<any[]>([]);
-  const [tournaments, setTournaments] = useState<any[]>([]);
-  const [orders, setOrders] = useState<any[]>([]);
-  const [support, setSupport] = useState<any[]>([]);
+export default function AdminDashboardPage() {
+  const [stats, setStats] = useState<any>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
-      api.getMembers(),
-      api.getTournaments(),
-      api.getOrders(),
-      api.getSupport(),
-    ])
-      .then(([m, t, o, s]) => {
-        setMembers(m);
-        setTournaments(t);
-        setOrders(o);
-        setSupport(s);
-      })
-      .finally(() => setLoading(false));
+      api.getMembers().catch(() => []),
+      api.getTournaments().catch(() => []),
+      api.getEvents().catch(() => []),
+      api.getGallery().catch(() => []),
+      api.getNotifications().catch(() => []),
+      api.getOrders().catch(() => []),
+      api.getSupport().catch(() => []),
+    ]).then(([m, t, e, g, n, o, s]) => {
+      setStats({ members: m.length, tournaments: t.length, events: e.length, gallery: g.length, notifications: n.length, orders: o.length, support: s.length });
+    }).finally(() => setLoading(false));
   }, []);
 
-  const stats = [
-    { label: "إجمالي الأعضاء", value: formatNumber(members.length), change: 0, icon: "Users", color: "#E50914" },
-    { label: "البطولات", value: formatNumber(tournaments.length), change: 0, icon: "Swords", color: "#FFD700" },
-    { label: "الطلبات", value: formatNumber(orders.length), change: 0, icon: "ShoppingCart", color: "#00E676" },
-    { label: "الدعم", value: formatNumber(support.length), change: 0, icon: "HeadphonesIcon", color: "#FF3B30" },
-  ];
-
-  const upcomingEvents = tournaments.filter((t) => t.type === "upcoming");
-
-  if (loading) {
-    return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-        <WelcomeBanner />
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-[140px] rounded-[20px] bg-[rgba(255,255,255,0.03)] animate-pulse" />
-          ))}
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 h-[400px] rounded-[20px] bg-[rgba(255,255,255,0.03)] animate-pulse" />
-            <div className="h-[400px] rounded-[20px] bg-[rgba(255,255,255,0.03)] animate-pulse" />
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 h-[300px] rounded-[20px] bg-[rgba(255,255,255,0.03)] animate-pulse" />
-            <div className="h-[300px] rounded-[20px] bg-[rgba(255,255,255,0.03)] animate-pulse" />
-          </div>
-        </motion.div>
-    );
-  }
+  if (loading) return <Spinner />;
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-      <WelcomeBanner />
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        {stats.map((stat, i) => (
-          <StatsCard key={stat.label} {...stat} delay={i * 0.1} />
-        ))}
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-black">لوحة التحكم</h1>
+        <p className="text-[var(--text-muted)] text-sm mt-1">نظرة عامة على الكلان</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <Charts />
-        </div>
-        <ActivityTimeline />
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <StatsCard icon={<Users size={22} />} label="الأعضاء" value={stats.members || 0} color="var(--primary)" />
+        <StatsCard icon={<Swords size={22} />} label="البطولات" value={stats.tournaments || 0} color="var(--secondary)" />
+        <StatsCard icon={<Calendar size={22} />} label="الفعاليات" value={stats.events || 0} color="var(--success)" />
+        <StatsCard icon={<Image size={22} />} label="الصور" value={stats.gallery || 0} color="var(--warning)" />
+        <StatsCard icon={<Bell size={22} />} label="الإشعارات" value={stats.notifications || 0} color="#FF6B35" />
+        <StatsCard icon={<ShoppingBag size={22} />} label="الطلبات" value={stats.orders || 0} color="#5865F2" />
+        <StatsCard icon={<MessageSquare size={22} />} label="الدعم" value={stats.support || 0} color="#25D366" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <LatestMembers />
-        </div>
-        <GlassCard>
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-bold">الفعاليات القادمة</h3>
-            <Calendar size={20} className="text-[#6B7280]" />
-          </div>
-          <div className="space-y-4">
-            {upcomingEvents.length === 0 ? (
-              <p className="text-sm text-[#6B7280]">لا توجد فعاليات قادمة</p>
-            ) : (
-              upcomingEvents.map((event, i) => (
-                <motion.div
-                  key={event._id || event.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  className="glass rounded-[14px] p-4 hover:bg-[rgba(255,255,255,0.03)] transition-colors"
-                >
-                  <p className="font-semibold text-sm">{event.name}</p>
-                  <div className="flex items-center gap-4 mt-2 text-xs text-[#6B7280]">
-                    <span>{event.startDate ? new Date(event.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "غير محدد"}</span>
-                    <span>{event.maxPlayers || "?"} لاعب</span>
-                  </div>
-                </motion.div>
-              ))
-            )}
-            <button className="flex items-center gap-1 text-sm text-[#E50914] font-semibold hover:underline mt-2">
-              عرض التقويم <ArrowRight size={16} />
-            </button>
-          </div>
-        </GlassCard>
-      </div>
-    </motion.div>
+      <Card>
+        <h2 className="font-bold text-lg mb-4">مرحباً بك في لوحة التحكم</h2>
+        <p className="text-sm text-[var(--text-muted)] leading-relaxed">
+          من هنا يمكنك إدارة جميع جوانب الكلان: الأعضاء، البطولات، الفعاليات،
+          الصور، الفيديو، الطلبات، الدعم، الإشعارات، والمزيد.
+        </p>
+      </Card>
+    </div>
   );
 }

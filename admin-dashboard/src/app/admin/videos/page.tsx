@@ -5,51 +5,50 @@ import Button from "@/components/ui/Button";
 import Spinner from "@/components/ui/Spinner";
 import Modal from "@/components/ui/Modal";
 import DataTable from "@/components/admin/DataTable";
-import { FormInput, FormTextarea } from "@/components/admin/FormField";
+import { FormInput } from "@/components/admin/FormField";
 import { api } from "@/lib/api";
 import { Plus } from "lucide-react";
 
-export default function AdminEventsPage() {
+export default function AdminVideosPage() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(false);
   const [form, setForm] = useState<any>({});
 
-  const load = () => { setLoading(true); api.getEvents().then(setData).finally(() => setLoading(false)); };
+  const load = () => { setLoading(true); api.getVideos().then(setData).finally(() => setLoading(false)); };
   useEffect(() => { load(); }, []);
 
   const add = async () => {
-    await api.addEvent(form);
+    await api.addVideo(form);
     setModal(false); setForm({}); load();
   };
 
   const remove = async (row: any) => {
-    if (confirm("هل أنت متأكد؟")) { await api.deleteEvent(row.id); load(); }
+    if (confirm("هل أنت متأكد؟")) { await api.deleteVideo(row.id); load(); }
   };
 
   const columns = [
     { key: "title", label: "العنوان" },
-    { key: "description", label: "الوصف" },
-    { key: "icon", label: "الأيقونة" },
+    { key: "url", label: "الرابط", render: (v: string) => v?.length > 40 ? v.slice(0, 40) + "..." : v || "—" },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black">الفعاليات</h1>
-          <p className="text-[var(--text-muted)] text-sm mt-1">إدارة الفعاليات</p>
+          <h1 className="text-2xl font-black">الفيديو</h1>
+          <p className="text-[var(--text-muted)] text-sm mt-1">إدارة مقاطع الفيديو</p>
         </div>
-        <Button onClick={() => { setForm({}); setModal(true); }}><Plus size={16} /> إضافة فعالية</Button>
+        <Button onClick={() => { setForm({}); setModal(true); }}><Plus size={16} /> إضافة فيديو</Button>
       </div>
 
       {loading ? <Spinner /> : <DataTable columns={columns} data={data} onDelete={remove} />}
 
-      <Modal open={modal} onClose={() => setModal(false)} title="إضافة فعالية">
+      <Modal open={modal} onClose={() => setModal(false)} title="إضافة فيديو">
         <div className="space-y-4">
           <FormInput label="العنوان" value={form.title || ""} onChange={e => setForm({ ...form, title: e.target.value })} />
-          <FormTextarea label="الوصف" value={form.description || ""} onChange={e => setForm({ ...form, description: e.target.value })} rows={2} />
-          <FormInput label="الأيقونة (clock/fire/war)" value={form.icon || ""} onChange={e => setForm({ ...form, icon: e.target.value })} />
+          <FormInput label="الرابط" value={form.url || ""} onChange={e => setForm({ ...form, url: e.target.value })} />
+          <FormInput label="الصورة المصغرة" value={form.thumbnail || ""} onChange={e => setForm({ ...form, thumbnail: e.target.value })} />
           <Button onClick={add} className="w-full">إضافة</Button>
         </div>
       </Modal>

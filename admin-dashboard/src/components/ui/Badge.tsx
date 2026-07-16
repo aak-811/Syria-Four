@@ -1,42 +1,30 @@
-"use client";
-
 import { cn } from "@/lib/utils";
 
 interface BadgeProps {
-  variant?: "default" | "success" | "warning" | "danger" | "info" | "gold";
-  children: React.ReactNode;
-  className?: string;
+  children: string;
+  variant?: "default" | "primary" | "success" | "warning" | "danger" | "gold" | "info";
   size?: "sm" | "md";
+  className?: string;
 }
 
-export default function Badge({ variant = "default", children, className, size = "sm" }: BadgeProps) {
-  const variants = {
-    default: "bg-[rgba(255,255,255,0.08)] text-[#9CA3AF]",
-    success: "bg-[rgba(0,230,118,0.12)] text-[#00E676]",
-    warning: "bg-[rgba(255,193,7,0.12)] text-[#FFC107]",
-    danger: "bg-[rgba(255,59,48,0.12)] text-[#FF3B30]",
-    info: "bg-[rgba(229,9,20,0.12)] text-[#E50914]",
-    gold: "bg-[rgba(255,215,0,0.12)] text-[#FFD700]",
-  };
+const colors: Record<string, string> = {
+  default: "bg-[rgba(255,255,255,0.06)] text-[var(--text-muted)]",
+  primary: "bg-[rgba(0,229,255,0.12)] text-[var(--primary)]",
+  success: "bg-[rgba(0,230,118,0.12)] text-[var(--success)]",
+  warning: "bg-[rgba(255,215,0,0.12)] text-[var(--warning)]",
+  danger: "bg-[rgba(229,9,20,0.12)] text-[var(--danger)]",
+  gold: "bg-[rgba(255,215,0,0.15)] text-yellow-300",
+  info: "bg-[rgba(139,92,246,0.12)] text-[var(--secondary)]",
+};
 
-  const sizes = {
-    sm: "px-2.5 py-1 text-[11px]",
-    md: "px-3 py-1.5 text-xs",
-  };
-
+export default function Badge({ children, variant = "default", size = "sm", className }: BadgeProps) {
   return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1.5 font-semibold rounded-full",
-        variants[variant],
-        sizes[size],
-        className
-      )}
-    >
-      <span className={cn("w-1.5 h-1.5 rounded-full", {
-        "bg-current": variant !== "default",
-        "bg-[#9CA3AF]": variant === "default",
-      })} />
+    <span className={cn(
+      "inline-block rounded-full font-semibold",
+      size === "sm" ? "px-2.5 py-0.5 text-[11px]" : "px-3 py-1 text-xs",
+      colors[variant],
+      className
+    )}>
       {children}
     </span>
   );
