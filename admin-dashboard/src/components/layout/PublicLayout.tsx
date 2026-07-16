@@ -11,7 +11,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
   const [mobileSidebar, setMobileSidebar] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A]">
+    <div className="min-h-screen bg-[#050816]">
       <Sidebar />
       <AnimatePresence>
         {mobileSidebar && (
@@ -33,7 +33,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25 }}
-              className="absolute top-0 right-0 bottom-0 w-[280px] bg-[#0A0A0A] border-l border-[rgba(255,255,255,0.06)] p-4"
+              className="absolute top-0 right-0 bottom-0 w-[280px] bg-[#050816] border-l border-[rgba(255,255,255,0.06)] p-4"
             >
               <button
                 onClick={() => setMobileSidebar(false)}

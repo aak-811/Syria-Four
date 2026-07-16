@@ -44,9 +44,9 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="fixed top-0 right-0 h-screen w-[260px] z-40 hidden lg:flex flex-col bg-[#0A0A0A] border-l border-[rgba(255,255,255,0.06)]">
+    <aside className="fixed top-0 right-0 h-screen w-[260px] z-40 hidden lg:flex flex-col bg-[#050816] border-l border-[rgba(255,255,255,0.06)]">
       <div className="flex items-center gap-3 px-6 h-[70px] border-b border-[rgba(255,255,255,0.06)] shrink-0">
-        <div className="w-9 h-9 rounded-full overflow-hidden bg-gradient-to-br from-[#E50914] to-[#FF6B35] flex items-center justify-center">
+        <div className="w-9 h-9 rounded-full overflow-hidden bg-gradient-to-br from-[#00E5FF] to-[#8B5CF6] flex items-center justify-center">
           <img src="/images/clan-logo.png" alt="S4" className="w-full h-full object-cover"
             onError={(e) => {
               (e.target as HTMLImageElement).style.display = 'none';
@@ -71,23 +71,23 @@ export default function Sidebar() {
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-[14px] text-sm font-medium transition-all duration-300 relative",
                   isActive
-                    ? "text-white bg-[rgba(229,9,20,0.15)]"
+                    ? "text-white bg-[rgba(0,229,255,0.1)]"
                     : "text-[#6B7280] hover:text-white hover:bg-[rgba(255,255,255,0.05)]"
                 )}
               >
                 {isActive && (
                   <motion.div
                     layoutId="sidebar-active"
-                    className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#E50914] rounded-full"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#00E5FF] rounded-full"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
-                <span className={cn(isActive ? "text-[#E50914]" : "text-current")}>
+                <span className={cn(isActive ? "text-[#00E5FF]" : "text-current")}>
                   {iconMap[item.icon]}
                 </span>
                 <span>{item.label}</span>
                 {item.badge && (
-                  <span className="mr-auto bg-[#E50914] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  <span className="mr-auto bg-[#00E5FF] text-[#050816] text-[10px] font-bold px-2 py-0.5 rounded-full">
                     {item.badge}
                   </span>
                 )}
@@ -101,7 +101,7 @@ export default function Sidebar() {
         {!isAdmin && (
           <Link href="/admin/login">
             <motion.div whileHover={{ x: -4 }} whileTap={{ scale: 0.98 }}
-              className="flex items-center gap-3 px-4 py-3 rounded-[14px] text-sm font-medium text-[#6B7280] hover:text-[#FFD700] hover:bg-[rgba(229,9,20,0.1)] transition-all duration-300"
+              className="flex items-center gap-3 px-4 py-3 rounded-[14px] text-sm font-medium text-[#6B7280] hover:text-[#00E5FF] hover:bg-[rgba(0,229,255,0.08)] transition-all duration-300"
             >
               <Shield size={20} />
               <span>لوحة الإدارة</span>

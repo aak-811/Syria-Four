@@ -49,39 +49,39 @@ export default function MobileNav() {
     ? adminItems.slice(4)
     : publicItems.slice(4);
 
+  const activeColor = "#00E5FF";
+  const inactiveColor = "#6B7280";
+
   return (
     <>
-      {/* Bottom Navigation Bar */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
-        <div className="bg-[rgba(10,10,10,0.98)] backdrop-blur-xl border-t border-[rgba(255,255,255,0.06)] px-2 pb-2 pt-2">
+        <div className="bg-[rgba(5,8,22,0.98)] backdrop-blur-xl border-t border-[rgba(255,255,255,0.06)] px-2 pb-2 pt-2">
           <div className="flex items-center justify-around relative">
             {mainItems.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <Link key={item.href} href={item.href} className="flex flex-col items-center gap-1 px-3 py-1">
-                  <div className={cn("p-2 rounded-full transition-all duration-300", isActive && "bg-[rgba(229,9,20,0.15)]")}>
-                    <item.icon size={20} className={isActive ? "text-[#E50914]" : "text-[#6B7280]"} />
+                  <div className={cn("p-2 rounded-full transition-all duration-300", isActive && "bg-[rgba(0,229,255,0.12)]")}>
+                    <item.icon size={20} className={isActive ? activeColor : inactiveColor} />
                   </div>
-                  <span className={cn("text-[9px] font-medium", isActive ? "text-[#E50914]" : "text-[#6B7280]")}>{item.label}</span>
+                  <span className={cn("text-[9px] font-medium", isActive ? "text-[#00E5FF]" : inactiveColor)}>{item.label}</span>
                 </Link>
               );
             })}
 
-            {/* More button */}
             <button onClick={() => setShowAll(!showAll)}
               className="flex flex-col items-center gap-1 px-3 py-1 relative"
             >
-              <div className={cn("p-2 rounded-full transition-all duration-300", showAll && "bg-[rgba(229,9,20,0.15)]")}>
-                <Menu size={20} className={showAll ? "text-[#E50914]" : "text-[#6B7280]"} />
+              <div className={cn("p-2 rounded-full transition-all duration-300", showAll && "bg-[rgba(0,229,255,0.12)]")}>
+                <Menu size={20} className={showAll ? activeColor : inactiveColor} />
               </div>
               <span className="text-[9px] font-medium text-[#6B7280]">المزيد</span>
             </button>
 
-            {/* Admin / Public link */}
             {!isAdmin && (
               <Link href="/admin/login" className="flex flex-col items-center gap-1 px-3 py-1">
                 <div className="p-2 rounded-full">
-                  <Shield size={20} className="text-[#6B7280]" />
+                  <Shield size={20} className={inactiveColor} />
                 </div>
                 <span className="text-[9px] font-medium text-[#6B7280]">الإدارة</span>
               </Link>
@@ -90,7 +90,6 @@ export default function MobileNav() {
         </div>
       </nav>
 
-      {/* Expanded More Menu */}
       <AnimatePresence>
         {showAll && (
           <>
@@ -106,7 +105,7 @@ export default function MobileNav() {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 30 }}
-              className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-[#0A0A0A] border-t border-[rgba(255,255,255,0.06)] rounded-t-3xl max-h-[60vh] overflow-y-auto"
+              className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-[#050816] border-t border-[rgba(255,255,255,0.06)] rounded-t-3xl max-h-[60vh] overflow-y-auto"
             >
               <div className="p-4">
                 <div className="flex items-center justify-between mb-4">
@@ -122,11 +121,11 @@ export default function MobileNav() {
                       <Link key={item.href} href={item.href} onClick={() => setShowAll(false)}
                         className={cn(
                           "flex flex-col items-center gap-2 p-4 rounded-[16px] transition-all duration-300",
-                          isActive ? "bg-[rgba(229,9,20,0.12)]" : "bg-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.06)]"
+                          isActive ? "bg-[rgba(0,229,255,0.1)]" : "bg-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.06)]"
                         )}
                       >
-                        <item.icon size={24} className={isActive ? "text-[#E50914]" : "text-[#9CA3AF]"} />
-                        <span className={cn("text-[10px] font-medium", isActive ? "text-[#E50914]" : "text-[#9CA3AF]")}>{item.label}</span>
+                        <item.icon size={24} className={isActive ? activeColor : "#9CA3AF"} />
+                        <span className={cn("text-[10px] font-medium", isActive ? "text-[#00E5FF]" : "#9CA3AF")}>{item.label}</span>
                       </Link>
                     );
                   })}

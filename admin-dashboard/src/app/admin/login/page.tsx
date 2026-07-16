@@ -24,7 +24,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#050816] flex items-center justify-center p-4">
       <div
         className="w-full max-w-md glass rounded-[24px] p-8 space-y-6"
         style={{
@@ -34,7 +34,7 @@ export default function LoginPage() {
         }}
       >
         <div className="text-center space-y-2">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#E50914] to-[#FF6B35] flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#00E5FF] to-[#8B5CF6] flex items-center justify-center mx-auto">
             <Lock size={28} className="text-white" />
           </div>
           <h1 className="text-2xl font-black">لوحة التحكم</h1>
@@ -48,7 +48,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="كلمة المرور"
-              className="w-full bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3.5 text-white placeholder-[#6B7280] focus:outline-none focus:border-[#E50914] transition-colors text-center text-lg tracking-wider"
+              className="w-full bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3.5 text-white placeholder-[#6B7280] focus:outline-none focus:border-[#00E5FF] transition-colors text-center text-lg tracking-wider"
               autoFocus
             />
             <button
@@ -70,9 +70,10 @@ export default function LoginPage() {
             className="w-full py-3.5 rounded-[14px] font-bold text-sm transition-all duration-300 disabled:opacity-50"
             style={{
               background: loading
-                ? "linear-gradient(135deg, #E50914, #FF6B35)"
-                : "linear-gradient(135deg, #E50914, #FF6B35)",
+                ? "linear-gradient(135deg, #00E5FF, #8B5CF6)"
+                : "linear-gradient(135deg, #00E5FF, #8B5CF6)",
               opacity: loading ? 0.7 : 1,
+              color: "#050816",
             }}
           >
             {loading ? (

@@ -10,6 +10,7 @@ import Link from "next/link";
 import { api } from "@/lib/api";
 import { cn, timeAgo } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
+import VisitorCounter from "@/components/ui/VisitorCounter";
 
 export default function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
   const router = useRouter();
@@ -59,7 +60,7 @@ export default function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => vo
 
   return (
     <header className={cn(
-      "fixed top-0 right-0 left-0 h-[70px] z-30 bg-[rgba(10,10,10,0.8)] backdrop-blur-xl border-b border-[rgba(255,255,255,0.06)]",
+      "fixed top-0 right-0 left-0 h-[70px] z-30 bg-[rgba(5,8,22,0.8)] backdrop-blur-xl border-b border-[rgba(255,255,255,0.06)]",
       isAdmin ? "lg:right-[260px]" : ""
     )}>
       <div className="flex items-center justify-between h-full px-4 lg:px-8 gap-4">
@@ -73,6 +74,7 @@ export default function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => vo
           <span className="text-sm font-bold hidden md:block">
             {isAdmin ? "لوحة التحكم" : "SYRIA FOUR"}
           </span>
+          {!isAdmin && <VisitorCounter />}
         </div>
 
         <div className="flex items-center gap-2">
@@ -96,7 +98,7 @@ export default function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => vo
               >
                 <Bell size={18} />
                 {unread > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 bg-[#E50914] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                  <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 bg-[#00E5FF] text-[#050816] text-[9px] font-bold rounded-full flex items-center justify-center">
                     {unread}
                   </span>
                 )}
@@ -115,7 +117,7 @@ export default function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => vo
                       <button
                         onClick={handleMarkAllRead}
                         disabled={markingAllRead || unread === 0}
-                        className="text-[11px] text-[#E50914] font-medium hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="text-[11px] text-[#00E5FF] font-medium hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {markingAllRead ? "جاري التحديث..." : "تحديد الكل كمقروء"}
                       </button>
@@ -161,7 +163,7 @@ export default function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => vo
               onClick={() => setProfileOpen(!profileOpen)}
               className="flex items-center gap-2 glass rounded-[14px] px-3 py-2 glass-hover cursor-pointer"
             >
-              <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-[#E50914] to-[#FF6B35] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-[#00E5FF] to-[#8B5CF6] flex items-center justify-center">
                 <Shield size={16} className="text-white" />
               </div>
               <div className="hidden sm:block">
@@ -196,7 +198,7 @@ export default function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => vo
                       <div className="border-t border-[rgba(255,255,255,0.06)]" />
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#E50914] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#FF3B30] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
                       >
                         <LogOut size={16} />
                         تسجيل الخروج
