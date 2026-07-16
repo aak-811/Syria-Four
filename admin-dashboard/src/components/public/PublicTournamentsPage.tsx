@@ -25,8 +25,21 @@ export default function PublicTournamentsPage() {
   const [tab, setTab] = useState("all");
   const [selected, setSelected] = useState<any>(null);
 
+  console.log('[TOURNAMENTS_PAGE] RENDER: loading =', loading, 'tournaments.length =', tournaments.length);
+
   useEffect(() => {
-    api.getTournaments().then(data => setTournaments(data.length > 0 ? data : fallbackTournaments)).catch(() => setTournaments(fallbackTournaments)).finally(() => setLoading(false));
+    console.log('[TOURNAMENTS_PAGE] useEffect START...');
+    api.getTournaments().then(data => {
+      console.log('[TOURNAMENTS_PAGE] .then() data length:', data?.length);
+      const final = data && data.length > 0 ? data : fallbackTournaments;
+      setTournaments(final);
+    }).catch(err => {
+      console.error('[TOURNAMENTS_PAGE] .catch():', err);
+      setTournaments(fallbackTournaments);
+    }).finally(() => {
+      console.log('[TOURNAMENTS_PAGE] .finally() - loading=false');
+      setLoading(false);
+    });
   }, []);
 
   const filtered = tab === "all" ? tournaments : tournaments.filter(t => t.type === tab);

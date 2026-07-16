@@ -46,8 +46,22 @@ export default function PublicMembersPage() {
   const [roleFilter, setRoleFilter] = useState("all");
   const [selected, setSelected] = useState<any>(null);
 
+  console.log('[MEMBERS_PAGE] RENDER: loading =', loading, 'members.length =', members.length);
+
   useEffect(() => {
-    api.getMembers().then(data => setMembers(data.length > 0 ? data : fallbackMembers)).catch(() => setMembers(fallbackMembers)).finally(() => setLoading(false));
+    console.log('[MEMBERS_PAGE] useEffect START - calling api.getMembers()...');
+    api.getMembers().then(data => {
+      console.log('[MEMBERS_PAGE] .then() data:', JSON.stringify(data).slice(0, 200), 'length:', data?.length);
+      const final = data && data.length > 0 ? data : fallbackMembers;
+      console.log('[MEMBERS_PAGE] Setting members, count =', final.length);
+      setMembers(final);
+    }).catch(err => {
+      console.error('[MEMBERS_PAGE] .catch() err:', err);
+      setMembers(fallbackMembers);
+    }).finally(() => {
+      console.log('[MEMBERS_PAGE] .finally() - setting loading=false');
+      setLoading(false);
+    });
   }, []);
 
   const roles = ["all", "leader", "chief", "vice", "elite", "member"];

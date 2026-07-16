@@ -111,23 +111,41 @@ export default function PublicHomePage() {
   const [notifications] = useState(notificationsData);
   const [dismissedNotifs, setDismissedNotifs] = useState<Set<string>>(new Set());
 
+  console.log('[PUBLIC_HOME] RENDER: loading =', loading, 'members.length =', members.length, 'tournaments.length =', tournaments.length);
+
   useEffect(() => {
-    Promise.all([
-      api.getMembers().catch(() => []),
-      api.getTournaments().catch(() => fallbackTournaments),
-      api.getEvents().catch(() => []),
-      api.getGallery().catch(() => fallbackGallery),
-    ]).then(([m, t, e, g]) => {
-      setMembers(m && m.length > 0 ? m : fallbackMembers);
-      setTournaments(t && t.length > 0 ? t : fallbackTournaments);
-      setGallery(g && g.length > 0 ? g : fallbackGallery);
-    }).finally(() => setLoading(false));
+    console.log('[PUBLIC_HOME] useEffect START - calling APIs...');
+    const p1 = api.getMembers().catch(err => { console.warn('[PUBLIC_HOME] getMembers failed:', err); return []; });
+    const p2 = api.getTournaments().catch(err => { console.warn('[PUBLIC_HOME] getTournaments failed:', err); return fallbackTournaments; });
+    const p3 = api.getEvents().catch(err => { console.warn('[PUBLIC_HOME] getEvents failed:', err); return []; });
+    const p4 = api.getGallery().catch(err => { console.warn('[PUBLIC_HOME] getGallery failed:', err); return fallbackGallery; });
+    Promise.all([p1, p2, p3, p4]).then(([m, t, e, g]) => {
+      console.log('[PUBLIC_HOME] .then() CALLED. m =', m, 't =', t, 'g =', g);
+      console.log('[PUBLIC_HOME] m.length =', m?.length, 't.length =', t?.length, 'g.length =', g?.length);
+      const finalM = m && m.length > 0 ? m : fallbackMembers;
+      const finalT = t && t.length > 0 ? t : fallbackTournaments;
+      const finalG = g && g.length > 0 ? g : fallbackGallery;
+      console.log('[PUBLIC_HOME] Setting state. finalM.length =', finalM.length);
+      setMembers(finalM);
+      setTournaments(finalT);
+      setGallery(finalG);
+    }).catch(err => {
+      console.error('[PUBLIC_HOME] .then() THREW:', err);
+      setMembers(fallbackMembers);
+      setTournaments(fallbackTournaments);
+      setGallery(fallbackGallery);
+    }).finally(() => {
+      console.log('[PUBLIC_HOME] .finally() CALLED - setting loading=false');
+      setLoading(false);
+    });
   }, []);
 
   const totalWins = members.reduce((s, m) => s + (parseInt(m.wins) || 0), 0);
   const leaders = members.filter(m => m.role && ["leader", "vice", "chief"].includes(m.role));
   const displayLeaders = leaders.length > 0 ? leaders : fallbackLeaders;
   const activeNotifs = notifications.filter(n => !dismissedNotifs.has(n.id));
+
+  console.log('[PUBLIC_HOME] RENDER GATE CHECK: loading =', loading, '→ returns', loading ? 'SKELETON' : 'CONTENT');
 
   if (loading) {
     return (

@@ -16,6 +16,8 @@ export default function PublicLeadersPage() {
   const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  console.log('[LEADERS_PAGE] RENDER: loading =', loading, 'members.length =', members.length);
+
   const fallbackMembers = [
     { id: "1", name: "AAK Khalid", gameId: "AAK-1234", role: "leader", level: 80, country: "SY", wins: 150, image: "https://api.dicebear.com/7.x/avataaars/svg?seed=AAK" },
     { id: "2", name: "Qusai", gameId: "Qusai-5678", role: "vice", level: 75, country: "SY", wins: 120, image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Qusai" },
@@ -23,7 +25,18 @@ export default function PublicLeadersPage() {
   ];
 
   useEffect(() => {
-    api.getMembers().then(data => setMembers(data.length > 0 ? data : fallbackMembers)).catch(() => setMembers(fallbackMembers)).finally(() => setLoading(false));
+    console.log('[LEADERS_PAGE] useEffect START...');
+    api.getMembers().then(data => {
+      console.log('[LEADERS_PAGE] .then() data length:', data?.length);
+      const final = data && data.length > 0 ? data : fallbackMembers;
+      setMembers(final);
+    }).catch(err => {
+      console.error('[LEADERS_PAGE] .catch():', err);
+      setMembers(fallbackMembers);
+    }).finally(() => {
+      console.log('[LEADERS_PAGE] .finally() - loading=false');
+      setLoading(false);
+    });
   }, []);
 
   const groups: Record<string, any[]> = { leader: [], vice: [], chief: [] };
