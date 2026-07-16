@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import PublicLayout from "@/components/layout/PublicLayout";
 import GlassCard from "@/components/ui/GlassCard";
 import Avatar from "@/components/ui/Avatar";
@@ -65,14 +66,14 @@ export default function LeadersPage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {items.map((l: any, i: number) => (
-                    <div key={l.id} className="animate-fade-slide-up" style={{ animationDelay: `${i * 0.05 + si * 0.1}s` }}>
-                      <GlassCard className="text-center py-8 relative overflow-hidden group">
+                    <Link key={l.id} href={`/leaders/${l.id}`} className="animate-fade-slide-up block no-underline" style={{ animationDelay: `${i * 0.05 + si * 0.1}s` }}>
+                      <GlassCard className="text-center py-8 relative overflow-hidden group cursor-pointer transition-all duration-300 hover:scale-[1.02]">
                         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#E50914] via-[#FF6B35] to-[#FFD700] opacity-0 group-hover:opacity-100 transition-opacity" />
                         <Avatar src={l.image || ""} name={l.name} size="xl" className="mx-auto mb-4" />
                         <h3 className="font-bold text-lg">{l.name}</h3>
                         <Badge variant={rd.variant} size="sm" className="mt-2">{key === "leader" ? "قائد" : key === "vice" ? "شريك قائد" : "زعيم"}</Badge>
                       </GlassCard>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </section>

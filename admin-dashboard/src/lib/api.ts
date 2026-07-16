@@ -28,6 +28,7 @@ export const api = {
 
   getEvents: () => request<any[]>("/api/events"),
   addEvent: (d: any) => request<any>("/api/events", { method: "POST", body: JSON.stringify(d) }),
+  updateEvent: (id: string, d: any) => request<any>(`/api/events/${id}`, { method: "PUT", body: JSON.stringify(d) }),
   deleteEvent: (id: string) => request<any>(`/api/events/${id}`, { method: "DELETE" }),
 
   getLeaderboard: () => request<any[]>("/api/leaderboard"),
@@ -51,10 +52,13 @@ export const api = {
 
   getGallery: () => request<any[]>("/api/gallery"),
   addGallery: (d: any) => request<any>("/api/gallery", { method: "POST", body: JSON.stringify(d) }),
+  updateGallery: (id: string, d: any) => request<any>(`/api/gallery/${id}`, { method: "PUT", body: JSON.stringify(d) }),
   deleteGallery: (id: string) => request<any>(`/api/gallery/${id}`, { method: "DELETE" }),
+  renameGallery: (id: string, label: string) => request<any>(`/api/gallery/${id}`, { method: "PUT", body: JSON.stringify({ label }) }),
 
   getVideos: () => request<any[]>("/api/videos"),
   addVideo: (d: any) => request<any>("/api/videos", { method: "POST", body: JSON.stringify(d) }),
+  updateVideo: (id: string, d: any) => request<any>(`/api/videos/${id}`, { method: "PUT", body: JSON.stringify(d) }),
   deleteVideo: (id: string) => request<any>(`/api/videos/${id}`, { method: "DELETE" }),
 
   getNotifications: () => request<any[]>("/api/notifications"),
