@@ -11,8 +11,7 @@ import { api } from "@/lib/api";
 import {
   Users, Swords, Trophy, Eye, Crown, Medal,
   Target, Zap, Sparkles, Calendar, Gift, Users2,
-  Image as ImageIcon, FileVideo, Bell, X,
-  Clock
+   Image as ImageIcon, FileVideo, Bell, Clock
 } from "lucide-react";
 
 const roleColors: Record<string, "danger" | "gold" | "success" | "info" | "default"> = {
@@ -45,12 +44,6 @@ const fallbackGallery = [
   { src: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=400&q=80", label: "بطولة" },
   { src: "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=400&q=80", label: "لحظة انتصار" },
   { src: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400&q=80", label: "تدريبات" },
-];
-
-const notificationsData = [
-  { id: "1", text: "انضم عضو جديد إلى الكلان!", time: "منذ 5 دقائق", color: "#00E5FF" },
-  { id: "2", text: "فوز جديد في البطولة!", time: "منذ 15 دقيقة", color: "#8B5CF6" },
-  { id: "3", text: "تم تحديث ترتيب الأعضاء", time: "منذ ساعة", color: "#00E676" },
 ];
 
 function SectionHeader({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle?: string }) {
@@ -107,8 +100,6 @@ export default function PublicHomePage() {
   const [tournaments, setTournaments] = useState<any[]>([]);
   const [gallery, setGallery] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [notifications] = useState(notificationsData);
-  const [dismissedNotifs, setDismissedNotifs] = useState<Set<string>>(new Set());
 
   console.log('[PUBLIC_HOME] RENDER: loading =', loading, 'members.length =', members.length, 'tournaments.length =', tournaments.length);
 
@@ -142,7 +133,6 @@ export default function PublicHomePage() {
   const totalWins = members.reduce((s, m) => s + (parseInt(m.wins) || 0), 0);
   const leaders = members.filter(m => m.role && ["leader", "vice", "chief"].includes(m.role));
   const displayLeaders = leaders.length > 0 ? leaders : fallbackLeaders;
-  const activeNotifs = notifications.filter(n => !dismissedNotifs.has(n.id));
 
   if (loading) {
     return (
@@ -158,43 +148,6 @@ export default function PublicHomePage() {
 
   return (
     <div className="space-y-10">
-
-      {/* Notifications Bar */}
-      {activeNotifs.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="fixed top-20 right-4 z-50 flex flex-col gap-2 max-w-sm w-full"
-        >
-          {activeNotifs.map((n, i) => (
-            <motion.div
-              key={n.id}
-              initial={{ opacity: 0, x: 50, filter: "blur(4px)" }}
-              animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-              exit={{ opacity: 0, x: 50 }}
-              transition={{ delay: i * 0.15 }}
-              className="glass-deep rounded-[14px] p-3 flex items-start gap-3 group shadow-xl"
-            >
-              <div
-                className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5"
-                style={{ backgroundColor: `${n.color}20` }}
-              >
-                <Bell size={14} style={{ color: n.color }} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium">{n.text}</p>
-                <p className="text-[10px] text-[#6B7280] mt-0.5">{n.time}</p>
-              </div>
-              <button
-                onClick={() => setDismissedNotifs(prev => new Set(prev).add(n.id))}
-                className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
-              >
-                <X size={14} className="text-[#6B7280] hover:text-white" />
-              </button>
-            </motion.div>
-          ))}
-        </motion.div>
-      )}
 
       {/* Hero Banner */}
       <motion.div
