@@ -1,19 +1,7 @@
--- SYRIA FOUR - Supabase Database Schema
--- DROP first to ensure fresh schema (safe for setup/migration)
+-- SYRIA FOUR - Supabase Database Schema (non-destructive)
+-- Creates tables if they don't exist, adds missing columns
 
-DROP TABLE IF EXISTS members CASCADE;
-DROP TABLE IF EXISTS tournaments CASCADE;
-DROP TABLE IF EXISTS events CASCADE;
-DROP TABLE IF EXISTS leaderboard CASCADE;
-DROP TABLE IF EXISTS orders CASCADE;
-DROP TABLE IF EXISTS support CASCADE;
-DROP TABLE IF EXISTS instagram CASCADE;
-DROP TABLE IF EXISTS gallery CASCADE;
-DROP TABLE IF EXISTS videos CASCADE;
-DROP TABLE IF EXISTS notifications CASCADE;
-DROP TABLE IF EXISTS players CASCADE;
-
-CREATE TABLE members (
+CREATE TABLE IF NOT EXISTS members (
   id TEXT PRIMARY KEY,
   code TEXT DEFAULT '',
   name TEXT NOT NULL DEFAULT '',
@@ -28,13 +16,14 @@ CREATE TABLE members (
   "joinDate" TEXT DEFAULT '',
   weapon TEXT DEFAULT '',
   wins INTEGER DEFAULT 0,
+  tournaments INTEGER DEFAULT 0,
   bio TEXT DEFAULT '',
   "rank" TEXT DEFAULT '',
   images JSONB DEFAULT '[]',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE tournaments (
+CREATE TABLE IF NOT EXISTS tournaments (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL DEFAULT '',
   type TEXT DEFAULT '',
@@ -52,11 +41,14 @@ CREATE TABLE tournaments (
   "prizeValue" TEXT DEFAULT '',
   gold TEXT DEFAULT '',
   silver TEXT DEFAULT '',
+  logo TEXT DEFAULT '',
+  status TEXT DEFAULT '',
+  "teamsCount" INTEGER DEFAULT 0,
   participants JSONB DEFAULT '[]',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE events (
+CREATE TABLE IF NOT EXISTS events (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL DEFAULT '',
   description TEXT DEFAULT '',
@@ -64,7 +56,7 @@ CREATE TABLE events (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE leaderboard (
+CREATE TABLE IF NOT EXISTS leaderboard (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL DEFAULT '',
   glory INTEGER DEFAULT 0,
@@ -72,7 +64,7 @@ CREATE TABLE leaderboard (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE orders (
+CREATE TABLE IF NOT EXISTS orders (
   id TEXT PRIMARY KEY,
   "playerName" TEXT DEFAULT '',
   "playerId" TEXT DEFAULT '',
@@ -83,7 +75,7 @@ CREATE TABLE orders (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE support (
+CREATE TABLE IF NOT EXISTS support (
   id TEXT PRIMARY KEY,
   "playerName" TEXT DEFAULT '',
   type TEXT DEFAULT '',
@@ -93,7 +85,7 @@ CREATE TABLE support (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE instagram (
+CREATE TABLE IF NOT EXISTS instagram (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL DEFAULT '',
   username TEXT DEFAULT '',
@@ -101,14 +93,14 @@ CREATE TABLE instagram (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE gallery (
+CREATE TABLE IF NOT EXISTS gallery (
   id TEXT PRIMARY KEY,
   label TEXT DEFAULT '',
   src TEXT DEFAULT '',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE videos (
+CREATE TABLE IF NOT EXISTS videos (
   id TEXT PRIMARY KEY,
   title TEXT DEFAULT '',
   url TEXT DEFAULT '',
@@ -116,8 +108,9 @@ CREATE TABLE videos (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE notifications (
+CREATE TABLE IF NOT EXISTS notifications (
   id TEXT PRIMARY KEY,
+  title TEXT DEFAULT '',
   message TEXT DEFAULT '',
   type TEXT DEFAULT 'info',
   active BOOLEAN DEFAULT false,
@@ -125,7 +118,7 @@ CREATE TABLE notifications (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE players (
+CREATE TABLE IF NOT EXISTS players (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL DEFAULT '',
   slug TEXT UNIQUE DEFAULT '',
@@ -151,9 +144,7 @@ CREATE TABLE players (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-DROP TABLE IF EXISTS requests CASCADE;
-
-CREATE TABLE requests (
+CREATE TABLE IF NOT EXISTS requests (
   id TEXT PRIMARY KEY,
   "tournamentId" TEXT DEFAULT '',
   "playerName" TEXT DEFAULT '',
@@ -163,9 +154,7 @@ CREATE TABLE requests (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-DROP TABLE IF EXISTS users CASCADE;
-
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL DEFAULT '',
   username TEXT UNIQUE NOT NULL DEFAULT '',
@@ -196,9 +185,7 @@ CREATE TABLE users (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-DROP TABLE IF EXISTS sessions CASCADE;
-
-CREATE TABLE sessions (
+CREATE TABLE IF NOT EXISTS sessions (
   id TEXT PRIMARY KEY,
   "userId" TEXT NOT NULL DEFAULT '',
   token TEXT DEFAULT '',
@@ -209,9 +196,7 @@ CREATE TABLE sessions (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-DROP TABLE IF EXISTS audit_logs CASCADE;
-
-CREATE TABLE audit_logs (
+CREATE TABLE IF NOT EXISTS audit_logs (
   id TEXT PRIMARY KEY,
   "userId" TEXT DEFAULT '',
   action TEXT DEFAULT '',
@@ -220,3 +205,24 @@ CREATE TABLE audit_logs (
   "createdAt" TEXT DEFAULT '',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Add missing columns for existing tables (safe, IF NOT EXISTS)
+DO $$ BEGIN
+  ALTER TABLE members ADD COLUMN IF NOT EXISTS tournaments INTEGER DEFAULT 0;
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS logo TEXT DEFAULT '';
+  ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS status TEXT DEFAULT '';
+  ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS "teamsCount" INTEGER DEFAULT 0;
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE notifications ADD COLUMN IF NOT EXISTS title TEXT DEFAULT '';
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+-- Reload PostgREST schema cache
+NOTIFY pgrst, 'reload schema';
