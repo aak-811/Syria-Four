@@ -7,15 +7,13 @@ import Link from "next/link";
 import { Lock, Loader2, ArrowRight, Globe } from "lucide-react";
 
 export default function AdminLoginPage() {
-  const { isLoggedIn, login } = useAuth();
+  const { isLoggedIn, login, logout } = useAuth();
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (isLoggedIn) router.replace("/admin");
-  }, [isLoggedIn, router]);
+  useEffect(() => { logout(); }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
