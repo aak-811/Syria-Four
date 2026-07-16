@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import GlassCard from "@/components/ui/GlassCard";
 import Avatar from "@/components/ui/Avatar";
 import Badge from "@/components/ui/Badge";
@@ -24,19 +23,12 @@ const fallbackMembers = [
   { id: "6", name: "Player2", gameId: "P2-003", role: "member", level: 55, country: "SY", wins: 40, tournaments: 5, image: "" },
 ];
 
-function SkeletonCard() {
-  return (
-    <GlassCard className="p-6 animate-pulse text-center">
-      <div className="w-20 h-20 rounded-full bg-[rgba(255,255,255,0.06)] mx-auto mb-4" />
-      <div className="h-5 w-24 bg-[rgba(255,255,255,0.06)] mx-auto mb-2 rounded" />
-      <div className="h-3 w-16 bg-[rgba(255,255,255,0.06)] mx-auto rounded" />
-      <div className="flex justify-center gap-4 mt-4">
-        <div className="h-8 w-16 bg-[rgba(255,255,255,0.06)] rounded" />
-        <div className="h-8 w-16 bg-[rgba(255,255,255,0.06)] rounded" />
-        <div className="h-8 w-16 bg-[rgba(255,255,255,0.06)] rounded" />
-      </div>
-    </GlassCard>
-  );
+function RoleBadge({ role }: { role?: string }) {
+  if (!role) return null;
+  const bg = role === "leader" ? "rgba(0,229,255,0.12)" : role === "chief" ? "rgba(255,215,0,0.12)" : role === "vice" ? "rgba(139,92,246,0.12)" : role === "elite" ? "rgba(0,230,118,0.12)" : "rgba(255,255,255,0.06)";
+  const color = role === "leader" ? "#00E5FF" : role === "chief" ? "#FFD700" : role === "vice" ? "#8B5CF6" : role === "elite" ? "#00E676" : "#9CA3AF";
+  const label = role === "leader" ? "قائد" : role === "vice" ? "نائب" : role === "chief" ? "زعيم" : role === "elite" ? "نخبة" : "عضو";
+  return <span className="text-[11px] px-3 py-1 rounded-full font-semibold" style={{ backgroundColor: bg, color }}>{label}</span>;
 }
 
 export default function PublicMembersPage() {
@@ -46,22 +38,12 @@ export default function PublicMembersPage() {
   const [roleFilter, setRoleFilter] = useState("all");
   const [selected, setSelected] = useState<any>(null);
 
-  console.log('[MEMBERS_PAGE] RENDER: loading =', loading, 'members.length =', members.length);
-
   useEffect(() => {
-    console.log('[MEMBERS_PAGE] useEffect START - calling api.getMembers()...');
     api.getMembers().then(data => {
-      console.log('[MEMBERS_PAGE] .then() data:', JSON.stringify(data).slice(0, 200), 'length:', data?.length);
-      const final = data && data.length > 0 ? data : fallbackMembers;
-      console.log('[MEMBERS_PAGE] Setting members, count =', final.length);
-      setMembers(final);
-    }).catch(err => {
-      console.error('[MEMBERS_PAGE] .catch() err:', err);
+      setMembers(data && data.length > 0 ? data : fallbackMembers);
+    }).catch(() => {
       setMembers(fallbackMembers);
-    }).finally(() => {
-      console.log('[MEMBERS_PAGE] .finally() - setting loading=false');
-      setLoading(false);
-    });
+    }).finally(() => setLoading(false));
   }, []);
 
   const roles = ["all", "leader", "chief", "vice", "elite", "member"];
@@ -73,13 +55,10 @@ export default function PublicMembersPage() {
 
   return (
     <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
-        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      >
+      <div>
         <h1 className="text-2xl font-black">الأعضاء</h1>
         <p className="text-[#9CA3AF] text-sm mt-1">جميع أعضاء كلان SYRIA FOUR</p>
-      </motion.div>
+      </div>
 
       <GlassCard className="p-4">
         <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
@@ -99,8 +78,8 @@ export default function PublicMembersPage() {
       <p className="text-sm text-[#6B7280]">{loading ? "جارٍ التحميل..." : `${filtered.length} عضو`}</p>
 
       {loading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
+        <div className="flex items-center justify-center py-20">
+          <div className="w-12 h-12 border-4 border-[rgba(0,229,255,0.2)] border-t-[#00E5FF] rounded-full animate-spin" />
         </div>
       )}
 
@@ -114,35 +93,13 @@ export default function PublicMembersPage() {
       {!loading && (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {filtered.map((m, i) => (
-            <motion.div
-              key={m.id}
-              initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ delay: i * 0.04 }}
-              whileHover={{ y: -6, scale: 1.02 }}
-            >
+            <div key={m.id} className="fade-in" style={{ animationDelay: `${i * 0.04}s` }}>
               <GlassCard hover onClick={() => setSelected(m)} className="text-center py-6 relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-b from-[rgba(0,229,255,0.02)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <Avatar src={m.image || ""} name={m.name} size="xl" className="mx-auto mb-3 ring-2 ring-[rgba(0,229,255,0.1)] ring-offset-2 ring-offset-[#050816] rounded-full" />
                 <h3 className="font-bold text-base">{m.name}</h3>
                 <p className="text-xs text-[#6B7280] mb-2">{m.gameId}</p>
                 <div className="flex items-center justify-center gap-2 mb-3">
-                  {m.role && (
-                    <span className="text-[11px] px-3 py-1 rounded-full font-semibold"
-                      style={{
-                        backgroundColor: m.role === "leader" ? "rgba(0,229,255,0.12)" :
-                          m.role === "chief" ? "rgba(255,215,0,0.12)" :
-                            m.role === "vice" ? "rgba(139,92,246,0.12)" :
-                              m.role === "elite" ? "rgba(0,230,118,0.12)" : "rgba(255,255,255,0.06)",
-                        color: m.role === "leader" ? "#00E5FF" :
-                          m.role === "chief" ? "#FFD700" :
-                            m.role === "vice" ? "#8B5CF6" :
-                              m.role === "elite" ? "#00E676" : "#9CA3AF",
-                      }}
-                    >
-                      {m.role === "leader" ? "قائد" : m.role === "vice" ? "نائب" : m.role === "chief" ? "زعيم" : m.role === "elite" ? "نخبة" : "عضو"}
-                    </span>
-                  )}
+                  <RoleBadge role={m.role} />
                   {m.country && (
                     <span className="text-[11px] px-3 py-1 rounded-full bg-[rgba(255,255,255,0.06)] text-[#9CA3AF]">{m.country}</span>
                   )}
@@ -170,7 +127,7 @@ export default function PublicMembersPage() {
                   </div>
                 </div>
               </GlassCard>
-            </motion.div>
+            </div>
           ))}
         </div>
       )}

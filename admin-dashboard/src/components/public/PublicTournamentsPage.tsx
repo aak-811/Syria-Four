@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import GlassCard from "@/components/ui/GlassCard";
 import Modal from "@/components/ui/Modal";
 import CountdownTimer from "@/components/ui/CountdownTimer";
@@ -25,21 +24,12 @@ export default function PublicTournamentsPage() {
   const [tab, setTab] = useState("all");
   const [selected, setSelected] = useState<any>(null);
 
-  console.log('[TOURNAMENTS_PAGE] RENDER: loading =', loading, 'tournaments.length =', tournaments.length);
-
   useEffect(() => {
-    console.log('[TOURNAMENTS_PAGE] useEffect START...');
     api.getTournaments().then(data => {
-      console.log('[TOURNAMENTS_PAGE] .then() data length:', data?.length);
-      const final = data && data.length > 0 ? data : fallbackTournaments;
-      setTournaments(final);
-    }).catch(err => {
-      console.error('[TOURNAMENTS_PAGE] .catch():', err);
+      setTournaments(data && data.length > 0 ? data : fallbackTournaments);
+    }).catch(() => {
       setTournaments(fallbackTournaments);
-    }).finally(() => {
-      console.log('[TOURNAMENTS_PAGE] .finally() - loading=false');
-      setLoading(false);
-    });
+    }).finally(() => setLoading(false));
   }, []);
 
   const filtered = tab === "all" ? tournaments : tournaments.filter(t => t.type === tab);
@@ -53,10 +43,10 @@ export default function PublicTournamentsPage() {
 
   return (
     <div className="space-y-6">
-      <motion.div initial={{ opacity: 0, y: 20, filter: "blur(8px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}>
+      <div>
         <h1 className="text-2xl font-black">البطولات</h1>
         <p className="text-[#9CA3AF] text-sm mt-1">جميع بطولات SYRIA FOUR</p>
-      </motion.div>
+      </div>
 
       <div className="flex items-center gap-2 flex-wrap">
         {["all", "previous", "current", "upcoming"].map(t => (
@@ -69,9 +59,9 @@ export default function PublicTournamentsPage() {
       </div>
 
       {loading && (
-        <div className="grid gap-4">{Array.from({ length: 3 }).map((_, i) => (
-          <GlassCard key={i} className="animate-pulse p-6"><div className="h-6 w-48 rounded bg-[rgba(255,255,255,0.06)]" /></GlassCard>
-        ))}</div>
+        <div className="flex items-center justify-center py-20">
+          <div className="w-12 h-12 border-4 border-[rgba(0,229,255,0.2)] border-t-[#00E5FF] rounded-full animate-spin" />
+        </div>
       )}
 
       {!loading && filtered.length === 0 && (
@@ -84,13 +74,7 @@ export default function PublicTournamentsPage() {
       {!loading && (
         <div className="grid gap-4">
           {filtered.map((t, i) => (
-            <motion.div
-              key={t.id || i}
-              initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ delay: i * 0.06 }}
-              whileHover={{ y: -3 }}
-            >
+            <div key={t.id || i} className="fade-in" style={{ animationDelay: `${i * 0.06}s` }}>
               <GlassCard hover onClick={() => setSelected(t)} className="relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-[rgba(139,92,246,0.03)] rounded-full blur-[50px]" />
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-4">
@@ -139,7 +123,7 @@ export default function PublicTournamentsPage() {
                   </div>
                 </div>
               </GlassCard>
-            </motion.div>
+            </div>
           ))}
         </div>
       )}
@@ -200,29 +184,6 @@ export default function PublicTournamentsPage() {
                 </div>
               </div>
             )}
-
-            <div className="border-2 border-dashed border-[rgba(139,92,246,0.2)] rounded-[14px] p-4 text-center transition-all duration-300 hover:border-[rgba(139,92,246,0.4)] hover:bg-[rgba(139,92,246,0.03)]"
-              onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.borderColor = "rgba(0,229,255,0.5)"; }}
-              onDragLeave={(e) => { e.currentTarget.style.borderColor = "rgba(139,92,246,0.2)"; }}
-              onDrop={(e) => {
-                e.preventDefault();
-                e.currentTarget.style.borderColor = "rgba(139,92,246,0.2)";
-                const files = Array.from(e.dataTransfer.files);
-                files.forEach(f => { const fd = new FormData(); fd.append("file", f); fetch("/api/upload", { method: "POST", body: fd }); });
-              }}
-            >
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <ImageIcon size={16} className="text-[#8B5CF6]" />
-                <FileVideo size={16} className="text-[#00E5FF]" />
-              </div>
-              <p className="text-xs text-[#6B7280] mb-2">اسحب صور أو فيديوهات البطولة</p>
-              <label className="inline-block px-4 py-1.5 rounded-[10px] bg-[#00E5FF] text-[#050816] text-xs font-bold cursor-pointer hover:shadow-[0_0_20px_rgba(0,229,255,0.3)] transition-all">
-                رفع ملف
-                <input type="file" multiple accept="image/*,video/*" className="hidden" onChange={(e) => {
-                  Array.from(e.target.files || []).forEach(f => { const fd = new FormData(); fd.append("file", f); fetch("/api/upload", { method: "POST", body: fd }); });
-                }} />
-              </label>
-            </div>
           </div>
         )}
       </Modal>
