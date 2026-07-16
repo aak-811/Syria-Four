@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import PublicNavbar from "@/components/layout/PublicNavbar";
-import PublicFooter from "@/components/layout/PublicFooter";
+import PublicLayout from "@/components/layout/PublicLayout";
 import GlassCard from "@/components/ui/GlassCard";
 import Avatar from "@/components/ui/Avatar";
 import Badge from "@/components/ui/Badge";
@@ -122,20 +121,17 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--bg)]">
-        <PublicNavbar />
+      <PublicLayout>
         <div className="flex items-center justify-center py-32">
           <div className="w-12 h-12 border-4 border-[rgba(0,229,255,0.2)] border-t-[#00E5FF] rounded-full animate-spin" />
         </div>
-      </div>
+      </PublicLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg)]">
-      <PublicNavbar />
-      <main className="pt-[70px]">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-10 space-y-10">
+    <PublicLayout>
+      <div className="space-y-10">
 
           {/* Notifications Bar */}
           {activeNotifs.length > 0 && (
@@ -485,9 +481,7 @@ export default function HomePage() {
             </GlassCard>
           </div>
 
-        </div>
-      </main>
-      <PublicFooter />
-    </div>
+      </div>
+    </PublicLayout>
   );
 }
