@@ -72,11 +72,7 @@ export default function PublicMembersPage() {
   });
 
   return (
-    <>
-      <div style={{ background: 'red', color: 'white', padding: '20px', fontSize: '40px', textAlign: 'center', position: 'relative', zIndex: 9999 }}>
-        MEMBERS CONTENT — loading=false ✓
-      </div>
-      <div className="space-y-6">
+    <div className="space-y-6">
       <motion.div
         initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -230,6 +226,5 @@ export default function PublicMembersPage() {
         )}
       </Modal>
     </div>
-    </>
   );
 }

@@ -157,13 +157,7 @@ export default function PublicHomePage() {
   }
 
   return (
-    <>
-      {/* DIAGNOSTIC: هذا المربع الأحمر يثبت أن المحتوى يُعرض بعد loading=false */}
-      <div style={{ background: 'red', color: 'white', padding: '20px', fontSize: '40px', textAlign: 'center', position: 'relative', zIndex: 9999 }}>
-        CONTENT IS RENDERING — loading=false ✓
-      </div>
-
-      <div className="space-y-10">
+    <div className="space-y-10">
 
       {/* Notifications Bar */}
       {activeNotifs.length > 0 && (
@@ -590,7 +584,6 @@ export default function PublicHomePage() {
       </motion.div>
 
     </div>
-    </>
   );
 }
 
