@@ -6,8 +6,9 @@ import Spinner from "@/components/ui/Spinner";
 import Modal from "@/components/ui/Modal";
 import DataTable from "@/components/admin/DataTable";
 import { FormInput } from "@/components/admin/FormField";
+import FormFileUpload from "@/components/admin/FormFileUpload";
 import { api } from "@/lib/api";
-import { Plus } from "lucide-react";
+import { Plus, Image as ImageIcon } from "lucide-react";
 
 export default function AdminGalleryPage() {
   const [data, setData] = useState<any[]>([]);
@@ -28,8 +29,12 @@ export default function AdminGalleryPage() {
   };
 
   const columns = [
+    {
+      key: "src", label: "الصورة", render: (v: string) => v ? (
+        <img src={v} alt="" className="w-12 h-12 rounded-[8px] object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+      ) : "—",
+    },
     { key: "label", label: "التسمية" },
-    { key: "src", label: "الرابط", render: (v: string) => v?.length > 40 ? v.slice(0, 40) + "..." : v || "—" },
   ];
 
   return (
@@ -46,8 +51,8 @@ export default function AdminGalleryPage() {
 
       <Modal open={modal} onClose={() => setModal(false)} title="إضافة صورة">
         <div className="space-y-4">
+          <FormFileUpload label="الصورة" value={form.src || ""} onChange={(url) => setForm({ ...form, src: url })} accept="image/*" />
           <FormInput label="التسمية" value={form.label || ""} onChange={e => setForm({ ...form, label: e.target.value })} />
-          <FormInput label="الرابط" value={form.src || ""} onChange={e => setForm({ ...form, src: e.target.value })} />
           <Button onClick={add} className="w-full">إضافة</Button>
         </div>
       </Modal>

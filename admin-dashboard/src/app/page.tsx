@@ -10,8 +10,8 @@ import CountdownTimer from "@/components/public/CountdownTimer";
 import { api } from "@/lib/api";
 import {
   Users, Swords, Trophy, Eye, Crown, Medal,
-  Target, Zap, Sparkles, Calendar, Gift, Users2,
-  Image as ImageIcon, FileVideo, Bell, X, Clock
+  Zap, Sparkles, Calendar, Gift, Users2,
+  Image as ImageIcon, FileVideo, Clock, Bell
 } from "lucide-react";
 
 const roleColors: Record<string, "danger" | "gold" | "success" | "info" | "default"> = {
@@ -44,12 +44,6 @@ const fallbackGallery = [
   { src: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=400&q=80", label: "بطولة" },
   { src: "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=400&q=80", label: "لحظة انتصار" },
   { src: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400&q=80", label: "تدريبات" },
-];
-
-const notificationsData = [
-  { id: "1", text: "انضم عضو جديد إلى الكلان!", time: "منذ 5 دقائق", color: "#00E5FF" },
-  { id: "2", text: "فوز جديد في البطولة!", time: "منذ 15 دقيقة", color: "#8B5CF6" },
-  { id: "3", text: "تم تحديث ترتيب الأعضاء", time: "منذ ساعة", color: "#00E676" },
 ];
 
 function SectionHeader({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle?: string }) {
@@ -95,8 +89,6 @@ export default function HomePage() {
   const [tournaments, setTournaments] = useState<any[]>([]);
   const [gallery, setGallery] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [notifications] = useState(notificationsData);
-  const [dismissedNotifs, setDismissedNotifs] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     Promise.all([
@@ -117,7 +109,6 @@ export default function HomePage() {
 
   const leaders = members.filter(m => m.role && ["leader", "vice", "chief"].includes(m.role));
   const displayLeaders = leaders.length > 0 ? leaders : fallbackLeaders;
-  const activeNotifs = notifications.filter(n => !dismissedNotifs.has(n.id));
 
   if (loading) {
     return (
@@ -132,29 +123,6 @@ export default function HomePage() {
   return (
     <PublicLayout>
       <div className="space-y-10">
-
-          {/* Notifications Bar */}
-          {activeNotifs.length > 0 && (
-            <div className="fixed top-20 right-4 z-50 flex flex-col gap-2 max-w-sm w-full">
-              {activeNotifs.map((n, i) => (
-                <div key={n.id} className="fade-in glass rounded-[14px] p-3 flex items-start gap-3 group shadow-xl"
-                  style={{ animationDelay: `${i * 0.15}s` }}>
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5"
-                    style={{ backgroundColor: `${n.color}20` }}>
-                    <Bell size={14} style={{ color: n.color }} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium">{n.text}</p>
-                    <p className="text-[10px] text-[#6B7280] mt-0.5">{n.time}</p>
-                  </div>
-                  <button onClick={() => setDismissedNotifs(prev => new Set(prev).add(n.id))}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                    <X size={14} className="text-[#6B7280] hover:text-white" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
 
           {/* Hero Banner */}
           <div className="fade-in text-center py-12 md:py-16 relative overflow-hidden"
@@ -262,31 +230,6 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* About Section */}
-          <div className="fade-in" style={{ animationDelay: "0.2s" }}>
-            <GlassCard className="p-6 md:p-8 relative overflow-hidden glow-border">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-[rgba(0,229,255,0.03)] rounded-full blur-[60px]" />
-              <div className="flex items-start gap-4 relative z-10">
-                <div className="w-12 h-12 rounded-[14px] bg-[rgba(0,229,255,0.1)] flex items-center justify-center shrink-0">
-                  <Target size={24} className="text-[#00E5FF]" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold mb-2">من نحن</h2>
-                  <p className="text-[#9CA3AF] leading-relaxed">
-                    SYRIA FOUR هو كلان فري فاير سوري يضم نخبة من اللاعبين المحترفين.
-                    نشارك في البطولات المحلية والعالمية، ونسعى دائمًا لتحقيق الانتصارات
-                    ورفع اسم سوريا عاليًا في عالم الألعاب الإلكترونية.
-                  </p>
-                  <div className="flex items-center gap-3 mt-4 text-sm text-[#6B7280]">
-                    <span className="flex items-center gap-1"><Zap size={14} className="text-[#00E5FF]" /> تأسس 2020</span>
-                    <span className="flex items-center gap-1"><Users size={14} className="text-[#8B5CF6]" /> {members.length}+ عضو</span>
-                    <span className="flex items-center gap-1"><Trophy size={14} className="text-[#FFD700]" /> {tournaments.length} بطولة</span>
-                  </div>
-                </div>
-              </div>
-            </GlassCard>
           </div>
 
           {/* Leaders Section */}

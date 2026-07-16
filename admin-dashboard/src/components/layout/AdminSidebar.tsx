@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, Users, Crown, Swords, Calendar, Image, Video,
-  ShoppingBag, MessageSquare, Camera, Bell, ClipboardList, Shield, FileText, Settings, LogOut
+  ShoppingBag, MessageSquare, Camera, Bell, ClipboardList, Shield, FileText, Settings, LogOut, Globe
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -61,7 +61,12 @@ export default function AdminSidebar() {
         })}
       </nav>
 
-      <div className="p-3 border-t border-[var(--border)]">
+      <div className="p-3 border-t border-[var(--border)] space-y-0.5">
+        <Link href="/"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-sm font-medium text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[rgba(0,229,255,0.08)] w-full transition-all duration-200 no-underline"
+        >
+          <Globe size={18} /> الموقع العام
+        </Link>
         <button
           onClick={logout}
           className="flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-sm font-medium text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-[rgba(229,9,20,0.1)] w-full transition-all duration-200"

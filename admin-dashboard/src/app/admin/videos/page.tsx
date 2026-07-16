@@ -6,8 +6,9 @@ import Spinner from "@/components/ui/Spinner";
 import Modal from "@/components/ui/Modal";
 import DataTable from "@/components/admin/DataTable";
 import { FormInput } from "@/components/admin/FormField";
+import FormFileUpload from "@/components/admin/FormFileUpload";
 import { api } from "@/lib/api";
-import { Plus } from "lucide-react";
+import { Plus, Video } from "lucide-react";
 
 export default function AdminVideosPage() {
   const [data, setData] = useState<any[]>([]);
@@ -29,7 +30,7 @@ export default function AdminVideosPage() {
 
   const columns = [
     { key: "title", label: "العنوان" },
-    { key: "url", label: "الرابط", render: (v: string) => v?.length > 40 ? v.slice(0, 40) + "..." : v || "—" },
+    { key: "url", label: "الفيديو", render: (v: string) => v?.length > 40 ? v.slice(0, 40) + "..." : v || "—" },
   ];
 
   return (
@@ -47,8 +48,8 @@ export default function AdminVideosPage() {
       <Modal open={modal} onClose={() => setModal(false)} title="إضافة فيديو">
         <div className="space-y-4">
           <FormInput label="العنوان" value={form.title || ""} onChange={e => setForm({ ...form, title: e.target.value })} />
-          <FormInput label="الرابط" value={form.url || ""} onChange={e => setForm({ ...form, url: e.target.value })} />
-          <FormInput label="الصورة المصغرة" value={form.thumbnail || ""} onChange={e => setForm({ ...form, thumbnail: e.target.value })} />
+          <FormFileUpload label="ملف الفيديو" value={form.url || ""} onChange={(url) => setForm({ ...form, url: url })} accept="video/*" />
+          <FormFileUpload label="الصورة المصغرة" value={form.thumbnail || ""} onChange={(url) => setForm({ ...form, thumbnail: url })} accept="image/*" />
           <Button onClick={add} className="w-full">إضافة</Button>
         </div>
       </Modal>
