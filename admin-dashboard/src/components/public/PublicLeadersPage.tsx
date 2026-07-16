@@ -51,7 +51,11 @@ export default function PublicLeadersPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <>
+      <div style={{ background: 'red', color: 'white', padding: '20px', fontSize: '40px', textAlign: 'center', position: 'relative', zIndex: 9999 }}>
+        LEADERS CONTENT — loading=false ✓
+      </div>
+      <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-2xl font-black">القيادات</h1>
         <p className="text-[#9CA3AF] text-sm mt-1">قادة وشركاء وزعماء SYRIA FOUR</p>
@@ -95,5 +99,6 @@ export default function PublicLeadersPage() {
         })
       )}
     </div>
+    </>
   );
 }

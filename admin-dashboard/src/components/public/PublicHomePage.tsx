@@ -145,8 +145,6 @@ export default function PublicHomePage() {
   const displayLeaders = leaders.length > 0 ? leaders : fallbackLeaders;
   const activeNotifs = notifications.filter(n => !dismissedNotifs.has(n.id));
 
-  console.log('[PUBLIC_HOME] RENDER GATE CHECK: loading =', loading, '→ returns', loading ? 'SKELETON' : 'CONTENT');
-
   if (loading) {
     return (
       <div className="space-y-8">
@@ -160,7 +158,13 @@ export default function PublicHomePage() {
   }
 
   return (
-    <div className="space-y-10">
+    <>
+      {/* DIAGNOSTIC: هذا المربع الأحمر يثبت أن المحتوى يُعرض بعد loading=false */}
+      <div style={{ background: 'red', color: 'white', padding: '20px', fontSize: '40px', textAlign: 'center', position: 'relative', zIndex: 9999 }}>
+        CONTENT IS RENDERING — loading=false ✓
+      </div>
+
+      <div className="space-y-10">
 
       {/* Notifications Bar */}
       {activeNotifs.length > 0 && (
@@ -596,6 +600,7 @@ export default function PublicHomePage() {
       </motion.div>
 
     </div>
+    </>
   );
 }
 
