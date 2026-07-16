@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { Lock, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { Lock, Loader2, ArrowRight, Globe } from "lucide-react";
 
 export default function AdminLoginPage() {
   const { isLoggedIn, login } = useAuth();
@@ -30,6 +31,13 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
+        <Link href="/"
+          className="flex items-center gap-2 text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors mb-6 text-sm no-underline"
+        >
+          <ArrowRight size={16} />
+          العودة إلى الموقع
+        </Link>
+
         <div className="text-center mb-8">
           <div className="w-16 h-16 rounded-2xl mx-auto mb-4 bg-gradient-to-br from-[var(--primary)] to-[var(--secondary)] flex items-center justify-center">
             <Lock size={28} className="text-white" />
@@ -57,6 +65,15 @@ export default function AdminLoginPage() {
             دخول
           </button>
         </form>
+
+        <div className="mt-6 text-center">
+          <Link href="/"
+            className="inline-flex items-center gap-2 text-[var(--text-muted)] hover:text-white transition-colors text-sm no-underline glass rounded-[12px] px-4 py-2"
+          >
+            <Globe size={16} />
+            الموقع العام
+          </Link>
+        </div>
       </div>
     </div>
   );

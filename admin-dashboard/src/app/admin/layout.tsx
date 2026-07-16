@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import AdminSidebar from "@/components/layout/AdminSidebar";
 import AdminTopbar from "@/components/layout/AdminTopbar";
+import AdminMobileNav from "@/components/layout/AdminMobileNav";
 import Spinner from "@/components/ui/Spinner";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -44,11 +45,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       )}
 
-      <main className="pt-[70px] pb-8 px-4 md:px-8 lg:mr-[260px] transition-all duration-300">
+      <main className="pt-[70px] pb-24 lg:pb-8 px-4 md:px-8 lg:mr-[260px] transition-all duration-300">
         <div className="max-w-7xl mx-auto">
           {children}
         </div>
       </main>
+      <AdminMobileNav />
     </div>
   );
 }

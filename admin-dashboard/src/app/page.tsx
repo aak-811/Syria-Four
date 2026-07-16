@@ -130,9 +130,15 @@ export default function HomePage() {
             <div className="absolute inset-0 bg-gradient-to-b from-[rgba(0,229,255,0.06)] via-transparent to-[rgba(139,92,246,0.04)] pointer-events-none" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[rgba(0,229,255,0.03)] blur-[100px] pointer-events-none" />
 
-            <div className="fade-in w-32 h-32 rounded-2xl mx-auto mb-6 shadow-[0_0_60px_rgba(0,229,255,0.3)] relative overflow-hidden bg-gradient-to-br from-[#00E5FF] to-[#8B5CF6] flex items-center justify-center"
+            <div className="fade-in w-32 h-32 rounded-2xl mx-auto mb-6 shadow-[0_0_60px_rgba(0,229,255,0.3)] relative overflow-hidden"
               style={{ animationDelay: "0.2s" }}>
-              <span className="text-white font-black text-4xl tracking-tighter">S4</span>
+              <img src="/images/clan-logo.png" alt="SYRIA FOUR" className="w-full h-full object-contain"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                  (e.target as HTMLImageElement).parentElement!.classList.add('bg-gradient-to-br', 'from-[#00E5FF]', 'to-[#8B5CF6]');
+                  (e.target as HTMLImageElement).parentElement!.innerHTML = '<span class="text-white font-black text-4xl tracking-tighter">S4</span>';
+                }}
+              />
               <div className="absolute -top-1 -right-1 w-6 h-6 bg-[#8B5CF6] rounded-full flex items-center justify-center shadow-lg shadow-[rgba(139,92,246,0.4)]">
                 <Sparkles size={14} className="text-white" />
               </div>
@@ -256,44 +262,6 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* Vision & Values */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="fade-in" style={{ animationDelay: "0.1s" }}>
-              <GlassCard className="p-6 relative overflow-hidden">
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-[rgba(0,229,255,0.03)] rounded-full blur-[40px]" />
-                <div className="relative z-10">
-                  <h3 className="font-bold mb-4 flex items-center gap-2">
-                    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#00E5FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                    </svg>
-                    رؤيتنا
-                  </h3>
-                  <p className="text-sm text-[#9CA3AF] leading-relaxed">
-                    نطمح أن نكون أفضل كلان فري فاير في سوريا والمنطقة العربية،
-                    من خلال التدريب المستمر والمشاركة في البطولات الكبرى.
-                  </p>
-                </div>
-              </GlassCard>
-            </div>
-            <div className="fade-in" style={{ animationDelay: "0.2s" }}>
-              <GlassCard className="p-6 relative overflow-hidden">
-                <div className="absolute bottom-0 right-0 w-32 h-32 bg-[rgba(139,92,246,0.03)] rounded-full blur-[40px]" />
-                <div className="relative z-10">
-                  <h3 className="font-bold mb-4 flex items-center gap-2">
-                    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                    </svg>
-                    قيمنا
-                  </h3>
-                  <p className="text-sm text-[#9CA3AF] leading-relaxed">
-                    الانضباط، الاحترام، والعمل الجماعي هم أساس نجاحنا.
-                    نؤمن بأن الفريق القوي يبني أفرادًا أقوياء.
-                  </p>
-                </div>
-              </GlassCard>
-            </div>
-          </div>
-
           {/* Tournaments Section */}
           {tournaments.length > 0 && (
             <div>
@@ -386,43 +354,6 @@ export default function HomePage() {
               </div>
             </div>
           )}
-
-          {/* Upload Section */}
-          <div className="fade-in" style={{ animationDelay: "0.3s" }}>
-            <GlassCard className="p-6">
-              <SectionHeader icon={<FileVideo size={20} className="text-[#8B5CF6]" />} title="رفع الملفات" subtitle="اسحب وأفلت الصور والفيديوهات" />
-              <div
-                className="border-2 border-dashed border-[rgba(139,92,246,0.2)] rounded-[14px] p-8 text-center transition-all duration-300 hover:border-[rgba(139,92,246,0.4)] hover:bg-[rgba(139,92,246,0.03)]"
-                onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.borderColor = "rgba(0,229,255,0.5)"; e.currentTarget.style.backgroundColor = "rgba(0,229,255,0.03)"; }}
-                onDragLeave={(e) => { e.currentTarget.style.borderColor = "rgba(139,92,246,0.2)"; e.currentTarget.style.backgroundColor = "transparent"; }}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  e.currentTarget.style.borderColor = "rgba(139,92,246,0.2)";
-                  e.currentTarget.style.backgroundColor = "transparent";
-                  Array.from(e.dataTransfer.files).forEach(f => {
-                    const fd = new FormData();
-                    fd.append("file", f);
-                    fetch("/api/upload", { method: "POST", body: fd });
-                  });
-                }}
-              >
-                <div className="w-16 h-16 rounded-full bg-[rgba(139,92,246,0.1)] flex items-center justify-center mx-auto mb-4">
-                  <ImageIcon size={28} className="text-[#8B5CF6]" />
-                </div>
-                <p className="text-sm text-[#9CA3AF] mb-2">اسحب وأفلت الصور أو الفيديوهات هنا</p>
-                <label className="inline-block px-6 py-2.5 rounded-[12px] bg-[#00E5FF] text-[#050816] text-sm font-bold cursor-pointer hover:shadow-[0_0_30px_rgba(0,229,255,0.3)] transition-all duration-300">
-                  اختر من الجهاز
-                  <input type="file" multiple accept="image/*,video/*" className="hidden" onChange={(e) => {
-                    Array.from(e.target.files || []).forEach(f => {
-                      const fd = new FormData();
-                      fd.append("file", f);
-                      fetch("/api/upload", { method: "POST", body: fd });
-                    });
-                  }} />
-                </label>
-              </div>
-            </GlassCard>
-          </div>
 
       </div>
     </PublicLayout>
