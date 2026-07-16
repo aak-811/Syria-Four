@@ -118,9 +118,9 @@ export default function PublicHomePage() {
       api.getEvents().catch(() => []),
       api.getGallery().catch(() => fallbackGallery),
     ]).then(([m, t, e, g]) => {
-      setMembers(m.length > 0 ? m : fallbackMembers);
-      setTournaments(t.length > 0 ? t : fallbackTournaments);
-      setGallery(g.length > 0 ? g : fallbackGallery);
+      setMembers(m && m.length > 0 ? m : fallbackMembers);
+      setTournaments(t && t.length > 0 ? t : fallbackTournaments);
+      setGallery(g && g.length > 0 ? g : fallbackGallery);
     }).finally(() => setLoading(false));
   }, []);
 
