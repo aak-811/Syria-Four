@@ -67,6 +67,7 @@ const fileDB = {
   deleteMember(id) { return fileDB.delete('members', id); },
   getTournaments() { return fileDB.getAll('tournaments'); },
   addTournament(d) { return fileDB.add('tournaments', d); },
+  updateTournament(id, d) { return fileDB.update('tournaments', id, d); },
   deleteTournament(id) { return fileDB.delete('tournaments', id); },
   getEvents() { return fileDB.getAll('events'); },
   addEvent(d) { return fileDB.add('events', d); },
@@ -219,22 +220,34 @@ if (dbUrl) {
   pgPool = new Pool({ connectionString: dbUrl, max: 1, connectionTimeoutMillis: 5000 });
 }
 
+let checkAttempts = 0;
 async function checkTables() {
   if (checkedTables) return tablesExist;
-  checkedTables = true;
-  if (!pgPool) return false;
+  checkAttempts++;
+  if (!pgPool) { console.log('No DATABASE_URL configured. Using local JSON storage.'); checkedTables = true; return false; }
   try {
     const res = await pgPool.query("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'members')");
     tablesExist = res.rows[0].exists;
-    if (!tablesExist) {
-      console.log('Supabase tables not found. Using local JSON storage.');
-      console.log('Run: npm run setup (after adding DATABASE_URL to .env)');
-    } else {
+    if (tablesExist) {
       console.log('Supabase tables detected. Using Supabase storage.');
+      checkedTables = true;
+    } else if (checkAttempts < 3) {
+      console.log('Supabase tables not found (attempt ' + checkAttempts + '/3). Retrying in 2s...');
+      await new Promise(r => setTimeout(r, 2000));
+      return checkTables();
+    } else {
+      console.log('Supabase tables not found after 3 attempts. Using local JSON storage.');
+      console.log('Run: npm run setup');
+      checkedTables = true;
     }
   } catch (err) {
-    console.log('Cannot connect to database:', err.message);
+    console.log('DB connection error (attempt ' + checkAttempts + '/3):', err.message);
+    if (checkAttempts < 3) {
+      await new Promise(r => setTimeout(r, 2000));
+      return checkTables();
+    }
     tablesExist = false;
+    checkedTables = true;
   }
   return tablesExist;
 }
@@ -264,6 +277,7 @@ const supabaseDB = {
   deleteMember(id) { return sb.members.delete(id); },
   getTournaments() { return sb.tournaments.getAll(); },
   addTournament(d) { return sb.tournaments.add(d); },
+  updateTournament(id, d) { return sb.tournaments.update(id, d); },
   deleteTournament(id) { return sb.tournaments.delete(id); },
   getEvents() { return sb.events.getAll(); },
   addEvent(d) { return sb.events.add(d); },
@@ -387,6 +401,7 @@ const DB = {
 
   getTournaments: ar(() => supabaseDB.getTournaments(), () => fileDB.getTournaments()),
   addTournament: rw(d => supabaseDB.addTournament(d), d => fileDB.addTournament(d)),
+  updateTournament: rw((id, d) => supabaseDB.updateTournament(id, d), (id, d) => fileDB.updateTournament(id, d)),
   deleteTournament: rw(id => supabaseDB.deleteTournament(id), id => fileDB.deleteTournament(id)),
 
   getEvents: ar(() => supabaseDB.getEvents(), () => fileDB.getEvents()),

@@ -14,6 +14,16 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// Diagnostic endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    supabase: !!process.env.SUPABASE_URL,
+    database: !!process.env.DATABASE_URL,
+    dashboard: require('fs').existsSync(path.join(__dirname, 'admin-dashboard', 'out', 'index.html')),
+  });
+});
+
 // Admin login redirect
 app.post('/api/admin-login', (req, res) => {
   const { password } = req.body;

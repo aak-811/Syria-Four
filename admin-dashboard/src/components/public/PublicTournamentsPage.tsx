@@ -1,16 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import GlassCard from "@/components/ui/GlassCard";
 import Modal from "@/components/ui/Modal";
 import CountdownTimer from "@/components/ui/CountdownTimer";
 import { api } from "@/lib/api";
 import {
   Swords, Calendar, Users2, Gift, Clock, Medal,
-  Image as ImageIcon, FileVideo, X
+  Image as ImageIcon, FileVideo
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 const typeNames: Record<string, string> = { previous: "سابقة", current: "جارية", upcoming: "قادمة" };
 

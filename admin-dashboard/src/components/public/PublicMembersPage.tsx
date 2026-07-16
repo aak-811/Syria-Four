@@ -109,7 +109,7 @@ export default function PublicMembersPage() {
             >
               <GlassCard hover onClick={() => setSelected(m)} className="text-center py-6 relative overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-b from-[rgba(0,229,255,0.02)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <Avatar src={m.image || ""} size="xl" className="mx-auto mb-3 ring-2 ring-[rgba(0,229,255,0.1)] ring-offset-2 ring-offset-[#050816] rounded-full" />
+                <Avatar src={m.image || ""} name={m.name} size="xl" className="mx-auto mb-3 ring-2 ring-[rgba(0,229,255,0.1)] ring-offset-2 ring-offset-[#050816] rounded-full" />
                 <h3 className="font-bold text-base">{m.name}</h3>
                 <p className="text-xs text-[#6B7280] mb-2">{m.gameId}</p>
                 <div className="flex items-center justify-center gap-2 mb-3">
@@ -164,7 +164,7 @@ export default function PublicMembersPage() {
       <Modal open={!!selected} onClose={() => setSelected(null)} title="تفاصيل العضو">
         {selected && (
           <div className="text-center">
-            <Avatar src={selected.image || ""} size="xl" className="mx-auto mb-4 ring-2 ring-[rgba(0,229,255,0.15)] ring-offset-2 ring-offset-[#050816] rounded-full" />
+            <Avatar src={selected.image || ""} name={selected.name} size="xl" className="mx-auto mb-4 ring-2 ring-[rgba(0,229,255,0.15)] ring-offset-2 ring-offset-[#050816] rounded-full" />
             <h2 className="text-xl font-bold">{selected.name}</h2>
             <p className="text-sm text-[#9CA3AF]">{selected.gameId}</p>
             <div className="flex justify-center gap-2 mt-3 flex-wrap">

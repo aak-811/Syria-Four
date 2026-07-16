@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import MobileNav from "./MobileNav";
+import ErrorBoundary from "@/components/ui/ErrorBoundary";
 import { X } from "lucide-react";
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
@@ -50,7 +51,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         style={{ marginRight: "var(--sidebar-width, 260px)" }}
       >
         <div className="max-w-7xl mx-auto">
-          {children}
+          <ErrorBoundary>{children}</ErrorBoundary>
         </div>
       </main>
       <MobileNav />

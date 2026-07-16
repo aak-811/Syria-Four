@@ -224,5 +224,42 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_column THEN NULL;
 END $$;
 
+-- Enable RLS on all tables
+ALTER TABLE members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tournaments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE leaderboard ENABLE ROW LEVEL SECURITY;
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE support ENABLE ROW LEVEL SECURITY;
+ALTER TABLE instagram ENABLE ROW LEVEL SECURITY;
+ALTER TABLE gallery ENABLE ROW LEVEL SECURITY;
+ALTER TABLE videos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE players ENABLE ROW LEVEL SECURITY;
+ALTER TABLE requests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+
+-- Allow public SELECT on all tables (for anon key access)
+DO $$ BEGIN
+  CREATE POLICY "allow_public_select" ON members FOR SELECT USING (true);
+  CREATE POLICY "allow_public_select" ON tournaments FOR SELECT USING (true);
+  CREATE POLICY "allow_public_select" ON events FOR SELECT USING (true);
+  CREATE POLICY "allow_public_select" ON leaderboard FOR SELECT USING (true);
+  CREATE POLICY "allow_public_select" ON orders FOR SELECT USING (true);
+  CREATE POLICY "allow_public_select" ON support FOR SELECT USING (true);
+  CREATE POLICY "allow_public_select" ON instagram FOR SELECT USING (true);
+  CREATE POLICY "allow_public_select" ON gallery FOR SELECT USING (true);
+  CREATE POLICY "allow_public_select" ON videos FOR SELECT USING (true);
+  CREATE POLICY "allow_public_select" ON notifications FOR SELECT USING (true);
+  CREATE POLICY "allow_public_select" ON players FOR SELECT USING (true);
+  CREATE POLICY "allow_public_select" ON requests FOR SELECT USING (true);
+  CREATE POLICY "allow_public_select" ON users FOR SELECT USING (true);
+  CREATE POLICY "allow_public_select" ON sessions FOR SELECT USING (true);
+  CREATE POLICY "allow_public_select" ON audit_logs FOR SELECT USING (true);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
 -- Reload PostgREST schema cache
 NOTIFY pgrst, 'reload schema';

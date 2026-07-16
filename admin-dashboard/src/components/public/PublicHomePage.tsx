@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import GlassCard from "@/components/ui/GlassCard";
 import Avatar from "@/components/ui/Avatar";
 import Badge from "@/components/ui/Badge";
@@ -11,8 +11,8 @@ import { api } from "@/lib/api";
 import {
   Users, Swords, Trophy, Eye, Crown, Medal,
   Target, Zap, Sparkles, Calendar, Gift, Users2,
-  Image as ImageIcon, FileVideo, Bell, X, ChevronLeft,
-  Clock, MapPin, Globe
+  Image as ImageIcon, FileVideo, Bell, X,
+  Clock
 } from "lucide-react";
 
 const roleColors: Record<string, "danger" | "gold" | "success" | "info" | "default"> = {
@@ -106,11 +106,9 @@ function AnimatedStatCard({ icon, value, label, suffix = "", delay = 0, color = 
 export default function PublicHomePage() {
   const [members, setMembers] = useState<any[]>([]);
   const [tournaments, setTournaments] = useState<any[]>([]);
-  const [events, setEvents] = useState<any[]>([]);
   const [gallery, setGallery] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [notifications] = useState(notificationsData);
-  const [showNotifications, setShowNotifications] = useState(false);
   const [dismissedNotifs, setDismissedNotifs] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -122,7 +120,6 @@ export default function PublicHomePage() {
     ]).then(([m, t, e, g]) => {
       setMembers(m.length > 0 ? m : fallbackMembers);
       setTournaments(t.length > 0 ? t : fallbackTournaments);
-      setEvents(e.length > 0 ? e : []);
       setGallery(g.length > 0 ? g : fallbackGallery);
     }).finally(() => setLoading(false));
   }, []);
@@ -288,7 +285,7 @@ export default function PublicHomePage() {
             >
               <GlassCard className="text-center py-6 relative overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-b from-[rgba(0,229,255,0.03)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <Avatar src={m.image || ""} size="xl" className="mx-auto mb-3 ring-2 ring-[rgba(0,229,255,0.15)] ring-offset-2 ring-offset-[#050816] rounded-full" />
+                <Avatar src={m.image || ""} name={m.name} size="xl" className="mx-auto mb-3 ring-2 ring-[rgba(0,229,255,0.15)] ring-offset-2 ring-offset-[#050816] rounded-full" />
                 <h3 className="font-bold text-base">{m.name}</h3>
                 <p className="text-xs text-[#6B7280] mb-2">{m.gameId}</p>
                 <div className="flex items-center justify-center gap-2 mb-3">
@@ -378,7 +375,7 @@ export default function PublicHomePage() {
                 <GlassCard className="text-center py-6 relative overflow-hidden group">
                   <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#00E5FF] via-[#8B5CF6] to-[#FFD700] opacity-60" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[rgba(0,229,255,0.03)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <Avatar src={l.image || ""} size="xl" className="mx-auto mb-3" />
+                  <Avatar src={l.image || ""} name={l.name} size="xl" className="mx-auto mb-3" />
                   <h3 className="font-bold">{l.name}</h3>
                   <p className="text-xs text-[#6B7280]">{l.gameId}</p>
                   <Badge variant={roleColors[l.role] || "default"} size="sm" className="mt-2">

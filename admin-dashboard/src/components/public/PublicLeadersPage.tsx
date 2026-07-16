@@ -65,7 +65,7 @@ export default function PublicLeadersPage() {
                   <motion.div key={l.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 + si * 0.1 }}>
                     <GlassCard className="text-center py-8 relative overflow-hidden group">
                       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#E50914] via-[#FF6B35] to-[#FFD700] opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <Avatar src={l.image || ""} size="xl" className="mx-auto mb-4" />
+                      <Avatar src={l.image || ""} name={l.name} size="xl" className="mx-auto mb-4" />
                       <h3 className="font-bold text-lg">{l.name}</h3>
                       <Badge variant={sec.key === "leader" ? "gold" : sec.key === "vice" ? "success" : "danger"} size="sm" className="mt-2">{roleNames[sec.key]}</Badge>
                       {l.instagram && (
