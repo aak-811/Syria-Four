@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 
 interface AnimatedCounterProps {
   from?: number;
@@ -23,12 +23,10 @@ export default function AnimatedCounter({
   formatter,
 }: AnimatedCounterProps) {
   const [count, setCount] = useState(from);
-  const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
   const hasAnimated = useRef(false);
 
   useEffect(() => {
-    if (!isInView || hasAnimated.current) return;
+    if (hasAnimated.current) return;
     hasAnimated.current = true;
 
     const startTime = performance.now();
@@ -43,7 +41,7 @@ export default function AnimatedCounter({
     }
 
     requestAnimationFrame(animate);
-  }, [isInView, from, to, duration]);
+  }, [from, to, duration]);
 
   const display = formatter
     ? formatter(count)
@@ -51,9 +49,8 @@ export default function AnimatedCounter({
 
   return (
     <motion.span
-      ref={ref}
-      initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
-      animate={isInView ? { opacity: 1, y: 0, filter: "blur(0px)" } : {}}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       className={className}
     >

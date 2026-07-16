@@ -80,8 +80,7 @@ function AnimatedStatCard({ icon, value, label, suffix = "", delay = 0, color = 
   return (
     <motion.div
       initial={{ opacity: 0, y: 30, scale: 0.9 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ delay, duration: 0.5 }}
       whileHover={{ y: -6, scale: 1.02 }}
       className="relative group"
@@ -270,8 +269,7 @@ export default function PublicHomePage() {
             <motion.div
               key={s.label}
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ delay: i * 0.1 }}
               whileHover={{ y: -4, scale: 1.02 }}
             >
@@ -300,8 +298,7 @@ export default function PublicHomePage() {
             <motion.div
               key={m.id || i}
               initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
-              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              viewport={{ once: true }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ delay: i * 0.05 }}
               whileHover={{ y: -6, scale: 1.02 }}
             >
@@ -353,8 +350,7 @@ export default function PublicHomePage() {
       {/* About Section */}
       <motion.div
         initial={{ opacity: 0, y: 30, filter: "blur(6px)" }}
-        whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        viewport={{ once: true }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: 0.6 }}
       >
         <GlassCard className="p-6 md:p-8 relative overflow-hidden glow-border">
@@ -389,8 +385,7 @@ export default function PublicHomePage() {
               <motion.div
                 key={l.id || i}
                 initial={{ opacity: 0, x: -20, filter: "blur(4px)" }}
-                whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-                viewport={{ once: true }}
+                animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
                 transition={{ delay: i * 0.08 }}
                 whileHover={{ y: -4, scale: 1.02 }}
               >
@@ -414,10 +409,9 @@ export default function PublicHomePage() {
       {/* Vision & Values */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <motion.div
-          initial={{ opacity: 0, x: -30, filter: "blur(6px)" }}
-          whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+        initial={{ opacity: 0, x: -30, filter: "blur(6px)" }}
+        animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+        transition={{ duration: 0.5 }}
           whileHover={{ y: -4 }}
         >
           <GlassCard className="p-6 relative overflow-hidden">
@@ -434,10 +428,9 @@ export default function PublicHomePage() {
           </GlassCard>
         </motion.div>
         <motion.div
-          initial={{ opacity: 0, x: 30, filter: "blur(6px)" }}
-          whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+        initial={{ opacity: 0, x: 30, filter: "blur(6px)" }}
+        animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+        transition={{ duration: 0.5 }}
           whileHover={{ y: -4 }}
         >
           <GlassCard className="p-6 relative overflow-hidden">
@@ -464,8 +457,7 @@ export default function PublicHomePage() {
               <motion.div
                 key={t.id || i}
                 initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
-                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                viewport={{ once: true }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 transition={{ delay: i * 0.08 }}
                 whileHover={{ y: -2 }}
               >
@@ -538,8 +530,7 @@ export default function PublicHomePage() {
               <motion.div
                 key={i}
                 initial={{ opacity: 0, scale: 0.85, filter: "blur(6px)" }}
-                whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                viewport={{ once: true }}
+                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
                 transition={{ delay: i * 0.1 }}
                 whileHover={{ scale: 1.05 }}
                 className="rounded-[14px] overflow-hidden aspect-square group cursor-pointer relative"
@@ -559,8 +550,7 @@ export default function PublicHomePage() {
       {/* Upload Section for Tournaments - drag & drop */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        animate={{ opacity: 1, y: 0 }}
       >
         <GlassCard className="p-6">
           <SectionHeader icon={<FileVideo size={20} className="text-[#8B5CF6]" />} title="رفع الملفات" subtitle="اسحب وأفلت الصور والفيديوهات" />
