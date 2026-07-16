@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { motion } from "framer-motion";
 import GlassCard from "@/components/ui/GlassCard";
 import Input from "@/components/ui/Input";
 import { api } from "@/lib/api";
@@ -35,17 +34,17 @@ export default function PublicSupportPage() {
 
   return (
     <div className="space-y-6">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+      <div className="fade-in">
         <h1 className="text-2xl font-black">الدعم الفني</h1>
         <p className="text-[#9CA3AF] text-sm mt-1">للتواصل مع إدارة SYRIA FOUR</p>
-      </motion.div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {contacts.map((c, i) => {
           const Icon = c.icon;
           return (
-            <motion.a key={i} href={c.href} target="_blank" rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
+            <a key={i} href={c.href} target="_blank" rel="noopener noreferrer"
+              className="fade-in block" style={{ animationDelay: `${i * 0.06}s` }}
             >
               <GlassCard hover>
                 <div className="flex items-center gap-4">
@@ -58,7 +57,7 @@ export default function PublicSupportPage() {
                   </div>
                 </div>
               </GlassCard>
-            </motion.a>
+            </a>
           );
         })}
       </div>

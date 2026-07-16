@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import GlassCard from "@/components/ui/GlassCard";
 import { api } from "@/lib/api";
 import { Image } from "lucide-react";
@@ -27,10 +26,10 @@ export default function PublicGalleryPage() {
 
   return (
     <div className="space-y-6">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+      <div className="fade-in">
         <h1 className="text-2xl font-black">المعرض</h1>
         <p className="text-[#9CA3AF] text-sm mt-1">صور وفيديوهات SYRIA FOUR</p>
-      </motion.div>
+      </div>
       {loading ? (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">{Array.from({ length: 8 }).map((_, i) => (
           <div key={i} className="aspect-square rounded-[14px] bg-[rgba(255,255,255,0.03)] animate-pulse" />
@@ -40,15 +39,15 @@ export default function PublicGalleryPage() {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {images.map((img, i) => (
-            <motion.div key={i} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }}
-              className="aspect-square rounded-[14px] overflow-hidden cursor-pointer group relative"
+            <div key={i} className="fade-in aspect-square rounded-[14px] overflow-hidden cursor-pointer group relative"
+              style={{ animationDelay: `${i * 0.04}s` }}
               onClick={() => setLightbox(img.src)}
             >
               <img src={img.src} alt={img.label || ""} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
                 <Image size={32} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       )}

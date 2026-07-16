@@ -1,8 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import GlassCard from "@/components/ui/GlassCard";
-import Badge from "@/components/ui/Badge";
 import { api } from "@/lib/api";
 import { Clock, Flame, Crosshair } from "lucide-react";
 
@@ -23,10 +21,10 @@ export default function PublicEventsPage() {
 
   return (
     <div className="space-y-6">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+      <div className="fade-in">
         <h1 className="text-2xl font-black">الفعاليات</h1>
         <p className="text-[#9CA3AF] text-sm mt-1">فعاليات وأنشطة SYRIA FOUR</p>
-      </motion.div>
+      </div>
       {loading ? (
         <div className="grid gap-4">{Array.from({ length: 3 }).map((_, i) => (
           <GlassCard key={i} className="animate-pulse p-6"><div /></GlassCard>
@@ -37,7 +35,7 @@ export default function PublicEventsPage() {
         <div className="grid gap-4">{events.map((e, i) => {
           const Icon = iconMap[e.icon] || Clock;
           return (
-            <motion.div key={e.id || i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+            <div key={e.id || i} className="fade-in" style={{ animationDelay: `${i * 0.05}s` }}>
               <GlassCard>
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-[14px] bg-[rgba(255,215,0,0.12)] flex items-center justify-center shrink-0">
@@ -50,7 +48,7 @@ export default function PublicEventsPage() {
                   </div>
                 </div>
               </GlassCard>
-            </motion.div>
+            </div>
           );
         })}</div>
       )}

@@ -1,5 +1,4 @@
 "use client";
-import { motion } from "framer-motion";
 import GlassCard from "@/components/ui/GlassCard";
 import { Shield, AlertTriangle, Users, Swords, Ban, MessageCircle, Star, AlertCircle } from "lucide-react";
 
@@ -33,7 +32,7 @@ const rules = [
 export default function PublicRulesPage() {
   return (
     <div className="space-y-6">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+      <div className="fade-in">
         <div className="flex items-center gap-3">
           <Shield size={28} className="text-[#FFD700]" />
           <div>
@@ -41,7 +40,7 @@ export default function PublicRulesPage() {
             <p className="text-[#9CA3AF] text-sm mt-1">قوانين وانضباط كلان SYRIA FOUR</p>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       <GlassCard className="p-4 flex items-start gap-3 border-r-4 border-r-[#FFD700]">
         <AlertCircle size={20} className="text-[#FFD700] shrink-0 mt-0.5" />
@@ -52,7 +51,7 @@ export default function PublicRulesPage() {
         {rules.map((r, i) => {
           const Icon = r.icon;
           return (
-            <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}>
+            <div key={i} className="fade-in" style={{ animationDelay: `${i * 0.06}s` }}>
               <GlassCard className="group relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-1 h-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ backgroundColor: r.color }} />
                 <div className="flex items-start gap-4">
@@ -65,7 +64,7 @@ export default function PublicRulesPage() {
                   </div>
                 </div>
               </GlassCard>
-            </motion.div>
+            </div>
           );
         })}
       </div>
