@@ -1,18 +1,15 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
-import Link from "next/link";
+import { useState, useEffect, useRef } from "react";
 import PublicLayout from "@/components/layout/PublicLayout";
 import GlassCard from "@/components/ui/GlassCard";
-import AnimatedCounter from "@/components/ui/AnimatedCounter";
 import Avatar from "@/components/ui/Avatar";
 import { api } from "@/lib/api";
 import {
-  Users, Swords, Trophy, Eye,
-  Zap, Sparkles,
-  Medal, Crown, Shield,
-  Star, Diamond, Gift, MapPin, Award, Flame, Crosshair,
-  Move, ZoomIn, Globe as GlobeIcon
+  Swords, Trophy, Sparkles,
+  Medal, Crown,
+  Star, Gift, Award,
+  ZoomIn, Globe as GlobeIcon
 } from "lucide-react";
 
 const fallbackAwards = [
@@ -32,8 +29,6 @@ const fallbackHallOfFame = [
   { id: "3", title: "أقوى لاعب رانكد", playerName: "Za3im", description: "الأعلى في الرانكد", image: "" },
   { id: "4", title: "أقوى لاعب", playerName: "AAK Khalid", description: "أقوى لاعب في الكلان", image: "" },
 ];
-
-const fallbackStats = { members: 120, wars: 28, tournaments: 15, diamonds: 50 };
 
 const countryPositions: Record<string, { x: number; y: number }> = {
   SY: { x: 52, y: 38 }, SA: { x: 55, y: 40 }, AE: { x: 58, y: 37 },
@@ -81,15 +76,6 @@ export default function HomePage() {
 
   const vip = vipSettings[0];
   const activeMembers = members.filter(m => m.role && ["leader", "vice", "chief", "elite", "member"].includes(m.role));
-  const currentTournaments = tournaments.filter(t => t.type === "current");
-  const totalDiamonds = tournaments.reduce((sum, t) => sum + (Number(t.prizeValue) || 0), 0);
-
-  const stats = {
-    members: activeMembers.length || fallbackStats.members,
-    wars: currentTournaments.length || fallbackStats.wars,
-    tournaments: tournaments.length || fallbackStats.tournaments,
-    diamonds: totalDiamonds || fallbackStats.diamonds,
-  };
 
   // Map handlers
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -148,42 +134,6 @@ export default function HomePage() {
             50% { transform: translateY(-8px); }
           }
         `}</style>
-
-        {/* القسم الأول: إحصائيات رئيسية */}
-        <div>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-[12px] bg-[rgba(0,229,255,0.1)] flex items-center justify-center">
-              <Zap size={20} className="text-[#00E5FF]" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold">إحصائيات الكلان</h2>
-              <p className="text-xs text-[#9CA3AF]">أرقام SYRIA FOUR</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
-            {[
-              { icon: <Users size={24} />, value: stats.members, label: "إجمالي الأعضاء", suffix: "", delay: 0, color: "#00E5FF", desc: `${activeMembers.length} عضو نشط` },
-              { icon: <Swords size={24} />, value: stats.wars, label: "الحروب النشطة", suffix: "", delay: 0.1, color: "#FF3B30", desc: `${currentTournaments.length} حرب جارية` },
-              { icon: <Trophy size={24} />, value: stats.tournaments, label: "إجمالي البطولات", suffix: "", delay: 0.2, color: "#FFD700", desc: `${tournaments.length} بطولة` },
-              { icon: <Diamond size={24} />, value: Math.floor(stats.diamonds / 1000), label: "جوائز البطولات", suffix: "K+", delay: 0.3, color: "#00E676", desc: "ديموند كجوائز" },
-            ].map((s, i) => (
-              <div key={s.label} className="fade-in relative group" style={{ animationDelay: `${s.delay}s` }}>
-                <div className="absolute -inset-0.5 rounded-[20px] bg-gradient-to-b from-[rgba(0,229,255,0.1)] to-[rgba(139,92,246,0.05)] opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500" />
-                <GlassCard className="text-center py-6 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#00E5FF] via-[#8B5CF6] to-[#FFD700] opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3 transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(0,229,255,0.2)]" style={{ backgroundColor: `${s.color}15` }}>
-                    <div style={{ color: s.color }}>{s.icon}</div>
-                  </div>
-                  <p className="text-3xl md:text-4xl font-black tabular-nums text-white">
-                    <AnimatedCounter to={s.value} suffix={s.suffix} duration={2} />
-                  </p>
-                  <p className="text-sm font-bold mt-1" style={{ color: s.color }}>{s.label}</p>
-                  <p className="text-[10px] text-[#6B7280] mt-1">{s.desc}</p>
-                </GlassCard>
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* القسم الثاني: الأوسمة النادرة */}
         <div>
