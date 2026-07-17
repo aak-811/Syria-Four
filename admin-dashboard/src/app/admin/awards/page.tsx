@@ -24,9 +24,13 @@ export default function AdminAwardsPage() {
   const openEdit = (row: any) => { setEdit(row); setForm({ ...row }); setModal(true); };
 
   const save = async () => {
-    if (edit) await api.updateAward(edit.id, form);
-    else await api.addAward(form);
-    setModal(false); load();
+    try {
+      if (edit) await api.updateAward(edit.id, form);
+      else await api.addAward(form);
+      setModal(false); load();
+    } catch (err: any) {
+      alert("خطأ: " + (err.message || "فشل الحفظ"));
+    }
   };
 
   const remove = async (row: any) => {

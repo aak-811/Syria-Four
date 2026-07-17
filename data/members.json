@@ -50,5 +50,18 @@
   },
   {
     "id": "cb68688a-6be5-4715-8873-d857e1af6474"
+  },
+  {
+    "id": "27f01282-4812-4a56-b68a-72383dab58ab",
+    "goldFrame": true,
+    "vipBadge": true,
+    "image": "/uploads/1784311250935-444709625.jpg",
+    "name": "ابو امير",
+    "age": "-1"
+  },
+  {
+    "id": "c12f7609-235d-42ed-bfaf-e225c4e866b3",
+    "goldFrame": true,
+    "vipBadge": true
   }
 ]

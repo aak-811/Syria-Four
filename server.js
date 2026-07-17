@@ -141,6 +141,9 @@ app.use('/api/gallery', createRouter('gallery'));
 app.use('/api/videos', createRouter('videos'));
 app.use('/api/notifications', createRouter('notifications'));
 app.use('/api/requests', createRouter('requests'));
+app.use('/api/awards', createRouter('awards'));
+app.use('/api/vip', createRouter('vip'));
+app.use('/api/hall-of-fame', createRouter('hall-of-fame'));
 
 app.get('/api/players', async (req, res) => {
   try {

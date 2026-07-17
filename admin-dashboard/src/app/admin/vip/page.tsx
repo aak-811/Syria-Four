@@ -23,9 +23,13 @@ export default function AdminVipPage() {
   const openEdit = (row: any) => { setEdit(row); setForm({ ...row }); setModal(true); };
 
   const save = async () => {
-    if (edit) await api.updateVipSetting(edit.id, form);
-    else await api.addVipSetting(form);
-    setModal(false); load();
+    try {
+      if (edit) await api.updateVipSetting(edit.id, form);
+      else await api.addVipSetting(form);
+      setModal(false); load();
+    } catch (err: any) {
+      alert("خطأ: " + (err.message || "فشل الحفظ"));
+    }
   };
 
   const remove = async (row: any) => {
