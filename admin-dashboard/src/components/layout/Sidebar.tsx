@@ -4,14 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
-  LayoutDashboard, Users, Crown, Swords, Calendar, Image as ImageIcon,
+  LayoutDashboard, Users, Swords, Calendar, Image as ImageIcon,
   ShoppingCart, HeadphonesIcon, Hand, Shield, LogOut, Bot,
 } from "lucide-react";
 
 const iconMap: Record<string, React.ReactNode> = {
   LayoutDashboard: <LayoutDashboard size={20} />,
   Users: <Users size={20} />,
-  Crown: <Crown size={20} />,
   Swords: <Swords size={20} />,
   Calendar: <Calendar size={20} />,
   Image: <ImageIcon size={20} />,
@@ -23,7 +22,6 @@ const iconMap: Record<string, React.ReactNode> = {
 
 const publicItems = [
   { icon: "LayoutDashboard", label: "الرئيسية", href: "/" },
-  { icon: "Crown", label: "القيادات", href: "/leaders" },
   { icon: "Users", label: "الأعضاء", href: "/members" },
   { icon: "Swords", label: "البطولات", href: "/tournaments" },
   { icon: "Calendar", label: "الفعاليات", href: "/events" },

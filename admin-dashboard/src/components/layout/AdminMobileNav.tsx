@@ -14,7 +14,6 @@ type NavItem = { label: string; icon: any; href: string };
 const mainItems: NavItem[] = [
   { label: "الرئيسية", icon: LayoutDashboard, href: "/admin" },
   { label: "الأعضاء", icon: Users, href: "/admin/members" },
-  { label: "القيادات", icon: Crown, href: "/admin/leaders" },
   { label: "البطولات", icon: Swords, href: "/admin/tournaments" },
 ];
 

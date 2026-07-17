@@ -13,7 +13,6 @@ import { useAuth } from "@/lib/auth-context";
 const items = [
   { href: "/admin", label: "لوحة التحكم", icon: LayoutDashboard },
   { href: "/admin/members", label: "الأعضاء", icon: Users },
-  { href: "/admin/leaders", label: "القيادات", icon: Crown },
   { href: "/admin/tournaments", label: "البطولات", icon: Swords },
   { href: "/admin/events", label: "الفعاليات", icon: Calendar },
   { href: "/admin/awards", label: "الأوسمة", icon: Medal },
