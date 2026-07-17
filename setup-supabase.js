@@ -31,8 +31,9 @@ async function runSetup() {
   // Migrate all data
   const collections = [
     'members', 'tournaments', 'events', 'leaderboard',
-    'orders', 'support', 'instagram', 'gallery',
-    'notifications', 'players', 'users', 'sessions', 'audit_logs', 'requests'
+    'orders', 'support', 'instagram', 'gallery', 'videos',
+    'notifications', 'players', 'users', 'sessions', 'audit_logs', 'requests',
+    'awards', 'vip', 'hall-of-fame'
   ];
 
   let totalMigrated = 0;

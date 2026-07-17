@@ -154,6 +154,36 @@ CREATE TABLE IF NOT EXISTS requests (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS awards (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL DEFAULT '',
+  "holderName" TEXT DEFAULT '',
+  description TEXT DEFAULT '',
+  icon TEXT DEFAULT '',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS vip (
+  id TEXT PRIMARY KEY,
+  title TEXT DEFAULT '',
+  description TEXT DEFAULT '',
+  "instagram1" TEXT DEFAULT '',
+  "instagram2" TEXT DEFAULT '',
+  "link1" TEXT DEFAULT '',
+  "link2" TEXT DEFAULT '',
+  "isEnabled" BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS "hall-of-fame" (
+  id TEXT PRIMARY KEY,
+  title TEXT DEFAULT '',
+  "playerName" TEXT DEFAULT '',
+  description TEXT DEFAULT '',
+  image TEXT DEFAULT '',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL DEFAULT '',
@@ -209,6 +239,13 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 -- Add missing columns for existing tables (safe, IF NOT EXISTS)
 DO $$ BEGIN
   ALTER TABLE members ADD COLUMN IF NOT EXISTS tournaments INTEGER DEFAULT 0;
+  ALTER TABLE members ADD COLUMN IF NOT EXISTS "playStyle" TEXT DEFAULT '';
+  ALTER TABLE members ADD COLUMN IF NOT EXISTS "isPrime" BOOLEAN DEFAULT false;
+  ALTER TABLE members ADD COLUMN IF NOT EXISTS "goldFrame" BOOLEAN DEFAULT false;
+  ALTER TABLE members ADD COLUMN IF NOT EXISTS "vipBadge" BOOLEAN DEFAULT false;
+  ALTER TABLE members ADD COLUMN IF NOT EXISTS "nameColor" TEXT DEFAULT '';
+  ALTER TABLE members ADD COLUMN IF NOT EXISTS "profileColor" TEXT DEFAULT '';
+  ALTER TABLE members ADD COLUMN IF NOT EXISTS "galleryImage" TEXT DEFAULT '';
 EXCEPTION WHEN duplicate_column THEN NULL;
 END $$;
 
@@ -216,6 +253,16 @@ DO $$ BEGIN
   ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS logo TEXT DEFAULT '';
   ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS status TEXT DEFAULT '';
   ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS "teamsCount" INTEGER DEFAULT 0;
+  ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS "snowType" TEXT DEFAULT '';
+  ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS "maxPlayers" INTEGER DEFAULT 0;
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE events ADD COLUMN IF NOT EXISTS image TEXT DEFAULT '';
+  ALTER TABLE events ADD COLUMN IF NOT EXISTS reward TEXT DEFAULT '';
+  ALTER TABLE events ADD COLUMN IF NOT EXISTS participants INTEGER DEFAULT 0;
+  ALTER TABLE events ADD COLUMN IF NOT EXISTS squad TEXT DEFAULT '';
 EXCEPTION WHEN duplicate_column THEN NULL;
 END $$;
 
@@ -240,6 +287,9 @@ ALTER TABLE requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE awards ENABLE ROW LEVEL SECURITY;
+ALTER TABLE vip ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "hall-of-fame" ENABLE ROW LEVEL SECURITY;
 
 -- Allow public SELECT on all tables (for anon key access)
 DO $$ BEGIN
@@ -258,6 +308,9 @@ DO $$ BEGIN
   CREATE POLICY "allow_public_select" ON users FOR SELECT USING (true);
   CREATE POLICY "allow_public_select" ON sessions FOR SELECT USING (true);
   CREATE POLICY "allow_public_select" ON audit_logs FOR SELECT USING (true);
+  CREATE POLICY "allow_public_select" ON awards FOR SELECT USING (true);
+  CREATE POLICY "allow_public_select" ON vip FOR SELECT USING (true);
+  CREATE POLICY "allow_public_select" ON "hall-of-fame" FOR SELECT USING (true);
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
