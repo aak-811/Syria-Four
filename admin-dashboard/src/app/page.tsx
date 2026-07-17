@@ -9,8 +9,8 @@ import Avatar from "@/components/ui/Avatar";
 import { api } from "@/lib/api";
 import {
   Users, Swords, Trophy, Eye,
-  Zap, Sparkles, Bell,
-  Image as ImageIcon, FileVideo, Medal, Crown, Shield,
+  Zap, Sparkles,
+  Medal, Crown, Shield,
   Star, Diamond, Gift, MapPin, Award, Flame, Crosshair
 } from "lucide-react";
 
@@ -32,22 +32,9 @@ const fallbackHallOfFame = [
   { id: "4", title: "أقوى لاعب", playerName: "AAK Khalid", description: "أقوى لاعب في الكلان", image: "" },
 ];
 
-const awardIcons: Record<string, any> = {
-  "مؤسس الكلان": Crown,
-  "أقوى لاعب حروب": Swords,
-  "أقوى لاعب بطولات": Trophy,
-  "داعم الكلان": Gift,
-};
-
-const awardColors: Record<string, string> = {
-  "مؤسس الكلان": "#FFD700",
-  "أقوى لاعب حروب": "#FF3B30",
-  "أقوى لاعب بطولات": "#8B5CF6",
-  "داعم الكلان": "#00E676",
-};
-
 export default function HomePage() {
   const [members, setMembers] = useState<any[]>([]);
+  const [tournaments, setTournaments] = useState<any[]>([]);
   const [awards, setAwards] = useState<any[]>([]);
   const [vipSettings, setVipSettings] = useState<any[]>([]);
   const [hallOfFame, setHallOfFame] = useState<any[]>([]);
@@ -56,11 +43,13 @@ export default function HomePage() {
   useEffect(() => {
     Promise.all([
       api.getMembers().catch(() => []),
+      api.getTournaments().catch(() => []),
       api.getAwards().catch(() => fallbackAwards),
       api.getVipSettings().catch(() => fallbackVip),
       api.getHallOfFame().catch(() => fallbackHallOfFame),
-    ]).then(([m, a, v, h]) => {
+    ]).then(([m, t, a, v, h]) => {
       setMembers(m.length > 0 ? m : []);
+      setTournaments(t.length > 0 ? t : []);
       setAwards(a.length > 0 ? a : fallbackAwards);
       setVipSettings(v.length > 0 ? v : fallbackVip);
       setHallOfFame(h.length > 0 ? h : fallbackHallOfFame);
@@ -73,6 +62,10 @@ export default function HomePage() {
 
   const vip = vipSettings[0];
   const activeMembers = members.filter(m => m.role && ["leader", "vice", "chief", "elite", "member"].includes(m.role));
+  const currentTournaments = tournaments.filter(t => t.type === "current");
+  const previousTournaments = tournaments.filter(t => t.type !== "current");
+  const totalWins = members.reduce((sum, m) => sum + (Number(m.wins) || 0), 0);
+  const totalDiamonds = tournaments.reduce((sum, t) => sum + (Number(t.prizeValue) || 0), 0);
 
   return (
     <PublicLayout>
@@ -102,7 +95,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* القسم الأول: إحصائيات رئيسية */}
+        {/* القسم الأول: إحصائيات رئيسية (حقيقية) */}
         <div>
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-[12px] bg-[rgba(0,229,255,0.1)] flex items-center justify-center">
@@ -110,15 +103,15 @@ export default function HomePage() {
             </div>
             <div>
               <h2 className="text-xl font-bold">إحصائيات الكلان</h2>
-              <p className="text-xs text-[#9CA3AF]">أرقام SYRIA FOUR</p>
+              <p className="text-xs text-[#9CA3AF]">أرقام حقيقية من قاعدة البيانات</p>
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
             {[
-              { icon: <Users size={24} />, value: activeMembers.length || 120, label: "إجمالي الأعضاء", suffix: "", delay: 0, color: "#00E5FF", desc: "عضو في الكلان" },
-              { icon: <Swords size={24} />, value: 28, label: "الحروب هذا الشهر", suffix: "", delay: 0.1, color: "#FF3B30", desc: "حرب شهرية" },
-              { icon: <Trophy size={24} />, value: 15, label: "البطولات", suffix: "+", delay: 0.2, color: "#FFD700", desc: "بطولة رسمية" },
-              { icon: <Diamond size={24} />, value: 50, label: "الجواهر الموزعة", suffix: "K+", delay: 0.3, color: "#00E676", desc: "جوائز للأعضاء" },
+              { icon: <Users size={24} />, value: activeMembers.length, label: "إجمالي الأعضاء", suffix: "", delay: 0, color: "#00E5FF", desc: `${activeMembers.length} عضو` },
+              { icon: <Swords size={24} />, value: currentTournaments.length, label: "الحروب النشطة", suffix: "", delay: 0.1, color: "#FF3B30", desc: `${currentTournaments.length} حرب` },
+              { icon: <Trophy size={24} />, value: tournaments.length, label: "إجمالي البطولات", suffix: "", delay: 0.2, color: "#FFD700", desc: `${tournaments.length} بطولة` },
+              { icon: <Diamond size={24} />, value: totalDiamonds, label: "جوائز البطولات", suffix: "", delay: 0.3, color: "#00E676", desc: `${previousTournaments.length} بطولة سابقة` },
             ].map((s, i) => (
               <div key={s.label} className="fade-in relative group" style={{ animationDelay: `${s.delay}s` }}>
                 <div className="absolute -inset-0.5 rounded-[20px] bg-gradient-to-b from-[rgba(0,229,255,0.1)] to-[rgba(139,92,246,0.05)] opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500" />
@@ -138,7 +131,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* القسم الثاني: الأوسمة النادرة */}
+        {/* القسم الثاني: الأوسمة النادرة مع الصور */}
         <div>
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-[12px] bg-[rgba(255,215,0,0.1)] flex items-center justify-center">
@@ -151,15 +144,30 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {awards.map((a, i) => {
-              const Icon = awardIcons[a.title] || Medal;
-              const color = awardColors[a.title] || "#FFD700";
+              const awardIconMap: Record<string, any> = {
+                "مؤسس الكلان": Crown,
+                "أقوى لاعب حروب": Swords,
+                "أقوى لاعب بطولات": Trophy,
+                "داعم الكلان": Gift,
+              };
+              const Icon = awardIconMap[a.title] || Medal;
+              const color = a.title === "مؤسس الكلان" ? "#FFD700" :
+                a.title === "أقوى لاعب حروب" ? "#FF3B30" :
+                  a.title === "أقوى لاعب بطولات" ? "#8B5CF6" :
+                    a.title === "داعم الكلان" ? "#00E676" : "#FFD700";
               return (
                 <div key={a.id || i} className="fade-in" style={{ animationDelay: `${i * 0.1}s` }}>
                   <GlassCard className="text-center py-6 group relative overflow-hidden">
                     <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FFD700] via-[#FF6B35] to-[#FFD700] opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(255,215,0,0.2)]" style={{ backgroundColor: `${color}20` }}>
-                      <Icon size={28} style={{ color }} />
-                    </div>
+                    {a.icon ? (
+                      <div className="w-16 h-16 rounded-full mx-auto mb-3 overflow-hidden ring-2 ring-[rgba(255,215,0,0.2)] transition-all duration-300 group-hover:scale-110">
+                        <img src={a.icon} alt={a.title} className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(255,215,0,0.2)]" style={{ backgroundColor: `${color}20` }}>
+                        <Icon size={28} style={{ color }} />
+                      </div>
+                    )}
                     <h3 className="font-bold text-base">{a.title}</h3>
                     <p className="text-sm font-semibold mt-1" style={{ color }}>{a.holderName}</p>
                     {a.description && <p className="text-[10px] text-[#6B7280] mt-1">{a.description}</p>}
@@ -237,25 +245,61 @@ export default function HomePage() {
             </div>
           </div>
           <GlassCard className="p-6 text-center">
-            <div className="relative w-full h-[200px] md:h-[300px] rounded-[16px] overflow-hidden bg-gradient-to-b from-[rgba(0,229,255,0.03)] to-[rgba(139,92,246,0.03)] flex items-center justify-center">
+            <div className="relative w-full h-[250px] md:h-[350px] rounded-[16px] overflow-hidden bg-gradient-to-b from-[rgba(0,229,255,0.03)] to-[rgba(139,92,246,0.03)] flex items-center justify-center">
               <div className="absolute inset-0" style={{
                 backgroundImage: "radial-gradient(circle at 20% 50%, rgba(0,229,255,0.06) 0%, transparent 50%), radial-gradient(circle at 80% 30%, rgba(139,92,246,0.06) 0%, transparent 50%), radial-gradient(circle at 50% 70%, rgba(255,215,0,0.04) 0%, transparent 50%)"
               }} />
-              <div className="relative z-10 text-center">
-                <MapPin size={48} className="text-[#00E5FF] mx-auto mb-3 opacity-50" />
-                <p className="text-lg font-bold">سوريا</p>
-                <p className="text-sm text-[#6B7280]">جميع الأعضاء من سوريا 🇸🇾</p>
-                <div className="flex items-center justify-center gap-2 mt-3">
-                  {activeMembers.slice(0, 10).map((m, i) => (
-                    <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00E5FF] to-[#8B5CF6] flex items-center justify-center text-[10px] font-bold text-white shadow-lg">
-                      {(m.name || "?").charAt(0)}
+              <div className="relative z-10 w-full h-full flex flex-col items-center justify-center">
+                {/* World Map Dots */}
+                <div className="absolute inset-0">
+                  {/* Syria */}
+                  <div className="absolute top-[38%] left-[52%] group/dot">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#00E5FF] to-[#8B5CF6] flex items-center justify-center shadow-lg shadow-[rgba(0,229,255,0.3)] animate-pulse-slow">
+                      <span className="text-[8px] font-bold text-white">SY</span>
                     </div>
-                  ))}
-                  {activeMembers.length > 10 && (
-                    <div className="w-8 h-8 rounded-full bg-[rgba(255,255,255,0.06)] flex items-center justify-center text-[10px] text-[#6B7280]">
-                      +{activeMembers.length - 10}
+                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/dot:opacity-100 transition-opacity bg-[rgba(0,0,0,0.8)] text-white text-[10px] px-2 py-1 rounded whitespace-nowrap">
+                      سوريا - {activeMembers.length} عضو
                     </div>
-                  )}
+                  </div>
+                  {/* Egypt */}
+                  <div className="absolute top-[45%] left-[51%] group/dot">
+                    <div className="w-4 h-4 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FF6B35] flex items-center justify-center shadow-lg animate-pulse-slow" style={{ animationDelay: "0.5s" }}>
+                      <span className="text-[6px] font-bold text-white">EG</span>
+                    </div>
+                  </div>
+                  {/* UAE */}
+                  <div className="absolute top-[37%] left-[58%] group/dot">
+                    <div className="w-4 h-4 rounded-full bg-gradient-to-br from-[#00E676] to-[#00E5FF] flex items-center justify-center shadow-lg animate-pulse-slow" style={{ animationDelay: "1s" }}>
+                      <span className="text-[6px] font-bold text-white">AE</span>
+                    </div>
+                  </div>
+                  {/* Saudi Arabia */}
+                  <div className="absolute top-[40%] left-[55%] group/dot">
+                    <div className="w-4 h-4 rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#FFD700] flex items-center justify-center shadow-lg animate-pulse-slow" style={{ animationDelay: "1.5s" }}>
+                      <span className="text-[6px] font-bold text-white">SA</span>
+                    </div>
+                  </div>
+                </div>
+                {/* Grid lines */}
+                <div className="absolute inset-0 opacity-[0.03]" style={{
+                  backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
+                  backgroundSize: "40px 40px"
+                }} />
+                <div className="relative z-10 text-center">
+                  <p className="text-lg font-bold">سوريا</p>
+                  <p className="text-sm text-[#6B7280]">جميع الأعضاء من الوطن العربي</p>
+                  <div className="flex items-center justify-center gap-2 mt-4 flex-wrap">
+                    {activeMembers.slice(0, 15).map((m, i) => (
+                      <div key={i} className="w-9 h-9 rounded-full bg-gradient-to-br from-[#00E5FF] to-[#8B5CF6] flex items-center justify-center text-[11px] font-bold text-white shadow-lg ring-1 ring-[rgba(255,255,255,0.15)] transition-transform hover:scale-110">
+                        {(m.name || "?").charAt(0)}
+                      </div>
+                    ))}
+                    {activeMembers.length > 15 && (
+                      <div className="w-9 h-9 rounded-full bg-[rgba(255,255,255,0.06)] flex items-center justify-center text-[11px] text-[#6B7280] ring-1 ring-[rgba(255,255,255,0.08)]">
+                        +{activeMembers.length - 15}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

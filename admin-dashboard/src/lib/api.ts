@@ -37,6 +37,7 @@ export const api = {
   deleteLeaderboardEntry: (id: string) => request<any>(`/api/leaderboard/${id}`, { method: "DELETE" }),
 
   getOrders: () => request<any[]>("/api/orders"),
+  addOrder: (d: any) => request<any>("/api/orders", { method: "POST", body: JSON.stringify(d) }),
   updateOrder: (id: string, d: any) => request<any>(`/api/orders/${id}`, { method: "PUT", body: JSON.stringify(d) }),
   deleteOrder: (id: string) => request<any>(`/api/orders/${id}`, { method: "DELETE" }),
 

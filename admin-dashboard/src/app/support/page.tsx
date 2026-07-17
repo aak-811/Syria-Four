@@ -4,13 +4,13 @@ import { useState } from "react";
 import PublicLayout from "@/components/layout/PublicLayout";
 import GlassCard from "@/components/ui/GlassCard";
 import { api } from "@/lib/api";
-import { MessageCircle, Camera, Mail, Phone, Send, CheckCircle, Loader2 } from "lucide-react";
+import { MessageCircle, Camera, Phone, Send, CheckCircle, Loader2, Headphones, ChevronLeft } from "lucide-react";
 
 const contacts = [
-  { icon: MessageCircle, label: "Discord", value: "SYRIA FOUR", href: "https://discord.gg/syriafour", color: "#5865F2" },
-  { icon: Camera, label: "Instagram", value: "@syriafour", href: "https://instagram.com/syriafour", color: "#E4405F" },
-  { icon: Mail, label: "البريد الإلكتروني", value: "support@syriafour.com", href: "mailto:support@syriafour.com", color: "#FFD700" },
-  { icon: Phone, label: "واتساب", value: "+963 XXX XXX XXX", href: "https://wa.me/963", color: "#25D366" },
+  { icon: Camera, label: "قائد الكلان", value: "@aak.811", href: "https://instagram.com/aak.811", color: "#E1306C", desc: "AAK Khalid - مؤسس الكلان" },
+  { icon: Camera, label: "شريك القائد", value: "@qusai7r", href: "https://instagram.com/qusai7r", color: "#FFD700", desc: "Qusai - شريك القائد" },
+  { icon: Camera, label: "إدارة الدعم", value: "@Lorans_83", href: "https://instagram.com/Lorans_83", color: "#8B5CF6", desc: "Lorans - الدعم الفني" },
+  { icon: Phone, label: "واتساب", value: "+963 934 946 251", href: "https://wa.me/963934946251", color: "#25D366", desc: "للتواصل المباشر" },
 ];
 
 export default function SupportPage() {
@@ -47,15 +47,18 @@ export default function SupportPage() {
               <a key={i} href={c.href} target="_blank" rel="noopener noreferrer"
                 className="animate-fade-slide-up no-underline" style={{ animationDelay: `${i * 0.07}s` }}
               >
-                <GlassCard hover>
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-[14px] flex items-center justify-center shrink-0" style={{ backgroundColor: `${c.color}22` }}>
-                      <Icon size={22} style={{ color: c.color }} />
+                <GlassCard hover className="relative overflow-hidden group">
+                  <div className="absolute -top-10 -left-10 w-32 h-32 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ backgroundColor: `${c.color}08`, filter: "blur(40px)" }} />
+                  <div className="flex items-center gap-4 relative z-10">
+                    <div className="w-14 h-14 rounded-[16px] flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110" style={{ backgroundColor: `${c.color}18` }}>
+                      <Icon size={24} style={{ color: c.color }} />
                     </div>
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <p className="text-xs text-[#6B7280]">{c.label}</p>
                       <p className="font-semibold">{c.value}</p>
+                      <p className="text-[11px] text-[#9CA3AF]">{c.desc}</p>
                     </div>
+                    <ChevronLeft size={16} className="text-[#6B7280] group-hover:text-[#c] transition-colors" />
                   </div>
                 </GlassCard>
               </a>
@@ -76,7 +79,7 @@ export default function SupportPage() {
               <input placeholder="اسمك" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} required
                 className="w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3 text-sm text-white placeholder-[#6B7280] outline-none focus:border-[#00E5FF] transition-all duration-300"
               />
-              <input placeholder="بريدك الإلكتروني (اختياري)" type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
+              <input placeholder="بريدك الإلكتروني أو إنستغرام (اختياري)" type="text" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
                 className="w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] rounded-[14px] px-4 py-3 text-sm text-white placeholder-[#6B7280] outline-none focus:border-[#00E5FF] transition-all duration-300"
               />
               <textarea placeholder="رسالتك..." rows={5} required
@@ -84,7 +87,7 @@ export default function SupportPage() {
                 value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))}
               />
               <button type="submit" disabled={sending}
-                className="w-full py-3 rounded-[14px] bg-[#E50914] text-white font-semibold text-sm hover:bg-[#f5101a] transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-3 rounded-[14px] bg-[#E50914] text-white font-semibold text-sm hover:bg-[#f5101a] transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 border-0 cursor-pointer"
               >{sending ? <Loader2 size={18} className="animate-spin" /> : <Send size={16} />} إرسال</button>
             </form>
           )}
