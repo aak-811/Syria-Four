@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import {
   LayoutDashboard, Users, Crown, Swords, Calendar, Image as ImageIcon,
-  ShoppingCart, HeadphonesIcon, Hand, Shield, Menu, X,
+  ShoppingCart, HeadphonesIcon, Hand, Shield, Menu, X, Bot,
 } from "lucide-react";
 
 type NavItem = { label: string; icon: any; href: string };
@@ -18,6 +18,7 @@ const publicItems: NavItem[] = [
   { label: "البطولات", icon: Swords, href: "/tournaments" },
   { label: "الفعاليات", icon: Calendar, href: "/events" },
   { label: "المعرض", icon: ImageIcon, href: "/gallery" },
+  { label: "المساعد", icon: Bot, href: "/assistant" },
   { label: "الشحن", icon: ShoppingCart, href: "/shop" },
   { label: "القوانين", icon: Hand, href: "/rules" },
   { label: "الدعم", icon: HeadphonesIcon, href: "/support" },

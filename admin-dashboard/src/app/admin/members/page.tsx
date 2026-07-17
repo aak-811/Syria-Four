@@ -73,6 +73,18 @@ export default function AdminMembersPage() {
             <span className="text-sm font-medium text-[var(--text-muted)]">أيقونة برايم</span>
           </label>
           <FormFileUpload label="معرض الصور الشخصية" value={form.galleryImage || ""} onChange={(url) => setForm({ ...form, galleryImage: url })} accept="image/*" />
+          <div className="grid grid-cols-2 gap-3">
+            <label className="flex items-center gap-2 p-3 rounded-[12px] bg-[rgba(255,215,0,0.06)] border border-[rgba(255,215,0,0.15)]">
+              <input type="checkbox" checked={form.goldFrame || false} onChange={e => setForm({ ...form, goldFrame: e.target.checked })} className="w-4 h-4 accent-[#FFD700]" />
+              <span className="text-sm font-medium text-[#FFD700]">إطار ذهبي</span>
+            </label>
+            <label className="flex items-center gap-2 p-3 rounded-[12px] bg-[rgba(0,229,255,0.06)] border border-[rgba(0,229,255,0.15)]">
+              <input type="checkbox" checked={form.vipBadge || false} onChange={e => setForm({ ...form, vipBadge: e.target.checked })} className="w-4 h-4 accent-[#00E5FF]" />
+              <span className="text-sm font-medium text-[#00E5FF]">شارة VIP</span>
+            </label>
+          </div>
+          <FormInput label="لون الاسم (hex)" value={form.nameColor || ""} onChange={e => setForm({ ...form, nameColor: e.target.value })} placeholder="مثل: #FFD700" />
+          <FormInput label="لون صفحة العضو (hex)" value={form.profileColor || ""} onChange={e => setForm({ ...form, profileColor: e.target.value })} placeholder="مثل: #8B5CF6" />
           <FormTextarea label="السيرة" value={form.bio || ""} onChange={e => setForm({ ...form, bio: e.target.value })} rows={3} />
           <Button onClick={save} className="w-full">{edit ? "تحديث" : "إضافة"}</Button>
         </div>

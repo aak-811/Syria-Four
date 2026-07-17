@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, Users, Crown, Swords, Calendar, Image as ImageIcon,
-  ShoppingCart, HeadphonesIcon, Hand, Shield, LogOut,
+  ShoppingCart, HeadphonesIcon, Hand, Shield, LogOut, Bot,
 } from "lucide-react";
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -18,6 +18,7 @@ const iconMap: Record<string, React.ReactNode> = {
   ShoppingCart: <ShoppingCart size={20} />,
   HeadphonesIcon: <HeadphonesIcon size={20} />,
   Hand: <Hand size={20} />,
+  Bot: <Bot size={20} />,
 };
 
 const publicItems = [
@@ -27,6 +28,7 @@ const publicItems = [
   { icon: "Swords", label: "البطولات", href: "/tournaments" },
   { icon: "Calendar", label: "الفعاليات", href: "/events" },
   { icon: "Image", label: "المعرض", href: "/gallery" },
+  { icon: "Bot", label: "المساعد", href: "/assistant" },
   { icon: "Hand", label: "القوانين", href: "/rules" },
   { icon: "ShoppingCart", label: "الشحن", href: "/shop" },
   { icon: "HeadphonesIcon", label: "الدعم", href: "/support" },

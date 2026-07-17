@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import {
   LayoutDashboard, Users, Crown, Swords, Calendar, Image as ImageIcon,
-  ShoppingBag, MessageSquare, Shield, Globe, Menu, X,
+  ShoppingBag, MessageSquare, Shield, Globe, Menu, X, Medal, Award
 } from "lucide-react";
 
 type NavItem = { label: string; icon: any; href: string };
@@ -20,6 +20,9 @@ const mainItems: NavItem[] = [
 
 const moreItems: NavItem[] = [
   { label: "الفعاليات", icon: Calendar, href: "/admin/events" },
+  { label: "الأوسمة", icon: Medal, href: "/admin/awards" },
+  { label: "VIP", icon: Crown, href: "/admin/vip" },
+  { label: "قاعة المشاهير", icon: Award, href: "/admin/hall-of-fame" },
   { label: "المعرض والفيديو", icon: ImageIcon, href: "/admin/gallery" },
   { label: "الطلبات", icon: ShoppingBag, href: "/admin/orders" },
   { label: "الدعم", icon: MessageSquare, href: "/admin/support" },

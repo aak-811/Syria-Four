@@ -32,5 +32,23 @@
     "bio": "",
     "image": "",
     "prime": 8
+  },
+  {
+    "id": "066fd5e4-d196-4788-915b-bd59f37dcea4",
+    "image": "/uploads/1784219015052-839526401.jpg",
+    "name": "غير معروف",
+    "age": "18",
+    "gameId": "99999999",
+    "role": "leader",
+    "isPrime": true,
+    "playStyle": "رومات",
+    "level": "100",
+    "wins": "999",
+    "country": "سوريا ",
+    "galleryImage": "/uploads/1784219125237-196590216.jpg",
+    "bio": "لا يعرف"
+  },
+  {
+    "id": "cb68688a-6be5-4715-8873-d857e1af6474"
   }
 ]

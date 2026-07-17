@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, Users, Crown, Swords, Calendar, Image,
-  ShoppingBag, MessageSquare, Camera, Bell, ClipboardList, Shield, FileText, Settings, LogOut, Globe
+  ShoppingBag, MessageSquare, Camera, Bell, ClipboardList, Shield, FileText, Settings, LogOut, Globe,
+  Medal, Diamond, Award
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -15,6 +16,9 @@ const items = [
   { href: "/admin/leaders", label: "القيادات", icon: Crown },
   { href: "/admin/tournaments", label: "البطولات", icon: Swords },
   { href: "/admin/events", label: "الفعاليات", icon: Calendar },
+  { href: "/admin/awards", label: "الأوسمة", icon: Medal },
+  { href: "/admin/vip", label: "VIP", icon: Crown },
+  { href: "/admin/hall-of-fame", label: "قاعة المشاهير", icon: Award },
   { href: "/admin/gallery", label: "المعرض والفيديو", icon: Image },
   { href: "/admin/orders", label: "الطلبات", icon: ShoppingBag },
   { href: "/admin/support", label: "الدعم", icon: MessageSquare },

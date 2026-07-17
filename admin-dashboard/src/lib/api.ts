@@ -87,4 +87,19 @@ export const api = {
     fd.append("file", file);
     return fetch("/api/upload", { method: "POST", body: fd }).then(r => r.json());
   },
+
+  getAwards: () => request<any[]>("/api/awards"),
+  addAward: (d: any) => request<any>("/api/awards", { method: "POST", body: JSON.stringify(d) }),
+  updateAward: (id: string, d: any) => request<any>(`/api/awards/${id}`, { method: "PUT", body: JSON.stringify(d) }),
+  deleteAward: (id: string) => request<any>(`/api/awards/${id}`, { method: "DELETE" }),
+
+  getVipSettings: () => request<any[]>("/api/vip"),
+  addVipSetting: (d: any) => request<any>("/api/vip", { method: "POST", body: JSON.stringify(d) }),
+  updateVipSetting: (id: string, d: any) => request<any>(`/api/vip/${id}`, { method: "PUT", body: JSON.stringify(d) }),
+  deleteVipSetting: (id: string) => request<any>(`/api/vip/${id}`, { method: "DELETE" }),
+
+  getHallOfFame: () => request<any[]>("/api/hall-of-fame"),
+  addHallOfFame: (d: any) => request<any>("/api/hall-of-fame", { method: "POST", body: JSON.stringify(d) }),
+  updateHallOfFame: (id: string, d: any) => request<any>(`/api/hall-of-fame/${id}`, { method: "PUT", body: JSON.stringify(d) }),
+  deleteHallOfFame: (id: string) => request<any>(`/api/hall-of-fame/${id}`, { method: "DELETE" }),
 };

@@ -22,5 +22,18 @@
     "title": "تجريب",
     "description": "ع الف",
     "icon": "fire"
+  },
+  {
+    "id": "ff0a394b-6d70-492e-a133-03706ebe5188",
+    "image": "/uploads/1784219184322-983934417.jpg",
+    "title": "انتحار و لايكات",
+    "description": "فعالية كلان",
+    "icon": "قادمة",
+    "reward": "300",
+    "participants": "20",
+    "squad": "سكوادات الكلان"
+  },
+  {
+    "id": "a58abfd3-22fd-45bb-8846-6d0a5293faf7"
   }
 ]

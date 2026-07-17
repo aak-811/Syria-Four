@@ -11,8 +11,12 @@ const links = [
   { href: "/members", label: "الأعضاء" },
   { href: "/leaders", label: "القيادات" },
   { href: "/tournaments", label: "البطولات" },
-  { href: "/about", label: "من نحن" },
-  { href: "/contact", label: "اتصل بنا" },
+  { href: "/events", label: "الفعاليات" },
+  { href: "/gallery", label: "المعرض" },
+  { href: "/assistant", label: "المساعد" },
+  { href: "/rules", label: "القوانين" },
+  { href: "/shop", label: "الشحن" },
+  { href: "/support", label: "الدعم" },
 ];
 
 export default function PublicNavbar() {
