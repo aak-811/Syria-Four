@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import PublicLayout from "@/components/layout/PublicLayout";
 import GlassCard from "@/components/ui/GlassCard";
 import Avatar from "@/components/ui/Avatar";
 import Badge from "@/components/ui/Badge";
 import { api } from "@/lib/api";
-import { Crown, Star, Shield, ArrowLeft, Camera, Users, Swords, Calendar, MessageSquare, LayoutDashboard, Phone, Gamepad2, Award } from "lucide-react";
+import { Crown, Star, Shield, ArrowLeft, Camera, Users, Swords, Calendar, MessageSquare, LayoutDashboard, Phone, Gamepad2, Award, Lock, Loader2, X } from "lucide-react";
 
 const fallback = [
   { id: "1", name: "AAK Khalid", gameId: "AAK-1234", role: "leader", level: 80, wins: 150, image: "", instagram: "aak.811", country: "SY", age: "25", playStyle: "Sniper", bio: "مؤسس ورئيس كلان SYRIA FOUR", goldFrame: true, vipBadge: true, nameColor: "#FFD700", profileColor: "#0a0a2e" },
@@ -46,10 +45,54 @@ const roleIcons: Record<string, any> = { leader: Crown, vice: Star, chief: Shiel
 const roleLabels: Record<string, string> = { leader: "قائد", vice: "شريك قائد", chief: "زعيم" };
 const roleColors: Record<string, "gold" | "success" | "danger"> = { leader: "gold", vice: "success", chief: "danger" };
 
-function DetailView({ person, isAdmin, onClose }: { person: any; isAdmin: boolean; onClose: () => void }) {
+function DetailView({ person, onClose }: { person: any; onClose: () => void }) {
+  const [showPw, setShowPw] = useState(false);
+  const [pw, setPw] = useState("");
+  const [pwErr, setPwErr] = useState("");
+  const [pwLoading, setPwLoading] = useState(false);
+  const [targetHref, setTargetHref] = useState("");
+
   if (!person) return null;
   const RoleIcon = roleIcons[person.role] || Crown;
   const links = (person.role === "leader" || person.role === "vice") ? leaderLinks : chiefLinks;
+
+  const handleAdminClick = (href: string) => {
+    const authed = localStorage.getItem("dashboard_auth") === "true";
+    if (authed) {
+      window.location.href = href;
+    } else {
+      setTargetHref(href);
+      setShowPw(true);
+      setPw("");
+      setPwErr("");
+    }
+  };
+
+  const handlePwSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!pw) return;
+    setPwLoading(true);
+    setPwErr("");
+    try {
+      const res = await fetch("/api/admin-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: pw }),
+      });
+      const data = await res.json();
+      if (res.ok && data.redirect) {
+        localStorage.setItem("dashboard_auth", "true");
+        setShowPw(false);
+        window.location.href = targetHref;
+      } else {
+        setPwErr("كلمة المرور خاطئة");
+      }
+    } catch {
+      setPwErr("حدث خطأ في الاتصال");
+    } finally {
+      setPwLoading(false);
+    }
+  };
 
   return (
     <div className="animate-fade-slide-up">
@@ -131,28 +174,51 @@ function DetailView({ person, isAdmin, onClose }: { person: any; isAdmin: boolea
         ) : null}
 
         {/* Admin Links */}
-        {isAdmin ? (
-          <div>
-            <h2 className="text-lg font-bold mb-3">{person.role === "chief" ? "لوحة التحكم (صلاحيات محدودة)" : "لوحة التحكم الكاملة"}</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-              {links.map((link) => {
-                const Icon = link.icon;
-                return (
-                  <Link key={link.href} href={link.href}
-                    className="glass rounded-[14px] p-4 text-center hover:scale-[1.02] transition-all duration-300 no-underline group"
-                  >
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-2 transition-all duration-300 group-hover:scale-110"
-                      style={{ backgroundColor: `${link.color}15` }}>
-                      <Icon size={20} style={{ color: link.color }} />
-                    </div>
-                    <p className="text-xs font-semibold text-white">{link.label}</p>
-                  </Link>
-                );
-              })}
-            </div>
+        <div>
+          <h2 className="text-lg font-bold mb-3">{person.role === "chief" ? "لوحة التحكم (صلاحيات محدودة)" : "لوحة التحكم الكاملة"}</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {links.map((link) => {
+              const Icon = link.icon;
+              return (
+                <button key={link.href} onClick={() => handleAdminClick(link.href)}
+                  className="flex flex-col items-center gap-2 glass rounded-[14px] p-4 text-center hover:scale-[1.02] transition-all duration-300 group border-0 cursor-pointer w-full"
+                >
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto transition-all duration-300 group-hover:scale-110"
+                    style={{ backgroundColor: `${link.color}15` }}>
+                    <Icon size={20} style={{ color: link.color }} />
+                  </div>
+                  <p className="text-xs font-semibold text-white">{link.label}</p>
+                </button>
+              );
+            })}
           </div>
-        ) : null}
+        </div>
       </div>
+
+      {/* Password Modal */}
+      {showPw ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[rgba(0,0,0,0.7)]" onClick={() => setShowPw(false)}>
+          <div className="glass rounded-[20px] p-6 w-full max-w-sm" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold">تأكيد الدخول</h3>
+              <button onClick={() => setShowPw(false)} className="border-0 bg-transparent text-[#9CA3AF] hover:text-white cursor-pointer"><X size={20} /></button>
+            </div>
+            <p className="text-sm text-[#9CA3AF] mb-4">يرجى إدخال كلمة المرور للدخول إلى لوحة التحكم</p>
+            <form onSubmit={handlePwSubmit} className="space-y-3">
+              <input type="password" placeholder="كلمة المرور" value={pw} onChange={e => setPw(e.target.value)} autoFocus
+                className="w-full bg-[rgba(255,255,255,0.04)] border border-[var(--border)] rounded-[14px] px-4 py-3 text-sm text-white placeholder-[var(--text-dim)] outline-none focus:border-[var(--primary)] transition-colors text-center"
+              />
+              {pwErr ? <p className="text-sm text-[var(--danger)] text-center">{pwErr}</p> : null}
+              <button type="submit" disabled={pwLoading || !pw}
+                className="w-full py-3 rounded-[14px] bg-[var(--primary)] text-[var(--bg)] font-semibold text-sm hover:brightness-110 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 border-0 cursor-pointer"
+              >
+                {pwLoading ? <Loader2 size={18} className="animate-spin" /> : <Lock size={16} />}
+                دخول
+              </button>
+            </form>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -160,11 +226,9 @@ function DetailView({ person, isAdmin, onClose }: { person: any; isAdmin: boolea
 export default function LeadersPage() {
   const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
-    setIsAdmin(localStorage.getItem("dashboard_auth") === "true");
     api.getMembers().then(data => setMembers(data?.length ? data : fallback))
       .catch(() => setMembers(fallback))
       .finally(() => setLoading(false));
@@ -180,7 +244,7 @@ export default function LeadersPage() {
   if (selected) {
     return (
       <PublicLayout>
-        <DetailView person={selected} isAdmin={isAdmin} onClose={() => setSelectedId(null)} />
+        <DetailView person={selected} onClose={() => setSelectedId(null)} />
       </PublicLayout>
     );
   }
