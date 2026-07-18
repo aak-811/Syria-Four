@@ -5,8 +5,9 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, Users, Swords, Calendar, Image as ImageIcon,
-  ShoppingCart, HeadphonesIcon, Hand, Shield, LogOut, Bot, MapPin,
+  ShoppingCart, HeadphonesIcon, Hand, Bot, MapPin, Sun, Moon,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const iconMap: Record<string, React.ReactNode> = {
   LayoutDashboard: <LayoutDashboard size={20} />,
@@ -36,6 +37,23 @@ const publicItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [dark, setDark] = useState(true);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("site_theme");
+    if (saved) {
+      setDark(saved === "dark");
+      document.documentElement.setAttribute("data-theme", saved);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const next = !dark;
+    setDark(next);
+    const val = next ? "dark" : "light";
+    localStorage.setItem("site_theme", val);
+    document.documentElement.setAttribute("data-theme", val);
+  };
 
   return (
     <aside className="fixed top-0 right-0 h-screen w-[260px] z-40 hidden lg:flex flex-col bg-[#050816] border-l border-[rgba(255,255,255,0.06)]">
@@ -75,13 +93,14 @@ export default function Sidebar() {
         })}
       </nav>
 
-      <div className="p-3 border-t border-[rgba(255,255,255,0.06)]">
-        <Link href="/admin/login">
-          <div className="flex items-center gap-3 px-4 py-3 rounded-[14px] text-sm font-medium text-[#6B7280] hover:text-[#00E5FF] hover:bg-[rgba(0,229,255,0.08)] transition-all duration-300">
-            <Shield size={20} />
-            <span>لوحة الإدارة</span>
-          </div>
-        </Link>
+      <div className="p-3 border-t border-[rgba(255,255,255,0.06)] space-y-1">
+        <button
+          onClick={toggleTheme}
+          className="flex items-center gap-3 px-4 py-3 rounded-[14px] text-sm font-medium text-[#6B7280] hover:text-white hover:bg-[rgba(255,255,255,0.05)] transition-all duration-300 w-full border-0 cursor-pointer text-right"
+        >
+          {dark ? <Sun size={18} /> : <Moon size={18} />}
+          <span>{dark ? "الوضع الفاتح" : "الوضع الليلي"}</span>
+        </button>
       </div>
     </aside>
   );

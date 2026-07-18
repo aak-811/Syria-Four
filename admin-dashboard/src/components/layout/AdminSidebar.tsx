@@ -33,14 +33,14 @@ export default function AdminSidebar() {
   const [dark, setDark] = useState(true);
 
   useEffect(() => {
-    const saved = localStorage.getItem("admin_theme");
+    const saved = localStorage.getItem("site_theme");
     if (saved) setDark(saved === "dark");
   }, []);
 
   const toggleTheme = () => {
     const next = !dark;
     setDark(next);
-    localStorage.setItem("admin_theme", next ? "dark" : "light");
+    localStorage.setItem("site_theme", next ? "dark" : "light");
     document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
   };
 

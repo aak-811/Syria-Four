@@ -17,7 +17,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     setMounted(true);
-    const saved = localStorage.getItem("admin_theme");
+    const saved = localStorage.getItem("site_theme");
     if (saved) document.documentElement.setAttribute("data-theme", saved);
     else document.documentElement.setAttribute("data-theme", "dark");
   }, []);
