@@ -9,6 +9,7 @@ import { Menu, X } from "lucide-react";
 const links = [
   { href: "/", label: "الرئيسية" },
   { href: "/members", label: "الأعضاء" },
+  { href: "/new-members", label: "أحدث الأعضاء" },
   { href: "/tournaments", label: "البطولات" },
   { href: "/events", label: "الفعاليات" },
   { href: "/gallery", label: "المعرض" },
