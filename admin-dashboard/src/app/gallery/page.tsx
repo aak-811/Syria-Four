@@ -95,10 +95,14 @@ export default function GalleryPage() {
                   <GlassCard className="overflow-hidden p-0">
                     <div className="aspect-video rounded-[18px] overflow-hidden bg-[rgba(0,0,0,0.3)]">
                       {v.url ? (
-                        <iframe src={v.url} title={v.title || ""} className="w-full h-full" allowFullScreen
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          style={{ border: "none" }}
-                        />
+                        v.url.includes("youtube") || v.url.includes("youtu.be") ? (
+                          <iframe src={v.url} title={v.title || ""} className="w-full h-full" allowFullScreen
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            style={{ border: "none" }}
+                          />
+                        ) : (
+                          <video src={v.url} controls className="w-full h-full" style={{ objectFit: "contain" }} />
+                        )
                       ) : v.thumbnail ? (
                         <img src={v.thumbnail} alt={v.title} className="w-full h-full object-cover" />
                       ) : (
