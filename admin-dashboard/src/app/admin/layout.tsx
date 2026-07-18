@@ -15,7 +15,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+    const saved = localStorage.getItem("admin_theme");
+    if (saved) document.documentElement.setAttribute("data-theme", saved);
+    else document.documentElement.setAttribute("data-theme", "dark");
+  }, []);
 
   if (!mounted) return null;
 
