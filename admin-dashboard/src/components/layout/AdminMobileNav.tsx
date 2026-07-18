@@ -25,7 +25,6 @@ const moreItems: NavItem[] = [
   { label: "المعرض والفيديو", icon: ImageIcon, href: "/admin/gallery" },
   { label: "الطلبات", icon: ShoppingBag, href: "/admin/orders" },
   { label: "الدعم", icon: MessageSquare, href: "/admin/support" },
-  { label: "الإعدادات", icon: Shield, href: "/admin/settings" },
 ];
 
 export default function AdminMobileNav() {

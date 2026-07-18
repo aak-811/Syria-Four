@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import AdminSidebar from "@/components/layout/AdminSidebar";
@@ -13,16 +13,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const path = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    const saved = localStorage.getItem("site_theme");
-    if (saved) document.documentElement.setAttribute("data-theme", saved);
-    else document.documentElement.setAttribute("data-theme", "dark");
-  }, []);
-
-  if (!mounted) return null;
 
   if (path === "/admin/login") return <>{children}</>;
 

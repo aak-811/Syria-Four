@@ -6,10 +6,9 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, Users, Crown, Swords, Calendar, Image,
   ShoppingBag, MessageSquare, Camera, Bell, ClipboardList, LogOut,
-  Medal, Award, Sparkles, Sun, Moon
+  Medal, Award, Sparkles
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
-import { useEffect, useState } from "react";
 
 const items = [
   { href: "/admin", label: "لوحة التحكم", icon: LayoutDashboard, color: "#00E5FF" },
@@ -30,19 +29,6 @@ const items = [
 export default function AdminSidebar() {
   const path = usePathname();
   const { logout } = useAuth();
-  const [dark, setDark] = useState(true);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("site_theme");
-    if (saved) setDark(saved === "dark");
-  }, []);
-
-  const toggleTheme = () => {
-    const next = !dark;
-    setDark(next);
-    localStorage.setItem("site_theme", next ? "dark" : "light");
-    document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
-  };
 
   return (
     <aside className="fixed top-0 right-0 bottom-0 w-[260px] border-l border-[var(--border)] bg-[var(--bg)] hidden lg:flex flex-col z-30">
@@ -86,14 +72,7 @@ export default function AdminSidebar() {
         })}
       </nav>
 
-      <div className="p-3 border-t border-[var(--border)] space-y-0.5">
-        <button
-          onClick={toggleTheme}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-sm font-medium text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[rgba(0,229,255,0.08)] w-full transition-all duration-200 border-0 cursor-pointer"
-        >
-          {dark ? <Sun size={18} /> : <Moon size={18} />}
-          {dark ? "الوضع الفاتح" : "الوضع الليلي"}
-        </button>
+      <div className="p-3 border-t border-[var(--border)]">
         <button
           onClick={logout}
           className="flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-sm font-medium text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-[rgba(229,9,20,0.1)] w-full transition-all duration-200 border-0 cursor-pointer"

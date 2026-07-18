@@ -61,7 +61,7 @@ export default function MobileNav() {
               <span className="text-[9px] font-medium text-[#6B7280]">المزيد</span>
             </button>
 
-            <Link href="/admin/login" className="flex flex-col items-center gap-1 px-3 py-1">
+            <Link href="/admin" className="flex flex-col items-center gap-1 px-3 py-1">
               <div className="p-2 rounded-full">
                 <Shield size={20} className={inactiveColor} />
               </div>
