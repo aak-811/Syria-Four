@@ -25,32 +25,49 @@ export default function AdminDashboardPage() {
     }).finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <Spinner />;
+  if (loading) return <div className="flex items-center justify-center min-h-[50vh]"><Spinner /></div>;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-black">لوحة التحكم</h1>
-        <p className="text-[var(--text-muted)] text-sm mt-1">نظرة عامة على الكلان</p>
+    <div className="space-y-8">
+      <div className="animate-fade-slide-up">
+        <h1 className="text-3xl font-black gradient-text inline-block">لوحة التحكم</h1>
+        <p className="text-[var(--text-muted)] text-sm mt-2">نظرة عامة على كلان SYRIA FOUR</p>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-        <StatsCard icon={<Users size={22} />} label="الأعضاء" value={stats.members || 0} color="var(--primary)" />
-        <StatsCard icon={<Swords size={22} />} label="البطولات" value={stats.tournaments || 0} color="var(--secondary)" />
-        <StatsCard icon={<Calendar size={22} />} label="الفعاليات" value={stats.events || 0} color="var(--success)" />
-        <StatsCard icon={<Image size={22} />} label="الصور" value={stats.gallery || 0} color="var(--warning)" />
-        <StatsCard icon={<Bell size={22} />} label="الإشعارات" value={stats.notifications || 0} color="#FF6B35" />
-        <StatsCard icon={<ShoppingBag size={22} />} label="الطلبات" value={stats.orders || 0} color="#5865F2" />
-        <StatsCard icon={<MessageSquare size={22} />} label="الدعم" value={stats.support || 0} color="#25D366" />
+        {[
+          { icon: <Users size={22} />, label: "الأعضاء", value: stats.members || 0, color: "#00E5FF", delay: 0 },
+          { icon: <Swords size={22} />, label: "البطولات", value: stats.tournaments || 0, color: "#8B5CF6", delay: 0.05 },
+          { icon: <Calendar size={22} />, label: "الفعاليات", value: stats.events || 0, color: "#00E676", delay: 0.1 },
+          { icon: <Image size={22} />, label: "الصور", value: stats.gallery || 0, color: "#FFD700", delay: 0.15 },
+          { icon: <Bell size={22} />, label: "الإشعارات", value: stats.notifications || 0, color: "#FF6B35", delay: 0.2 },
+          { icon: <ShoppingBag size={22} />, label: "الطلبات", value: stats.orders || 0, color: "#5865F2", delay: 0.25 },
+          { icon: <MessageSquare size={22} />, label: "الدعم", value: stats.support || 0, color: "#25D366", delay: 0.3 },
+        ].map((s, i) => (
+          <div key={s.label} className="animate-fade-slide-up" style={{ animationDelay: `${s.delay}s` }}>
+            <StatsCard icon={s.icon} label={s.label} value={s.value} color={s.color} />
+          </div>
+        ))}
       </div>
 
-      <Card>
-        <h2 className="font-bold text-lg mb-4">مرحباً بك في لوحة التحكم</h2>
-        <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-          من هنا يمكنك إدارة جميع جوانب الكلان: الأعضاء، البطولات، الفعاليات،
-          الصور، الفيديو، الطلبات، الدعم، الإشعارات، والمزيد.
-        </p>
-      </Card>
+      <div className="animate-fade-slide-up" style={{ animationDelay: "0.35s" }}>
+        <Card className="admin-welcome-gradient !p-8">
+          <div className="relative z-10">
+            <h2 className="text-xl font-black mb-3 bg-gradient-to-l from-[#00E5FF] via-[#8B5CF6] to-[#FFD700] bg-clip-text text-transparent">
+              مرحباً بك في لوحة التحكم
+            </h2>
+            <p className="text-sm text-[var(--text-muted)] leading-relaxed max-w-2xl">
+              من هنا يمكنك إدارة جميع جوانب <span className="text-[#00E5FF] font-semibold">SYRIA FOUR</span>:
+              الأعضاء، البطولات، الفعاليات، الصور، الفيديو، الطلبات، الدعم، الإشعارات، والمزيد.
+              كل ما تحتاجه لإدارة الكلان في مكان واحد.
+            </p>
+            <div className="flex items-center gap-2 mt-4">
+              <div className="w-2 h-2 rounded-full bg-[#00E5FF] animate-pulse" />
+              <span className="text-[11px] text-[#6B7280]">النظام يعمل بكامل طاقته — {stats.members || 0} عضو، {stats.tournaments || 0} بطولة</span>
+            </div>
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }

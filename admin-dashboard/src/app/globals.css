@@ -118,6 +118,211 @@ body { background: var(--bg); color: var(--text); font-family: system-ui, -apple
   }
 }
 
+/* Admin Layout Effects */
+.admin-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.admin-bg::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(0,229,255,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(139,92,246,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(255,215,0,0.02) 0%, transparent 50%);
+  animation: adminBgFloat 20s ease-in-out infinite;
+}
+@keyframes adminBgFloat {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(2%, 1%) rotate(1deg); }
+  66% { transform: translate(-1%, -1%) rotate(-0.5deg); }
+}
+.admin-grid {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.02;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Admin Sidebar */
+.sidebar-item {
+  position: relative;
+  overflow: hidden;
+}
+.sidebar-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.sidebar-item:hover::before {
+  opacity: 1;
+  background: rgba(255,255,255,0.03);
+}
+.sidebar-item.active {
+  background: linear-gradient(135deg, rgba(0,229,255,0.1), rgba(139,92,246,0.05));
+  border: 1px solid rgba(0,229,255,0.15);
+  box-shadow: 0 4px 20px rgba(0,229,255,0.08);
+}
+.sidebar-item.active::after {
+  content: '';
+  position: absolute;
+  right: -1px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: linear-gradient(to bottom, #00E5FF, #8B5CF6);
+  border-radius: 3px 0 0 3px;
+}
+.sidebar-icon {
+  transition: all 0.3s;
+}
+.sidebar-item.active .sidebar-icon {
+  filter: drop-shadow(0 0 8px rgba(0,229,255,0.4));
+}
+
+/* Admin Stats */
+.stats-card {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+.stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+.stats-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(to right, #00E5FF, #8B5CF6, #FFD700);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.stats-card:hover::before {
+  opacity: 1;
+}
+.stats-card .stats-glow {
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.stats-card:hover .stats-glow {
+  opacity: 0.15;
+}
+
+/* Admin Topbar */
+.admin-topbar {
+  background: rgba(5,8,22,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Admin Section Title */
+.admin-section-title {
+  position: relative;
+  display: inline-block;
+}
+.admin-section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(to left, #00E5FF, #8B5CF6, transparent);
+  border-radius: 2px;
+}
+
+/* Admin Card Premium */
+.admin-card {
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 18px;
+  transition: all 0.3s;
+}
+.admin-card:hover {
+  border-color: rgba(0,229,255,0.12);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+/* Admin Nav Mobile */
+.admin-mobile-nav-item {
+  position: relative;
+  transition: all 0.3s;
+}
+.admin-mobile-nav-item.active {
+  background: linear-gradient(135deg, rgba(0,229,255,0.12), rgba(139,92,246,0.06));
+  border: 1px solid rgba(0,229,255,0.15);
+  box-shadow: 0 0 20px rgba(0,229,255,0.06);
+}
+
+/* Admin Button Premium */
+.admin-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+.admin-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0,229,255,0.1), rgba(139,92,246,0.05));
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.admin-btn:hover::before {
+  opacity: 1;
+}
+
+/* Admin Welcome Card Gradient */
+.admin-welcome-gradient {
+  background: linear-gradient(135deg, rgba(0,229,255,0.05) 0%, rgba(139,92,246,0.05) 50%, rgba(255,215,0,0.03) 100%);
+  position: relative;
+  overflow: hidden;
+}
+.admin-welcome-gradient::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 50%, rgba(0,229,255,0.06) 0%, transparent 50%),
+              radial-gradient(circle at 70% 50%, rgba(139,92,246,0.04) 0%, transparent 50%);
+  animation: adminWelcomeFloat 8s ease-in-out infinite;
+}
+@keyframes adminWelcomeFloat {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-2%, 2%); }
+}
+
 /* Leaflet overrides */
 .leaflet-container {
   background: #050816 !important;

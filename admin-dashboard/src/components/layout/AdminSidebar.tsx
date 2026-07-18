@@ -6,27 +6,27 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, Users, Crown, Swords, Calendar, Image,
   ShoppingBag, MessageSquare, Camera, Bell, ClipboardList, Shield, FileText, Settings, LogOut, Globe,
-  Medal, Diamond, Award
+  Medal, Diamond, Award, Star, Sparkles
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
 const items = [
-  { href: "/admin", label: "لوحة التحكم", icon: LayoutDashboard },
-  { href: "/admin/members", label: "الأعضاء", icon: Users },
-  { href: "/admin/tournaments", label: "البطولات", icon: Swords },
-  { href: "/admin/events", label: "الفعاليات", icon: Calendar },
-  { href: "/admin/awards", label: "الأوسمة", icon: Medal },
-  { href: "/admin/vip", label: "VIP", icon: Crown },
-  { href: "/admin/hall-of-fame", label: "قاعة المشاهير", icon: Award },
-  { href: "/admin/gallery", label: "المعرض والفيديو", icon: Image },
-  { href: "/admin/orders", label: "الطلبات", icon: ShoppingBag },
-  { href: "/admin/support", label: "الدعم", icon: MessageSquare },
-  { href: "/admin/instagram", label: "إنستغرام", icon: Camera },
-  { href: "/admin/notifications", label: "الإشعارات", icon: Bell },
-  { href: "/admin/requests", label: "الطلبات", icon: ClipboardList },
-  { href: "/admin/users", label: "المستخدمين", icon: Shield },
-  { href: "/admin/audit", label: "سجل النشاط", icon: FileText },
-  { href: "/admin/settings", label: "الإعدادات", icon: Settings },
+  { href: "/admin", label: "لوحة التحكم", icon: LayoutDashboard, color: "#00E5FF" },
+  { href: "/admin/members", label: "الأعضاء", icon: Users, color: "#00E5FF" },
+  { href: "/admin/tournaments", label: "البطولات", icon: Swords, color: "#8B5CF6" },
+  { href: "/admin/events", label: "الفعاليات", icon: Calendar, color: "#00E676" },
+  { href: "/admin/awards", label: "الأوسمة", icon: Medal, color: "#FFD700" },
+  { href: "/admin/vip", label: "VIP", icon: Crown, color: "#FFD700" },
+  { href: "/admin/hall-of-fame", label: "قاعة المشاهير", icon: Award, color: "#FFD700" },
+  { href: "/admin/gallery", label: "المعرض والفيديو", icon: Image, color: "#FF6B35" },
+  { href: "/admin/orders", label: "الطلبات", icon: ShoppingBag, color: "#5865F2" },
+  { href: "/admin/support", label: "الدعم", icon: MessageSquare, color: "#25D366" },
+  { href: "/admin/instagram", label: "إنستغرام", icon: Camera, color: "#E1306C" },
+  { href: "/admin/notifications", label: "الإشعارات", icon: Bell, color: "#FF6B35" },
+  { href: "/admin/requests", label: "الطلبات", icon: ClipboardList, color: "#8B5CF6" },
+  { href: "/admin/users", label: "المستخدمين", icon: Shield, color: "#5865F2" },
+  { href: "/admin/audit", label: "سجل النشاط", icon: FileText, color: "#9CA3AF" },
+  { href: "/admin/settings", label: "الإعدادات", icon: Settings, color: "#9CA3AF" },
 ];
 
 export default function AdminSidebar() {
@@ -42,23 +42,35 @@ export default function AdminSidebar() {
         <span className="font-bold text-sm">لوحة التحكم</span>
       </div>
 
-      <nav className="flex-1 overflow-y-auto p-3 space-y-0.5">
-        {items.map(item => {
+      <nav className="flex-1 overflow-y-auto p-3 space-y-0.5 scrollbar-hide">
+        {items.map((item, idx) => {
           const active = path === item.href || (item.href !== "/admin" && path.startsWith(item.href));
+          const Icon = item.icon;
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-sm font-medium transition-all duration-200",
-                active
-                  ? "bg-[rgba(0,229,255,0.1)] text-[var(--primary)]"
-                  : "text-[var(--text-muted)] hover:text-white hover:bg-[var(--surface)]"
-              )}
-            >
-              <item.icon size={18} />
-              {item.label}
-            </Link>
+            <div key={item.href}>
+              {idx === 1 && <div className="mx-3 my-2 h-px bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.06)] to-transparent" />}
+              {idx === 8 && <div className="mx-3 my-2 h-px bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.06)] to-transparent" />}
+              {idx === 13 && <div className="mx-3 my-2 h-px bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.06)] to-transparent" />}
+              <Link
+                href={item.href}
+                className={cn(
+                  "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-sm font-medium transition-all duration-300 no-underline",
+                  active
+                    ? "active text-white"
+                    : "text-[var(--text-muted)] hover:text-white hover:bg-[rgba(255,255,255,0.03)]"
+                )}
+              >
+                <span className="sidebar-icon flex items-center justify-center w-5 h-5" style={{ color: active ? item.color : undefined }}>
+                  <Icon size={18} />
+                </span>
+                <span>{item.label}</span>
+                {active && (
+                  <span className="mr-auto flex items-center">
+                    <Sparkles size={10} className="text-[#00E5FF] animate-pulse" />
+                  </span>
+                )}
+              </Link>
+            </div>
           );
         })}
       </nav>

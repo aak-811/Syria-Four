@@ -27,30 +27,34 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg)]">
-      <AdminSidebar />
-      <AdminTopbar onToggleSidebar={() => setMobileOpen(true)} />
+    <div className="min-h-screen bg-[var(--bg)] relative">
+      <div className="admin-bg" />
+      <div className="admin-grid" />
+      <div className="relative z-10">
+        <AdminSidebar />
+        <AdminTopbar onToggleSidebar={() => setMobileOpen(true)} />
 
-      {mobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <div className="absolute top-0 left-0 bottom-0 w-[280px] bg-[var(--bg)] border-r border-[var(--border)] p-4 overflow-y-auto">
-            <button onClick={() => setMobileOpen(false)}
-              className="mb-4 w-10 h-10 flex items-center justify-center rounded-full glass glass-hover"
-            >
-              <span className="text-lg">✕</span>
-            </button>
-            <AdminSidebar />
+        {mobileOpen && (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+            <div className="absolute top-0 left-0 bottom-0 w-[280px] bg-[var(--bg)] border-r border-[var(--border)] p-4 overflow-y-auto">
+              <button onClick={() => setMobileOpen(false)}
+                className="mb-4 w-10 h-10 flex items-center justify-center rounded-full glass glass-hover"
+              >
+                <span className="text-lg">✕</span>
+              </button>
+              <AdminSidebar />
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <main className="pt-[70px] pb-24 lg:pb-8 px-4 md:px-8 lg:mr-[260px] transition-all duration-300">
-        <div className="max-w-7xl mx-auto">
-          {children}
-        </div>
-      </main>
-      <AdminMobileNav />
+        <main className="pt-[70px] pb-24 lg:pb-8 px-4 md:px-8 lg:mr-[260px] transition-all duration-300 relative">
+          <div className="max-w-7xl mx-auto animate-fade-in">
+            {children}
+          </div>
+        </main>
+        <AdminMobileNav />
+      </div>
     </div>
   );
 }
