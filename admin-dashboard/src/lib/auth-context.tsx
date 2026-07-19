@@ -16,11 +16,9 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    setIsLoggedIn(localStorage.getItem("dashboard_auth") === "true");
-  }, []);
+  const [isLoggedIn, setIsLoggedIn] = useState(() =>
+    typeof window !== "undefined" && localStorage.getItem("dashboard_auth") === "true"
+  );
 
   const login = async (password: string): Promise<boolean> => {
     try {
