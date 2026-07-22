@@ -762,6 +762,28 @@ app.put('/api/admin/chat/settings', async (req, res) => {
   try { const s = await DB.updateChatSettings(req.body); res.json(s); } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// Per-member chat settings
+app.get('/api/chat/member-settings/:memberId', async (req, res) => {
+  try {
+    const s = await DB.getMemberChatSettings(req.params.memberId);
+    res.json(s || {});
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+app.get('/api/chat/my-settings', async (req, res) => {
+  try {
+    const { chatName } = req.query;
+    if (!chatName) return res.status(400).json({ error: 'chatName مطلوب' });
+    const s = await DB.getMemberChatSettingsByName(chatName);
+    res.json(s || {});
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+app.put('/api/chat/member-settings/:memberId', async (req, res) => {
+  try {
+    const s = await DB.updateMemberChatSettings(req.params.memberId, req.body);
+    res.json(s || {});
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // Dashboard SPA catch-all (must be last, after all API routes)
 app.use(serveDashboard);
 

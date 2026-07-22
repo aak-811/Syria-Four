@@ -641,4 +641,70 @@ DB.uploadChatFile = async (fileBuffer, fileName, mimeType) => {
   return { url: '', key: '' };
 };
 
+// --- Per-member Chat Settings ---
+fileDB.getMemberChatSettings = function(id) {
+  const member = readCollection('members').find(m => m.id === id);
+  if (!member) return null;
+  return {
+    ownBubbleBg: member.chatOwnBubbleBg || '#005C4B', ownBubbleText: member.chatOwnBubbleText || '#FFFFFF',
+    otherBubbleBg: member.chatOtherBubbleBg || '#1A1A2E', otherBubbleText: member.chatOtherBubbleText || '#FFFFFF',
+    chatBg: member.chatBg || '#0A0A1A', headerBg: member.chatHeaderBg || '#0D0D20',
+    inputBg: member.chatInputBg || '#1A1A2E', accentColor: member.chatAccentColor || '#00E5FF',
+  };
+};
+fileDB.getMemberChatSettingsByName = function(chatName) {
+  const member = readCollection('members').find(m => m.chatName === chatName);
+  return member ? fileDB.getMemberChatSettings(member.id) : null;
+};
+fileDB.updateMemberChatSettings = function(id, data) {
+  return fileDB.update('members', id, {
+    chatOwnBubbleBg: data.ownBubbleBg, chatOwnBubbleText: data.ownBubbleText,
+    chatOtherBubbleBg: data.otherBubbleBg, chatOtherBubbleText: data.otherBubbleText,
+    chatBg: data.chatBg, chatHeaderBg: data.headerBg,
+    chatInputBg: data.inputBg, chatAccentColor: data.accentColor,
+  });
+};
+
+// Supabase per-member chat settings
+const supabaseMemberSettings = {
+  get(id) {
+    return supabaseClient.from('members').select('*').eq('id', id).single().then(r => {
+      if (r.error && r.error.code !== 'PGRST116') throw r.error;
+      const m = r.data;
+      if (!m) return null;
+      return {
+        ownBubbleBg: m.chatOwnBubbleBg || '#005C4B', ownBubbleText: m.chatOwnBubbleText || '#FFFFFF',
+        otherBubbleBg: m.chatOtherBubbleBg || '#1A1A2E', otherBubbleText: m.chatOtherBubbleText || '#FFFFFF',
+        chatBg: m.chatBg || '#0A0A1A', headerBg: m.chatHeaderBg || '#0D0D20',
+        inputBg: m.chatInputBg || '#1A1A2E', accentColor: m.chatAccentColor || '#00E5FF',
+      };
+    });
+  },
+  getByName(chatName) {
+    return supabaseClient.from('members').select('*').eq('chatName', chatName).single().then(r => {
+      if (r.error && r.error.code !== 'PGRST116') throw r.error;
+      const m = r.data;
+      if (!m) return null;
+      return {
+        ownBubbleBg: m.chatOwnBubbleBg || '#005C4B', ownBubbleText: m.chatOwnBubbleText || '#FFFFFF',
+        otherBubbleBg: m.chatOtherBubbleBg || '#1A1A2E', otherBubbleText: m.chatOtherBubbleText || '#FFFFFF',
+        chatBg: m.chatBg || '#0A0A1A', headerBg: m.chatHeaderBg || '#0D0D20',
+        inputBg: m.chatInputBg || '#1A1A2E', accentColor: m.chatAccentColor || '#00E5FF',
+      };
+    });
+  },
+  update(id, data) {
+    return supabaseClient.from('members').update({
+      chatOwnBubbleBg: data.ownBubbleBg, chatOwnBubbleText: data.ownBubbleText,
+      chatOtherBubbleBg: data.otherBubbleBg, chatOtherBubbleText: data.otherBubbleText,
+      chatBg: data.chatBg, chatHeaderBg: data.headerBg,
+      chatInputBg: data.inputBg, chatAccentColor: data.accentColor,
+    }).eq('id', id).select().single().then(r => { if (r.error) throw r.error; return r.data; });
+  },
+};
+
+DB.getMemberChatSettings = ar(id => supabaseMemberSettings.get(id), id => fileDB.getMemberChatSettings(id));
+DB.getMemberChatSettingsByName = ar(name => supabaseMemberSettings.getByName(name), name => fileDB.getMemberChatSettingsByName(name));
+DB.updateMemberChatSettings = rw((id, data) => supabaseMemberSettings.update(id, data), (id, data) => fileDB.updateMemberChatSettings(id, data));
+
 module.exports = DB;

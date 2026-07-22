@@ -7,7 +7,7 @@ export default function ChatSidebar({ onClose }: { onClose?: () => void }) {
   const { userName, userAvatar, presence, userId, onlineCount, leave } = useChat();
 
   return (
-    <div className="w-[280px] h-full flex flex-col bg-[var(--bg)] border-l border-[var(--border)] shrink-0">
+    <div className="w-[280px] h-full flex flex-col border-l shrink-0" style={{ background: "var(--chat-bg)", borderColor: "var(--border)" }}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 h-14 border-b border-[var(--border)]">
         <div className="flex items-center gap-2">

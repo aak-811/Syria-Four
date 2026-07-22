@@ -64,14 +64,18 @@ export default function MessageBubble({ message: msg, isOwn, showAvatar }: Props
 
         {/* Bubble - WhatsApp style */}
         <div className={`px-3.5 py-2 ${isOwn
-          ? "rounded-[18px] rounded-bl-[6px] bg-[#005C4B] text-white"
-          : "rounded-[18px] rounded-br-[6px] bg-[var(--surface)] border border-[var(--border)] text-[var(--text)]"
-        }`}>
+          ? "rounded-[18px] rounded-bl-[6px]"
+          : "rounded-[18px] rounded-br-[6px] border"
+        }`} style={{
+          background: isOwn ? "var(--chat-own-bubble-bg)" : "var(--chat-other-bubble-bg)",
+          color: isOwn ? "var(--chat-own-bubble-text)" : "var(--chat-other-bubble-text)",
+          borderColor: isOwn ? "transparent" : "var(--border)",
+        }}>
           {renderContent()}
 
           {/* Time + Status */}
           <div className={`flex items-center gap-1 mt-0.5 ${isOwn ? "justify-start" : "justify-end"} -mb-0.5`}>
-            <span className={`text-[10px] ${isOwn ? "text-white/60" : "text-[var(--text-dim)]"}`}>{time}</span>
+            <span className="text-[10px]" style={{ color: isOwn ? "var(--chat-own-bubble-text)" : "var(--text-dim)", opacity: isOwn ? 0.6 : 1 }}>{time}</span>
             {isOwn && <span className="shrink-0">{statusIcon}</span>}
           </div>
         </div>

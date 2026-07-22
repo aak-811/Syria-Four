@@ -20,6 +20,7 @@ interface ChatContextType {
   typingUsers: string[];
   onlineCount: number;
   presence: Record<string, UserPresence>;
+  settings: Record<string, string>;
   join: (name: string, password: string) => Promise<boolean>;
   leave: () => void;
   sendMessage: (content: string, type?: string, extra?: any) => Promise<void>;
@@ -42,6 +43,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [presence, setPresence] = useState<Record<string, UserPresence>>({});
+  const [settings, setSettings] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!isJoined) return;
@@ -99,6 +101,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       setUserAvatar(avatar);
       setConversationId(result.conversation.id);
       setIsJoined(true);
+      // Load per-member chat settings
+      chatApi.getMySettings(name).then(s => {
+        if (s && Object.keys(s).length) setSettings(s);
+      }).catch(() => {});
       return true;
     } catch (err: any) {
       setJoinError(err.message || "كلمة السر خاطئة");
@@ -133,7 +139,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   }, [conversationId, userId, userName]);
 
   return (
-    <ChatContext.Provider value={{ userId, userName, userAvatar, isJoined, joinError, conversationId, messages, typingUsers, onlineCount, presence, join, leave, sendMessage, setTyping }}>
+    <ChatContext.Provider value={{ userId, userName, userAvatar, isJoined, joinError, conversationId, messages, typingUsers, onlineCount, presence, settings, join, leave, sendMessage, setTyping }}>
       {children}
     </ChatContext.Provider>
   );

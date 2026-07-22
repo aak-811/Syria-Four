@@ -269,26 +269,43 @@ function SettingsTab() {
   const [settings, setSettings] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [members, setMembers] = useState<any[]>([]);
+  const [selectedMemberId, setSelectedMemberId] = useState<string>("");
+
+  useEffect(() => { api.getMembers().then(all => setMembers(all.filter(m => m.chatName))); }, []);
+
+  const defaults = {
+    ownBubbleBg: "#005C4B", ownBubbleText: "#FFFFFF",
+    otherBubbleBg: "#1A1A2E", otherBubbleText: "#FFFFFF",
+    chatBg: "#0A0A1A", headerBg: "#0D0D20", inputBg: "#1A1A2E",
+    accentColor: "#00E5FF",
+  };
 
   const load = () => {
     setLoading(true);
-    chatApi.getChatSettings().then(s => {
-      if (s && s.id) setSettings(s);
-      else setSettings({
-        ownBubbleBg: "#005C4B", ownBubbleText: "#FFFFFF",
-        otherBubbleBg: "#1A1A2E", otherBubbleText: "#FFFFFF",
-        chatBg: "#0A0A1A", headerBg: "#0D0D20", inputBg: "#1A1A2E",
-        accentColor: "#00E5FF",
-      });
-    }).catch(() => {}).finally(() => setLoading(false));
+    if (selectedMemberId) {
+      chatApi.getMemberSettings(selectedMemberId).then(s => {
+        setSettings(Object.keys(s).length ? s : defaults);
+      }).catch(() => setSettings(defaults)).finally(() => setLoading(false));
+    } else {
+      chatApi.getChatSettings().then(s => {
+        setSettings(s && s.id ? s : defaults);
+      }).catch(() => setSettings(defaults)).finally(() => setLoading(false));
+    }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [selectedMemberId]);
 
   const save = async () => {
     setSaving(true);
-    try { await chatApi.updateChatSettings(settings); alert("تم حفظ الإعدادات"); }
-    catch (err: any) { alert("خطأ: " + (err.message || "فشل الحفظ")); }
+    try {
+      if (selectedMemberId) {
+        await chatApi.updateMemberSettings(selectedMemberId, settings);
+      } else {
+        await chatApi.updateChatSettings(settings);
+      }
+      alert("تم حفظ الإعدادات");
+    } catch (err: any) { alert("خطأ: " + (err.message || "فشل الحفظ")); }
     setSaving(false);
   };
 
@@ -311,6 +328,24 @@ function SettingsTab() {
         <p className="text-sm text-[var(--text-muted)]">إعدادات ألوان الدردشة</p>
         <button onClick={load} className="p-2 rounded-[10px] glass hover:bg-[var(--surface-hover)] transition-colors" title="تحديث"><RefreshCw size={15} /></button>
       </div>
+
+      {/* Member selector */}
+      <div className="glass rounded-[18px] p-4">
+        <label className="text-xs font-medium text-[var(--text-muted)] mb-1.5 block">اختر العضو</label>
+        <select value={selectedMemberId} onChange={e => setSelectedMemberId(e.target.value)}
+          className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-[14px] px-4 py-3 text-sm text-[var(--text)] outline-none focus:border-[var(--primary)]">
+          <option value="">الإعدادات العامة (كل الأعضاء)</option>
+          {members.map(m => (
+            <option key={m.id} value={m.id}>
+              {m.name || m.chatName} ({m.chatName})
+            </option>
+          ))}
+        </select>
+        {selectedMemberId && (
+          <p className="text-xs text-[var(--primary)] mt-2">يتم تطبيق هذه الإعدادات على {members.find(m => m.id === selectedMemberId)?.name || selectedMemberId} فقط في الدردشة</p>
+        )}
+      </div>
+
       <div className="glass rounded-[18px] p-5 space-y-4">
         <div className="flex items-center gap-2 mb-2">
           <Palette size={18} className="text-[var(--primary)]" />

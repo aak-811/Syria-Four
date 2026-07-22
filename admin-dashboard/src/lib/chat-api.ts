@@ -67,4 +67,9 @@ export const chatApi = {
   updateChatUser: (userId: string, data: any) => req<any>(`/api/admin/chat/users/${userId}`, { method: "PUT", body: JSON.stringify(data) }),
   getChatSettings: () => req<any>("/api/admin/chat/settings"),
   updateChatSettings: (data: any) => req<any>("/api/admin/chat/settings", { method: "PUT", body: JSON.stringify(data) }),
+
+  // Per-member chat settings
+  getMemberSettings: (memberId: string) => req<any>(`/api/chat/member-settings/${memberId}`),
+  updateMemberSettings: (memberId: string, data: any) => req<any>(`/api/chat/member-settings/${memberId}`, { method: "PUT", body: JSON.stringify(data) }),
+  getMySettings: (chatName: string) => req<any>(`/api/chat/my-settings?chatName=${encodeURIComponent(chatName)}`),
 };

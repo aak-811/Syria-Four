@@ -54,7 +54,7 @@ export default function MessageInput() {
   const addEmoji = (emoji: string) => { setText(prev => prev + emoji); setShowEmoji(false); if (inputRef.current) inputRef.current.focus(); };
 
   return (
-    <div className="border-t border-[var(--border)] shrink-0" style={{ background: "var(--bg)" }}>
+    <div className="border-t shrink-0" style={{ background: "var(--chat-input-bg)", borderColor: "var(--border)" }}>
       {showEmoji && (
         <div className="px-3 pt-2 pb-1 border-b border-[var(--border)]">
           <div className="flex flex-wrap gap-1 max-h-36 overflow-y-auto">
