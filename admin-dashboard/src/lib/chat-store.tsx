@@ -13,14 +13,14 @@ interface ChatContextType {
   userId: string;
   userName: string;
   userAvatar: string;
-  userGameId: string;
   isJoined: boolean;
   joinError: string;
   conversationId: string | null;
   messages: ChatMessage[];
   typingUsers: string[];
+  onlineCount: number;
   presence: Record<string, UserPresence>;
-  join: (name: string, gameId: string, password: string) => Promise<boolean>;
+  join: (name: string, password: string) => Promise<boolean>;
   leave: () => void;
   sendMessage: (content: string, type?: string, extra?: any) => Promise<void>;
   setTyping: (typing: boolean) => void;
@@ -36,7 +36,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [userId] = useState(() => getLS("chat_user_id") || generateId());
   const [userName, setUserName] = useState(() => getLS("chat_user_name"));
   const [userAvatar, setUserAvatar] = useState(() => getLS("chat_user_avatar"));
-  const [userGameId, setUserGameId] = useState(() => getLS("chat_user_game_id"));
   const [isJoined, setIsJoined] = useState(false);
   const [joinError, setJoinError] = useState("");
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -44,7 +43,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [presence, setPresence] = useState<Record<string, UserPresence>>({});
 
-  // Presence polling
   useEffect(() => {
     if (!isJoined) return;
     const fetchPresence = () => chatApi.getPresence().then(p => {
@@ -57,27 +55,20 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(interval);
   }, [isJoined]);
 
-  // Set user online
   useEffect(() => {
     if (!isJoined) return;
     chatApi.setPresence({ userId, username: userName, status: "online", lastSeen: new Date().toISOString() }).catch(() => {});
-    const handleBeforeUnload = () => {
-      navigator.sendBeacon("/api/chat/presence", JSON.stringify({ userId, username: userName, status: "offline", lastSeen: new Date().toISOString() }));
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    const fn = () => navigator.sendBeacon("/api/chat/presence", JSON.stringify({ userId, username: userName, status: "offline", lastSeen: new Date().toISOString() }));
+    window.addEventListener("beforeunload", fn);
+    return () => window.removeEventListener("beforeunload", fn);
   }, [isJoined, userId, userName]);
 
-  // Periodic ping
   useEffect(() => {
     if (!isJoined) return;
-    const ping = setInterval(() => {
-      chatApi.setPresence({ userId, username: userName, status: "online", lastSeen: new Date().toISOString() }).catch(() => {});
-    }, 30000);
+    const ping = setInterval(() => chatApi.setPresence({ userId, username: userName, status: "online", lastSeen: new Date().toISOString() }).catch(() => {}), 30000);
     return () => clearInterval(ping);
   }, [isJoined, userId, userName]);
 
-  // Polling for messages + typing
   useEffect(() => {
     if (!isJoined || !conversationId) return;
     const interval = setInterval(async () => {
@@ -93,21 +84,18 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(interval);
   }, [isJoined, conversationId, userId]);
 
-  const join = useCallback(async (name: string, gameId: string, password: string): Promise<boolean> => {
+  const onlineCount = Object.values(presence).filter(p => p.status === "online").length;
+
+  const join = useCallback(async (name: string, password: string): Promise<boolean> => {
     setJoinError("");
     try {
       const result = await chatApi.join(password);
-      if (!result.conversation) {
-        setJoinError("خطأ في إنشاء المحادثة");
-        return false;
-      }
+      if (!result.conversation) { setJoinError("خطأ في إنشاء المحادثة"); return false; }
       const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00E5FF&color=fff&bold=true`;
       localStorage.setItem("chat_user_id", userId);
       localStorage.setItem("chat_user_name", name);
-      localStorage.setItem("chat_user_game_id", gameId);
       localStorage.setItem("chat_user_avatar", avatar);
       setUserName(name);
-      setUserGameId(gameId);
       setUserAvatar(avatar);
       setConversationId(result.conversation.id);
       setIsJoined(true);
@@ -121,14 +109,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const leave = useCallback(() => {
     chatApi.setPresence({ userId, username: userName, status: "offline", lastSeen: new Date().toISOString() }).catch(() => {});
     localStorage.removeItem("chat_user_name");
-    localStorage.removeItem("chat_user_game_id");
     localStorage.removeItem("chat_user_avatar");
-    setUserName("");
-    setUserGameId("");
-    setUserAvatar("");
-    setIsJoined(false);
-    setConversationId(null);
-    setMessages([]);
+    setUserName(""); setUserAvatar(""); setIsJoined(false); setConversationId(null); setMessages([]);
   }, [userId, userName]);
 
   const sendMessage = useCallback(async (content: string, type = "text", extra = {}) => {
@@ -151,11 +133,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   }, [conversationId, userId, userName]);
 
   return (
-    <ChatContext.Provider value={{
-      userId, userName, userAvatar, userGameId, isJoined, joinError,
-      conversationId, messages, typingUsers, presence,
-      join, leave, sendMessage, setTyping,
-    }}>
+    <ChatContext.Provider value={{ userId, userName, userAvatar, isJoined, joinError, conversationId, messages, typingUsers, onlineCount, presence, join, leave, sendMessage, setTyping }}>
       {children}
     </ChatContext.Provider>
   );
