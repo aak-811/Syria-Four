@@ -264,7 +264,7 @@ function sbCol(tableName) {
 }
 
 const sb = {};
-['members','tournaments','events','leaderboard','orders','support','instagram','gallery','videos','notifications','players','users','sessions','audit_logs','awards','vip','hall-of-fame'].forEach(c => { sb[c] = sbCol(c); });
+['members','tournaments','events','leaderboard','orders','support','instagram','gallery','videos','notifications','players','users','sessions','audit_logs','awards','vip','hall-of-fame','conversations','conversation_members','messages','message_reads','typing_status','user_presence','blocked_users','pinned_messages','deleted_messages'].forEach(c => { sb[c] = sbCol(c); });
 
 const supabaseDB = {
   getAll(c) { return sb[c].getAll(); },
