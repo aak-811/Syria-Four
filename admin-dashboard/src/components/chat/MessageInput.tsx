@@ -8,7 +8,7 @@ import { chatApi } from "@/lib/chat-api";
 const EMOJI_LIST = ["😀","😁","😂","🤣","😃","😄","😅","😆","😉","😊","😋","😎","😍","🥰","😘","🤗","🤩","👍","❤️","🔥","💯","🎉","🙏","✨","💪","🤝","🫡","😈","👑","🏆","🛡️","⚔️","🎮","📱","💎","🌟"];
 
 export default function MessageInput() {
-  const { activeConv, sendMessage, setTyping } = useChat();
+  const { sendMessage, setTyping } = useChat();
   const [text, setText] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -16,11 +16,11 @@ export default function MessageInput() {
   const typingTimeout = useRef<NodeJS.Timeout>(undefined);
 
   const handleSend = useCallback(() => {
-    if (!activeConv || !text.trim()) return;
-    sendMessage(activeConv, text.trim());
+    if (!text.trim()) return;
+    sendMessage(text.trim());
     setText("");
-    setTyping(activeConv, false);
-  }, [activeConv, text, sendMessage, setTyping]);
+    setTyping(false);
+  }, [text, sendMessage, setTyping]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -31,25 +31,24 @@ export default function MessageInput() {
 
   const handleChange = (value: string) => {
     setText(value);
-    if (!activeConv) return;
-    setTyping(activeConv, value.length > 0);
+    setTyping(value.length > 0);
     if (typingTimeout.current) clearTimeout(typingTimeout.current);
-    typingTimeout.current = setTimeout(() => setTyping(activeConv, false), 3000);
+    typingTimeout.current = setTimeout(() => setTyping(false), 3000);
   };
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !activeConv) return;
+    if (!file) return;
     setUploading(true);
     try {
       const result = await chatApi.uploadFile(file);
       const type = file.type.startsWith("image/") ? "image" : file.type.startsWith("video/") ? "video" : "file";
       const ext = { fileUrl: result.url, fileName: result.name, fileSize: result.size, mimeType: result.type };
       if (text.trim()) {
-        await sendMessage(activeConv, text.trim(), "text");
+        await sendMessage(text.trim(), "text");
         setText("");
       }
-      await sendMessage(activeConv, "", type, ext);
+      await sendMessage("", type, ext);
     } catch {}
     setUploading(false);
     if (fileRef.current) fileRef.current.value = "";
@@ -59,8 +58,6 @@ export default function MessageInput() {
     setText(prev => prev + emoji);
     setShowEmoji(false);
   };
-
-  if (!activeConv) return null;
 
   return (
     <div className="border-t border-[var(--border)] p-3 bg-[var(--bg)] shrink-0">
@@ -77,7 +74,7 @@ export default function MessageInput() {
         <button onClick={() => fileRef.current?.click()} disabled={uploading} className="p-2 rounded-lg hover:bg-[var(--surface)] transition-colors text-[var(--text-dim)] hover:text-[var(--text)]">
           {uploading ? <div className="w-5 h-5 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" /> : <Paperclip size={20} />}
         </button>
-        <input ref={fileRef} type="file" onChange={handleFile} className="hidden" accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.zip,.mp3,.wav,.ogg" />
+        <input ref={fileRef} type="file" onChange={handleFile} className="hidden" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.zip,.mp3,.wav,.ogg" />
         <div className="flex-1 relative">
           <textarea
             value={text}

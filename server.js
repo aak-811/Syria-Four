@@ -610,6 +610,13 @@ app.post('/api/chat/typing', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+app.get('/api/chat/typing/:conversationId', async (req, res) => {
+  try {
+    const users = await DB.getTypingUsers(req.params.conversationId);
+    res.json(users);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // --- Presence ---
 app.post('/api/chat/presence', async (req, res) => {
   try {
@@ -644,6 +651,37 @@ app.post('/api/chat/upload', upload.single('file'), async (req, res) => {
     const result = await DB.uploadChatFile(req.file.buffer || require('fs').readFileSync(req.file.path), req.file.originalname, req.file.mimetype);
     res.json({ url: result.url || '/uploads/' + req.file.filename, name: req.file.originalname, size: req.file.size, type: req.file.mimetype });
   } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- Chat Join (password validation + auto-create SYRIA FOUR group) ---
+const CHAT_PASSWORD = 'aak.syria';
+const DEFAULT_CONVERSATION_NAME = 'SYRIA FOUR';
+
+app.post('/api/chat/join', async (req, res) => {
+  try {
+    const { password } = req.body;
+    if (password !== CHAT_PASSWORD) {
+      return res.status(403).json({ error: 'كلمة السر خاطئة' });
+    }
+    // Find or create the default "SYRIA FOUR" conversation
+    const conversations = await DB.getConversations();
+    let conv = conversations.find(c => c.name === DEFAULT_CONVERSATION_NAME && c.type === 'group');
+    if (!conv) {
+      conv = await DB.createConversation({
+        type: 'group',
+        name: DEFAULT_CONVERSATION_NAME,
+        description: 'الدردشة العامة للكلان',
+        image: '',
+        createdBy: 'system',
+        lastMessage: '',
+        lastMessageAt: new Date().toISOString(),
+        isArchived: false, isPinned: false, isMuted: false
+      });
+    }
+    res.json({ success: true, conversation: conv });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // --- Chat Stats (admin) ---

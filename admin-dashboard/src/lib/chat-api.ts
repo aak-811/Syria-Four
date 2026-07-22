@@ -13,6 +13,9 @@ async function req<T>(url: string, opts?: RequestInit): Promise<T> {
 }
 
 export const chatApi = {
+  // Join (password validation)
+  join: (password: string) => req<any>("/api/chat/join", { method: "POST", body: JSON.stringify({ password }) }),
+
   // Conversations
   getConversations: () => req<any[]>("/api/chat/conversations"),
   getConversation: (id: string) => req<any>(`/api/chat/conversations/${id}`),
@@ -37,6 +40,7 @@ export const chatApi = {
 
   // Typing
   setTyping: (d: any) => req<any>("/api/chat/typing", { method: "POST", body: JSON.stringify(d) }),
+  getTypingUsers: (convId: string) => req<any[]>(`/api/chat/typing/${convId}`),
 
   // Presence
   setPresence: (d: any) => req<any>("/api/chat/presence", { method: "POST", body: JSON.stringify(d) }),

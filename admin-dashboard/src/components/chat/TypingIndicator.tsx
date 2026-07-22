@@ -4,7 +4,7 @@ import { useChat } from "@/lib/chat-store";
 import { useState, useEffect } from "react";
 
 export default function TypingIndicator() {
-  const { activeConv, typingUsers } = useChat();
+  const { typingUsers } = useChat();
   const [dots, setDots] = useState("");
 
   useEffect(() => {
@@ -14,12 +14,10 @@ export default function TypingIndicator() {
     return () => clearInterval(interval);
   }, []);
 
-  const typing = activeConv ? typingUsers[activeConv]?.filter(t => t.isTyping) || [] : [];
+  if (typingUsers.length === 0) return null;
 
-  if (typing.length === 0) return null;
-
-  const names = typing.map(t => t.username).join(" و ");
-  const text = typing.length === 1 ? `${names} يكتب${dots}` : `${names} يكتبون${dots}`;
+  const names = typingUsers.join(" و ");
+  const text = typingUsers.length === 1 ? `${names} يكتب${dots}` : `${names} يكتبون${dots}`;
 
   return (
     <div className="flex items-center gap-2 px-2 py-1 text-xs text-[var(--text-muted)] animate-fade-in">
