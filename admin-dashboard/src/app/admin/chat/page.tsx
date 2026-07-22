@@ -2,22 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { chatApi } from "@/lib/chat-api";
+import { api } from "@/lib/api";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import Spinner from "@/components/ui/Spinner";
 import DataTable from "@/components/admin/DataTable";
 import { FormInput, FormTextarea } from "@/components/admin/FormField";
-import { api } from "@/lib/api";
 import FormFileUpload from "@/components/admin/FormFileUpload";
 import {
   MessageCircle, Users, MessageSquare, Settings as SettingsIcon,
-  RefreshCw, Trash2, Edit3, Plus, Palette, Save, UserPlus
+  RefreshCw, Trash2, Plus, Palette, Save
 } from "lucide-react";
 
-type Tab = "manageMembers" | "members" | "conversations" | "messages" | "settings";
+type Tab = "members" | "conversations" | "messages" | "settings";
 
 const tabs: { key: Tab; label: string; icon: any }[] = [
-  { key: "manageMembers", label: "إدارة الأعضاء", icon: UserPlus },
   { key: "members", label: "المتواجدون", icon: Users },
   { key: "conversations", label: "المحادثات", icon: MessageCircle },
   { key: "messages", label: "الرسائل", icon: MessageSquare },
@@ -48,7 +47,6 @@ export default function AdminChatPage() {
         })}
       </div>
 
-      {tab === "manageMembers" && <ManageMembersTab />}
       {tab === "members" && <MembersTab />}
       {tab === "conversations" && <ConversationsTab />}
       {tab === "messages" && <MessagesTab />}
@@ -57,8 +55,8 @@ export default function AdminChatPage() {
   );
 }
 
-// ===================== Manage Members Tab =====================
-function ManageMembersTab() {
+// ===================== Members Tab =====================
+function MembersTab() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(false);
@@ -90,9 +88,8 @@ function ManageMembersTab() {
       <img src={v} alt="" className="w-10 h-10 rounded-full object-cover" onError={e => (e.target as HTMLImageElement).style.display = "none"} />
     ) : "—" },
     { key: "name", label: "الاسم" },
-    { key: "gameId", label: "معرف اللعبة" },
-    { key: "role", label: "الدور" },
-    { key: "chatName", label: "دردشة", render: (v: string) => v ? <span className="text-[var(--primary)] text-xs font-medium">{v}</span> : "—" },
+    { key: "chatName", label: "اسم الدردشة", render: (v: string) => v ? <span className="text-[var(--primary)] text-xs font-medium">{v}</span> : "—" },
+    { key: "chatPassword", label: "كلمة السر", render: (v: string) => v ? "••••••" : "—" },
   ];
 
   return (
@@ -100,7 +97,7 @@ function ManageMembersTab() {
       <div className="flex items-center justify-between">
         <p className="text-sm text-[var(--text-muted)]">إدارة أعضاء الكلان — {data.length} عضو</p>
         <div className="flex gap-2">
-          <button onClick={load} className="p-2 rounded-[10px] glass hover:bg-[var(--surface-hover)] transition-colors"><RefreshCw size={15} /></button>
+          <button onClick={load} className="p-2 rounded-[10px] glass hover:bg-[var(--surface-hover)] transition-colors" title="تحديث"><RefreshCw size={15} /></button>
           <Button onClick={openAdd}><Plus size={16} /> إضافة عضو</Button>
         </div>
       </div>
@@ -124,71 +121,6 @@ function ManageMembersTab() {
             <FormInput label="كلمة سر الدردشة" value={form.chatPassword || ""} onChange={e => setForm({ ...form, chatPassword: e.target.value })} placeholder="كلمة السر للدخول إلى الدردشة" />
           </div>
           <Button onClick={save} className="w-full">{edit ? "تحديث" : "إضافة"}</Button>
-        </div>
-      </Modal>
-    </div>
-  );
-}
-
-// ===================== Members Tab =====================
-function MembersTab() {
-  const [users, setUsers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [modal, setModal] = useState(false);
-  const [edit, setEdit] = useState<any>(null);
-  const [form, setForm] = useState<any>({});
-
-  const load = () => { setLoading(true); chatApi.getChatUsers().then(setUsers).finally(() => setLoading(false)); };
-  useEffect(() => { load(); }, []);
-
-  const openEdit = (row: any) => { setEdit(row); setForm({ ...row }); setModal(true); };
-
-  const save = async () => {
-    try {
-      await chatApi.updateChatUser(edit.userId, form);
-      setModal(false); load();
-    } catch (err: any) { alert("خطأ: " + (err.message || "فشل التحديث")); }
-  };
-
-  const remove = async (row: any) => {
-    if (!confirm("هل أنت متأكد من إزالة هذا العضو من الدردشة؟")) return;
-    try {
-      const conversations = await chatApi.getConversations();
-      for (const conv of conversations) {
-        const members = await chatApi.getConversation(conv.id);
-        const member = (members.members || []).find((m: any) => m.userId === row.userId);
-        if (member) await chatApi.removeMember(conv.id, row.userId);
-      }
-      load();
-    } catch (err: any) { alert("خطأ: " + (err.message || "فشل الإزالة")); }
-  };
-
-  const columns = [
-    { key: "avatarUrl", label: "الصورة", render: (v: string, row: any) => (
-      v ? <img src={v} alt="" className="w-9 h-9 rounded-full object-cover" onError={e => (e.target as HTMLImageElement).style.display = "none"} />
-        : <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--secondary)] flex items-center justify-center text-xs font-bold text-white">{(row.username || "?").charAt(0)}</div>
-    ) },
-    { key: "userId", label: "المعرف", render: (v: string) => <span className="text-[10px] font-mono text-[var(--text-muted)]">{v}</span> },
-    { key: "username", label: "الاسم" },
-    { key: "status", label: "الحالة", render: (v: string) => (
-      <span className={`text-[11px] px-2 py-0.5 rounded-full ${v === "online" ? "bg-[rgba(0,230,118,0.1)] text-[#00E676]" : "bg-[rgba(107,114,128,0.1)] text-[var(--text-dim)]"}`}>{v === "online" ? "متصل" : "غير متصل"}</span>
-    ) },
-  ];
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-[var(--text-muted)]">إدارة أعضاء الدردشة — {users.length} عضو</p>
-        <button onClick={load} className="p-2 rounded-[10px] glass hover:bg-[var(--surface-hover)] transition-colors"><RefreshCw size={15} /></button>
-      </div>
-      {loading ? <Spinner /> : <DataTable columns={columns} data={users} onEdit={openEdit} onDelete={remove} />}
-
-      <Modal open={modal} onClose={() => setModal(false)} title="تعديل العضو">
-        <div className="space-y-4 px-1">
-          <FormInput label="الاسم" value={form.username || ""} onChange={e => setForm({ ...form, username: e.target.value })} />
-          <FormInput label="رابط الصورة الشخصية" value={form.avatarUrl || ""} onChange={e => setForm({ ...form, avatarUrl: e.target.value })} placeholder="https://example.com/avatar.jpg" />
-          <FormInput label="معرف العضو (userId)" value={form.userId || ""} onChange={e => setForm({ ...form, userId: e.target.value })} />
-          <Button onClick={save} className="w-full">حفظ التعديلات</Button>
         </div>
       </Modal>
     </div>
@@ -235,7 +167,7 @@ function ConversationsTab() {
       <div className="flex items-center justify-between">
         <p className="text-sm text-[var(--text-muted)]">{data.length} محادثة</p>
         <div className="flex gap-2">
-          <button onClick={load} className="p-2 rounded-[10px] glass hover:bg-[var(--surface-hover)] transition-colors"><RefreshCw size={15} /></button>
+          <button onClick={load} className="p-2 rounded-[10px] glass hover:bg-[var(--surface-hover)] transition-colors" title="تحديث"><RefreshCw size={15} /></button>
           <Button onClick={openAdd}><Plus size={16} /> إضافة محادثة</Button>
         </div>
       </div>
@@ -263,7 +195,9 @@ function MessagesTab() {
   const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => { chatApi.getConversations().then(setConversations); }, []);
+  const loadConvs = () => { chatApi.getConversations().then(setConversations); };
+
+  useEffect(() => { loadConvs(); }, []);
 
   const loadMessages = async (id: string) => {
     setConvId(id);
@@ -282,11 +216,14 @@ function MessagesTab() {
 
   return (
     <div className="space-y-4">
-      <select value={convId} onChange={e => loadMessages(e.target.value)}
-        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-[14px] px-4 py-3 text-sm text-[var(--text)] outline-none focus:border-[var(--primary)]">
-        <option value="">اختر محادثة</option>
-        {conversations.map(c => <option key={c.id} value={c.id}>{c.name || c.id}</option>)}
-      </select>
+      <div className="flex items-center gap-2">
+        <select value={convId} onChange={e => loadMessages(e.target.value)}
+          className="flex-1 bg-[var(--surface)] border border-[var(--border)] rounded-[14px] px-4 py-3 text-sm text-[var(--text)] outline-none focus:border-[var(--primary)]">
+          <option value="">اختر محادثة</option>
+          {conversations.map(c => <option key={c.id} value={c.id}>{c.name || c.id}</option>)}
+        </select>
+        <button onClick={loadConvs} className="p-3 rounded-[10px] glass hover:bg-[var(--surface-hover)] transition-colors shrink-0" title="تحديث"><RefreshCw size={15} /></button>
+      </div>
 
       {loading ? <Spinner /> : convId && (
         <div className="glass rounded-[18px] p-4 max-h-[500px] overflow-y-auto space-y-2">
@@ -328,7 +265,8 @@ function SettingsTab() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
+  const load = () => {
+    setLoading(true);
     chatApi.getChatSettings().then(s => {
       if (s && s.id) setSettings(s);
       else setSettings({
@@ -338,7 +276,9 @@ function SettingsTab() {
         accentColor: "#00E5FF",
       });
     }).catch(() => {}).finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => { load(); }, []);
 
   const save = async () => {
     setSaving(true);
@@ -362,6 +302,10 @@ function SettingsTab() {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-[var(--text-muted)]">إعدادات ألوان الدردشة</p>
+        <button onClick={load} className="p-2 rounded-[10px] glass hover:bg-[var(--surface-hover)] transition-colors" title="تحديث"><RefreshCw size={15} /></button>
+      </div>
       <div className="glass rounded-[18px] p-5 space-y-4">
         <div className="flex items-center gap-2 mb-2">
           <Palette size={18} className="text-[var(--primary)]" />
