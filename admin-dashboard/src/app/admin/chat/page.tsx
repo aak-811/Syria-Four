@@ -63,7 +63,12 @@ function MembersTab() {
   const [edit, setEdit] = useState<any>(null);
   const [form, setForm] = useState<any>({});
 
-  const load = () => { setLoading(true); api.getMembers().then(setData).finally(() => setLoading(false)); };
+  const load = () => {
+    setLoading(true);
+    api.getMembers().then(all => {
+      setData(all.filter(m => m.chatName && m.chatPassword));
+    }).finally(() => setLoading(false));
+  };
   useEffect(() => { load(); }, []);
 
   const openAdd = () => { setEdit(null); setForm({}); setModal(true); };

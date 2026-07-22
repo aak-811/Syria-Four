@@ -130,6 +130,35 @@ function createRouter(collection) {
   return router;
 }
 
+// --- Member-specific routes with duplicate chatName check ---
+app.post('/api/members', async (req, res) => {
+  try {
+    const { chatName } = req.body;
+    if (chatName) {
+      const members = await DB.getMembers();
+      if (members.some(m => m.chatName === chatName && m.id !== req.body.id)) {
+        return res.status(400).json({ error: 'اسم المستخدم في الدردشة موجود مسبقاً' });
+      }
+    }
+    const item = await DB.add('members', req.body);
+    res.status(201).json(item);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+app.put('/api/members/:id', async (req, res) => {
+  try {
+    const { chatName } = req.body;
+    if (chatName) {
+      const members = await DB.getMembers();
+      if (members.some(m => m.chatName === chatName && m.id !== req.params.id)) {
+        return res.status(400).json({ error: 'اسم المستخدم في الدردشة موجود مسبقاً' });
+      }
+    }
+    const item = await DB.update('members', req.params.id, req.body);
+    if (!item) return res.status(404).json({ error: 'Not found' });
+    res.json(item);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.use('/api/members', createRouter('members'));
 app.use('/api/tournaments', createRouter('tournaments'));
 app.use('/api/events', createRouter('events'));
@@ -626,7 +655,15 @@ app.post('/api/chat/presence', async (req, res) => {
 });
 
 app.get('/api/chat/presence', async (req, res) => {
-  try { res.json(await DB.getAllPresence()); } catch (err) { res.status(500).json({ error: err.message }); }
+  try {
+    const [presence, members] = await Promise.all([
+      DB.getAllPresence(),
+      DB.getMembers()
+    ]);
+    const validChatNames = new Set(members.filter(m => m.chatName).map(m => m.chatName));
+    const filtered = presence.filter(p => validChatNames.has(p.username));
+    res.json(filtered);
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // --- Block/Unblock ---
@@ -660,14 +697,16 @@ const DEFAULT_CONVERSATION_NAME = 'SYRIA FOUR';
 app.post('/api/chat/join', async (req, res) => {
   try {
     const { name, password } = req.body;
+    if (!name) return res.status(403).json({ error: 'الاسم مطلوب' });
 
-    // Allow global admin password
+    const members = await DB.getMembers();
+
     if (password === CHAT_PASSWORD) {
-      // Continue below
+      // Global password: name must match a member's chatName
+      const member = members.find(m => m.chatName === name);
+      if (!member) return res.status(403).json({ error: 'الاسم غير موجود في قائمة الأعضاء' });
     } else {
-      // Check member credentials: find member with matching chatName + chatPassword
-      if (!name) return res.status(403).json({ error: 'الاسم مطلوب' });
-      const members = await DB.getMembers();
+      // Member credentials: chatName + chatPassword must match
       const member = members.find(m => m.chatName === name && m.chatPassword === password);
       if (!member) return res.status(403).json({ error: 'الاسم أو كلمة السر خاطئة' });
     }
