@@ -24,7 +24,7 @@ const items = [
   { href: "/admin/support", label: "الدعم", icon: MessageSquare, color: "#25D366" },
   { href: "/admin/instagram", label: "إنستغرام", icon: Camera, color: "#E1306C" },
   { href: "/admin/notifications", label: "الإشعارات", icon: Bell, color: "#FF6B35" },
-  { href: "/admin/chat", label: "إحصائيات الدردشة", icon: MessageCircle, color: "#00E5FF" },
+  { href: "/admin/chat", label: "إدارة الدردشة", icon: MessageCircle, color: "#00E5FF" },
   { href: "/admin/requests", label: "الطلبات", icon: ClipboardList, color: "#8B5CF6" },
 ];
 
