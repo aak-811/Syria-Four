@@ -55,7 +55,7 @@ async function runSetup() {
     'awards', 'vip', 'hall-of-fame',
     'conversations', 'conversation_members', 'messages', 'message_reads',
     'typing_status', 'user_presence', 'blocked_users',
-    'pinned_messages', 'deleted_messages'
+    'pinned_messages', 'deleted_messages', 'chat_settings'
   ];
 
   let totalMigrated = 0;

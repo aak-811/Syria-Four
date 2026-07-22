@@ -700,6 +700,20 @@ app.get('/api/admin/chat/stats', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// --- Admin Chat Management ---
+app.get('/api/admin/chat/users', async (req, res) => {
+  try { res.json(await DB.getChatUsers()); } catch (err) { res.status(500).json({ error: err.message }); }
+});
+app.put('/api/admin/chat/users/:userId', async (req, res) => {
+  try { const user = await DB.updateChatUser(req.params.userId, req.body); res.json(user); } catch (err) { res.status(500).json({ error: err.message }); }
+});
+app.get('/api/admin/chat/settings', async (req, res) => {
+  try { res.json(await DB.getChatSettings()); } catch (err) { res.status(500).json({ error: err.message }); }
+});
+app.put('/api/admin/chat/settings', async (req, res) => {
+  try { const s = await DB.updateChatSettings(req.body); res.json(s); } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // Dashboard SPA catch-all (must be last, after all API routes)
 app.use(serveDashboard);
 

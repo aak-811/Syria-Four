@@ -61,4 +61,10 @@ export const chatApi = {
 
   // Admin stats
   getChatStats: () => req<any>("/api/admin/chat/stats"),
+
+  // Admin management
+  getChatUsers: () => req<any[]>("/api/admin/chat/users"),
+  updateChatUser: (userId: string, data: any) => req<any>(`/api/admin/chat/users/${userId}`, { method: "PUT", body: JSON.stringify(data) }),
+  getChatSettings: () => req<any>("/api/admin/chat/settings"),
+  updateChatSettings: (data: any) => req<any>("/api/admin/chat/settings", { method: "PUT", body: JSON.stringify(data) }),
 };

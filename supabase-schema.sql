@@ -475,6 +475,19 @@ CREATE INDEX IF NOT EXISTS idx_message_reads_user ON message_reads("userId");
 CREATE INDEX IF NOT EXISTS idx_blocked_users_user ON blocked_users("userId");
 CREATE INDEX IF NOT EXISTS idx_pinned_messages_conversation ON pinned_messages("conversationId");
 
+CREATE TABLE IF NOT EXISTS chat_settings (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  "ownBubbleBg" TEXT DEFAULT '#005C4B',
+  "ownBubbleText" TEXT DEFAULT '#FFFFFF',
+  "otherBubbleBg" TEXT DEFAULT '#1A1A2E',
+  "otherBubbleText" TEXT DEFAULT '#FFFFFF',
+  "chatBg" TEXT DEFAULT '#0A0A1A',
+  "headerBg" TEXT DEFAULT '#0D0D20',
+  "inputBg" TEXT DEFAULT '#1A1A2E',
+  "accentColor" TEXT DEFAULT '#00E5FF',
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Enable RLS
 ALTER TABLE conversations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE conversation_members ENABLE ROW LEVEL SECURITY;
@@ -485,6 +498,7 @@ ALTER TABLE user_presence ENABLE ROW LEVEL SECURITY;
 ALTER TABLE blocked_users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE pinned_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE deleted_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE chat_settings ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies (public access for chat since we use simple identity)
 DO $$ BEGIN
@@ -497,6 +511,7 @@ DO $$ BEGIN
   CREATE POLICY "allow_all_blocked_users" ON blocked_users FOR ALL USING (true);
   CREATE POLICY "allow_all_pinned_messages" ON pinned_messages FOR ALL USING (true);
   CREATE POLICY "allow_all_deleted_messages" ON deleted_messages FOR ALL USING (true);
+  CREATE POLICY "allow_all_chat_settings" ON chat_settings FOR ALL USING (true);
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 

@@ -264,7 +264,7 @@ function sbCol(tableName) {
 }
 
 const sb = {};
-['members','tournaments','events','leaderboard','orders','support','instagram','gallery','videos','notifications','players','users','sessions','audit_logs','awards','vip','hall-of-fame','conversations','conversation_members','messages','message_reads','typing_status','user_presence','blocked_users','pinned_messages','deleted_messages'].forEach(c => { sb[c] = sbCol(c); });
+['members','tournaments','events','leaderboard','orders','support','instagram','gallery','videos','notifications','players','users','sessions','audit_logs','awards','vip','hall-of-fame','conversations','conversation_members','messages','message_reads','typing_status','user_presence','blocked_users','pinned_messages','deleted_messages','chat_settings'].forEach(c => { sb[c] = sbCol(c); });
 
 const supabaseDB = {
   getAll(c) { return sb[c].getAll(); },
@@ -521,6 +521,28 @@ fileDB.unblockUser = function(userId, blockedId) {
 };
 fileDB.getBlockedUsers = function(userId) { return readCollection('blocked_users').filter(b => b.userId === userId); };
 
+fileDB.getChatUsers = function() {
+  const presence = readCollection('user_presence');
+  const msgs = readCollection('messages');
+  const seen = new Set();
+  presence.forEach(u => { seen.add(u.userId); });
+  msgs.forEach(m => { if (m.senderId && !seen.has(m.senderId)) { seen.add(m.senderId); presence.push({ userId: m.senderId, username: m.senderName || '', avatarUrl: m.senderAvatar || '', status: 'offline' }); } });
+  return presence;
+};
+fileDB.updateChatUser = function(userId, data) {
+  const items = readCollection('user_presence');
+  const idx = items.findIndex(u => u.userId === userId);
+  if (idx >= 0) { items[idx] = { ...items[idx], ...data }; writeCollection('user_presence', items); return items[idx]; }
+  return fileDB.add('user_presence', { userId, username: data.username || '', avatarUrl: data.avatarUrl || '', status: 'offline', ...data });
+};
+
+fileDB.getChatSettings = function() { const items = readCollection('chat_settings'); return items.length > 0 ? items[0] : {}; };
+fileDB.updateChatSettings = function(data) {
+  const items = readCollection('chat_settings');
+  if (items.length > 0) { items[0] = { ...items[0], ...data }; writeCollection('chat_settings', items); return items[0]; }
+  return fileDB.add('chat_settings', data);
+};
+
 // Supabase chat methods
 const supabaseChat = {
   createConversation(data) { return sb.conversations.add(data); },
@@ -559,6 +581,13 @@ const supabaseChat = {
   blockUser(data) { return sb.blocked_users.add(data); },
   unblockUser(userId, blockedId) { return supabaseClient.from('blocked_users').delete().eq('userId', userId).eq('blockedUserId', blockedId).then(r => { if (r.error) throw r.error; return true; }); },
   getBlockedUsers(userId) { return supabaseClient.from('blocked_users').select('*').eq('userId', userId).then(r => { if (r.error) throw r.error; return r.data || []; }); },
+
+  getChatUsers() { return supabaseClient.from('user_presence').select('*').then(r => { if (r.error) throw r.error; return r.data || []; }); },
+  updateChatUser(userId, data) {
+    return supabaseClient.from('user_presence').upsert({ userId, ...data }, { onConflict: 'userId' }).select().single().then(r => { if (r.error) throw r.error; return r.data; });
+  },
+  getChatSettings() { return supabaseClient.from('chat_settings').select('*').limit(1).then(r => { if (r.error) throw r.error; return (r.data || [])[0] || {}; }); },
+  updateChatSettings(data) { return supabaseClient.from('chat_settings').upsert(data, { onConflict: 'id' }).select().single().then(r => { if (r.error) throw r.error; return r.data; }); },
 };
 
 // Smart DB wrappers for chat
@@ -592,6 +621,11 @@ DB.getAllPresence = ar(() => supabaseChat.getAllPresence(), () => fileDB.getAllP
 DB.blockUser = rw(d => supabaseChat.blockUser(d), d => fileDB.blockUser(d));
 DB.unblockUser = rw((userId, blockedId) => supabaseChat.unblockUser(userId, blockedId), (userId, blockedId) => fileDB.unblockUser(userId, blockedId));
 DB.getBlockedUsers = ar(userId => supabaseChat.getBlockedUsers(userId), userId => fileDB.getBlockedUsers(userId));
+
+DB.getChatUsers = ar(() => supabaseChat.getChatUsers(), () => fileDB.getChatUsers());
+DB.updateChatUser = rw((userId, data) => supabaseChat.updateChatUser(userId, data), (userId, data) => fileDB.updateChatUser(userId, data));
+DB.getChatSettings = ar(() => supabaseChat.getChatSettings(), () => fileDB.getChatSettings());
+DB.updateChatSettings = rw(data => supabaseChat.updateChatSettings(data), data => fileDB.updateChatSettings(data));
 
 // Upload to Supabase Storage
 DB.uploadChatFile = async (fileBuffer, fileName, mimeType) => {
