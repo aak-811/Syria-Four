@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, Users, Crown, Swords, Calendar, Image,
   ShoppingBag, MessageSquare, Camera, Bell, ClipboardList, LogOut,
-  Medal, Award, Sparkles
+  Medal, Award, Sparkles, MessageCircle
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -23,6 +23,7 @@ const items = [
   { href: "/admin/support", label: "الدعم", icon: MessageSquare, color: "#25D366" },
   { href: "/admin/instagram", label: "إنستغرام", icon: Camera, color: "#E1306C" },
   { href: "/admin/notifications", label: "الإشعارات", icon: Bell, color: "#FF6B35" },
+  { href: "/admin/chat", label: "إحصائيات الدردشة", icon: MessageCircle, color: "#00E5FF" },
   { href: "/admin/requests", label: "الطلبات", icon: ClipboardList, color: "#8B5CF6" },
 ];
 

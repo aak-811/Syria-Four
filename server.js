@@ -485,6 +485,183 @@ app.put('/api/notifications/read-all', authMiddleware, async (req, res) => {
   }
 });
 
+// =====================================================
+// Chat API Routes
+// =====================================================
+
+const chatLimiter = rateLimit({ windowMs: 60 * 1000, max: 120 });
+
+// --- Conversations ---
+app.get('/api/chat/conversations', async (req, res) => {
+  try { res.json(await DB.getConversations()); } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/chat/conversations', async (req, res) => {
+  try {
+    const { type, name, createdBy, members } = req.body;
+    if (!type || !createdBy) return res.status(400).json({ error: 'type and createdBy required' });
+    const conv = await DB.createConversation({ type, name: name || '', description: '', image: '', createdBy, lastMessage: '', lastMessageAt: new Date().toISOString(), isArchived: false, isPinned: false, isMuted: false });
+    // Add creator and members
+    await DB.addConversationMember({ conversationId: conv.id, userId: createdBy, role: 'owner', joinedAt: new Date().toISOString(), isMuted: false });
+    if (members && Array.isArray(members)) {
+      for (const uid of members) {
+        if (uid !== createdBy) await DB.addConversationMember({ conversationId: conv.id, userId: uid, role: 'member', joinedAt: new Date().toISOString(), isMuted: false });
+      }
+    }
+    res.status(201).json(conv);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/chat/conversations/:id', async (req, res) => {
+  try {
+    const conv = await DB.getConversation(req.params.id);
+    if (!conv) return res.status(404).json({ error: 'Not found' });
+    conv.members = await DB.getConversationMembers(req.params.id);
+    res.json(conv);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/chat/conversations/:id', async (req, res) => {
+  try {
+    const conv = await DB.updateConversation(req.params.id, req.body);
+    if (!conv) return res.status(404).json({ error: 'Not found' });
+    res.json(conv);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/chat/conversations/:id', async (req, res) => {
+  try {
+    await DB.deleteConversation(req.params.id);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- Conversation Members ---
+app.post('/api/chat/conversations/:id/members', async (req, res) => {
+  try {
+    const { userId, role } = req.body;
+    const member = await DB.addConversationMember({ conversationId: req.params.id, userId: userId || '', role: role || 'member', joinedAt: new Date().toISOString(), isMuted: false });
+    res.status(201).json(member);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/chat/conversations/:id/members/:userId', async (req, res) => {
+  try {
+    const members = await DB.getConversationMembers(req.params.id);
+    const member = members.find(m => m.userId === req.params.userId);
+    if (member) await DB.removeConversationMember(member.id);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- Messages ---
+app.get('/api/chat/conversations/:id/messages', async (req, res) => {
+  try {
+    const msgs = await DB.getMessages(req.params.id);
+    res.json(msgs);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/chat/conversations/:id/messages', chatLimiter, async (req, res) => {
+  try {
+    const { senderId, senderName, senderAvatar, content, type, fileUrl, fileName, fileSize, mimeType, duration, replyTo } = req.body;
+    const msg = await DB.createMessage({
+      conversationId: req.params.id, senderId, senderName, senderAvatar,
+      content: content || '', type: type || 'text', fileUrl: fileUrl || '',
+      fileName: fileName || '', fileSize: fileSize || 0, mimeType: mimeType || '',
+      duration: duration || 0, replyTo: replyTo || '',
+      isEdited: false, isDeleted: false, deletedFor: '[]', reactions: '{}',
+      status: 'sent', created_at: new Date().toISOString()
+    });
+    // Update conversation last message
+    await DB.updateConversation(req.params.id, { lastMessage: content || (type === 'image' ? '🖼️ صورة' : type === 'audio' ? '🎵 تسجيل صوتي' : type === 'file' ? '📎 ملف' : type === 'voice' ? '🎤 رسالة صوتية' : '📎 مرفق'), lastMessageAt: new Date().toISOString(), lastMessageSender: senderName });
+    res.status(201).json(msg);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/chat/messages/:id', async (req, res) => {
+  try {
+    const msg = await DB.updateMessage(req.params.id, { ...req.body, isEdited: true });
+    if (!msg) return res.status(404).json({ error: 'Not found' });
+    res.json(msg);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/chat/messages/:id', async (req, res) => {
+  try {
+    const { userId, forEveryone } = req.body;
+    if (forEveryone) {
+      await DB.updateMessage(req.params.id, { isDeleted: true });
+    } else {
+      const msg = await DB.getMessage(req.params.id);
+      if (!msg) return res.status(404).json({ error: 'Not found' });
+      const deletedFor = [...(msg.deletedFor || []), userId];
+      await DB.updateMessage(req.params.id, { deletedFor });
+    }
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- Typing ---
+app.post('/api/chat/typing', async (req, res) => {
+  try {
+    await DB.setTypingStatus(req.body);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- Presence ---
+app.post('/api/chat/presence', async (req, res) => {
+  try {
+    await DB.setUserPresence(req.body);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/chat/presence', async (req, res) => {
+  try { res.json(await DB.getAllPresence()); } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- Block/Unblock ---
+app.post('/api/chat/block', async (req, res) => {
+  try {
+    const block = await DB.blockUser(req.body);
+    res.status(201).json(block);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/chat/block/:userId/:blockedUserId', async (req, res) => {
+  try {
+    await DB.unblockUser(req.params.userId, req.params.blockedUserId);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- Chat Upload ---
+app.post('/api/chat/upload', upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No file' });
+    const result = await DB.uploadChatFile(req.file.buffer || require('fs').readFileSync(req.file.path), req.file.originalname, req.file.mimetype);
+    res.json({ url: result.url || '/uploads/' + req.file.filename, name: req.file.originalname, size: req.file.size, type: req.file.mimetype });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- Chat Stats (admin) ---
+app.get('/api/admin/chat/stats', async (req, res) => {
+  try {
+    const conversations = await DB.getConversations();
+    const messages = await Promise.all(conversations.map(c => DB.getMessages(c.id).catch(() => [])));
+    const allMsgs = messages.flat();
+    const presence = await DB.getAllPresence().catch(() => []);
+    res.json({
+      totalConversations: conversations.length,
+      totalMessages: allMsgs.length,
+      totalFiles: allMsgs.filter(m => m.type === 'file' || m.type === 'image' || m.type === 'audio' || m.type === 'video').length,
+      onlineUsers: presence.filter(p => p.status === 'online').length,
+    });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // Dashboard SPA catch-all (must be last, after all API routes)
 app.use(serveDashboard);
 

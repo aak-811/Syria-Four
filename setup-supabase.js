@@ -29,11 +29,33 @@ async function runSetup() {
   }
 
   // Migrate all data
+  // Create chat storage bucket
+  try {
+    const { createClient } = require('@supabase/supabase-js');
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (supabaseUrl && supabaseKey) {
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      const { data: buckets } = await supabase.storage.listBuckets();
+      if (!buckets?.find(b => b.name === 'chat-uploads')) {
+        await supabase.storage.createBucket('chat-uploads', { public: true, fileSizeLimit: 52428800 });
+        console.log('Created chat-uploads storage bucket.');
+      } else {
+        console.log('chat-uploads bucket already exists.');
+      }
+    }
+  } catch (e) {
+    console.log('Storage bucket setup:', e.message);
+  }
+
   const collections = [
     'members', 'tournaments', 'events', 'leaderboard',
     'orders', 'support', 'instagram', 'gallery', 'videos',
     'notifications', 'players', 'users', 'sessions', 'audit_logs', 'requests',
-    'awards', 'vip', 'hall-of-fame'
+    'awards', 'vip', 'hall-of-fame',
+    'conversations', 'conversation_members', 'messages', 'message_reads',
+    'typing_status', 'user_presence', 'blocked_users',
+    'pinned_messages', 'deleted_messages'
   ];
 
   let totalMigrated = 0;

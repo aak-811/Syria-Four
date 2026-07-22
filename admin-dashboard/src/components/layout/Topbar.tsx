@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Shield } from "lucide-react";
+import { Shield, MessageCircle } from "lucide-react";
 
 export default function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
   return (
@@ -18,6 +18,12 @@ export default function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => vo
         </div>
 
         <div className="flex items-center gap-2">
+          <Link href="/chat">
+            <div className="flex items-center gap-2 glass rounded-[14px] px-4 py-2.5 glass-hover text-sm font-medium text-[var(--text-muted)] hover:text-white transition-colors">
+              <MessageCircle size={16} />
+              <span className="hidden sm:inline">الدردشة</span>
+            </div>
+          </Link>
           <Link href="/admin">
             <div className="flex items-center gap-2 glass rounded-[14px] px-4 py-2.5 glass-hover text-sm font-medium text-[#8B5CF6] hover:text-white transition-colors">
               <Shield size={16} />

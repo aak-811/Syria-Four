@@ -466,4 +466,145 @@ const DB = {
   getAuditLogs: ar(userId => supabaseDB.getAuditLogs(userId), userId => fileDB.getAuditLogs(userId)),
 };
 
+// ==============================
+// Chat DB Methods
+// ==============================
+
+// File-based chat methods
+fileDB.createConversation = function(data) { return fileDB.add('conversations', data); };
+fileDB.getConversations = function() { return readCollection('conversations'); };
+fileDB.getConversation = function(id) { return fileDB.getById('conversations', id); };
+fileDB.updateConversation = function(id, d) { return fileDB.update('conversations', id, d); };
+fileDB.deleteConversation = function(id) { return fileDB.delete('conversations', id); };
+
+fileDB.addConversationMember = function(data) { return fileDB.add('conversation_members', data); };
+fileDB.getConversationMembers = function(convId) { return readCollection('conversation_members').filter(m => m.conversationId === convId); };
+fileDB.removeConversationMember = function(id) { return fileDB.delete('conversation_members', id); };
+fileDB.getUserConversations = function(userId) { return readCollection('conversation_members').filter(m => m.userId === userId); };
+
+fileDB.createMessage = function(data) { return fileDB.add('messages', data); };
+fileDB.getMessages = function(convId) {
+  return readCollection('messages').filter(m => m.conversationId === convId && !m.isDeleted).sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+};
+fileDB.getMessage = function(id) { return fileDB.getById('messages', id); };
+fileDB.updateMessage = function(id, d) { return fileDB.update('messages', id, d); };
+fileDB.deleteMessage = function(id) { return fileDB.delete('messages', id); };
+
+fileDB.addMessageRead = function(data) { return fileDB.add('message_reads', data); };
+fileDB.getMessageReads = function(msgId) { return readCollection('message_reads').filter(r => r.messageId === msgId); };
+
+fileDB.setTypingStatus = function(data) { 
+  const items = readCollection('typing_status');
+  const idx = items.findIndex(t => t.conversationId === data.conversationId && t.userId === data.userId);
+  if (idx >= 0) { items[idx] = { ...items[idx], ...data }; writeCollection('typing_status', items); return items[idx]; }
+  return fileDB.add('typing_status', data);
+};
+fileDB.getTypingUsers = function(convId) { return readCollection('typing_status').filter(t => t.conversationId === convId && t.isTyping); };
+
+fileDB.setUserPresence = function(data) {
+  const items = readCollection('user_presence');
+  const idx = items.findIndex(u => u.userId === data.userId);
+  if (idx >= 0) { items[idx] = { ...items[idx], ...data }; writeCollection('user_presence', items); return items[idx]; }
+  return fileDB.add('user_presence', data);
+};
+fileDB.getUserPresence = function(userId) { return readCollection('user_presence').find(u => u.userId === userId) || null; };
+fileDB.getAllPresence = function() { return readCollection('user_presence'); };
+
+fileDB.blockUser = function(data) { return fileDB.add('blocked_users', data); };
+fileDB.unblockUser = function(userId, blockedId) {
+  const items = readCollection('blocked_users');
+  const idx = items.findIndex(b => b.userId === userId && b.blockedUserId === blockedId);
+  if (idx === -1) return false;
+  items.splice(idx, 1);
+  writeCollection('blocked_users', items);
+  return true;
+};
+fileDB.getBlockedUsers = function(userId) { return readCollection('blocked_users').filter(b => b.userId === userId); };
+
+// Supabase chat methods
+const supabaseChat = {
+  createConversation(data) { return sb.conversations.add(data); },
+  getConversations() { return sb.conversations.getAll(); },
+  getConversation(id) { return supabaseClient.from('conversations').select('*').eq('id', id).single().then(r => { if (r.error && r.error.code !== 'PGRST116') throw r.error; return r.data || null; }); },
+  updateConversation(id, d) { return sb.conversations.update(id, d); },
+  deleteConversation(id) { return sb.conversations.delete(id); },
+
+  addConversationMember(data) { return sb.conversation_members.add(data); },
+  getConversationMembers(convId) { return supabaseClient.from('conversation_members').select('*').eq('conversationId', convId).then(r => { if (r.error) throw r.error; return r.data || []; }); },
+  removeConversationMember(id) { return sb.conversation_members.delete(id); },
+  getUserConversations(userId) { return supabaseClient.from('conversation_members').select('*').eq('userId', userId).then(r => { if (r.error) throw r.error; return r.data || []; }); },
+
+  createMessage(data) { return sb.messages.add(data); },
+  getMessages(convId) {
+    return supabaseClient.from('messages').select('*').eq('conversationId', convId).eq('isDeleted', false).order('created_at', { ascending: true }).then(r => { if (r.error) throw r.error; return r.data || []; });
+  },
+  getMessage(id) { return supabaseClient.from('messages').select('*').eq('id', id).single().then(r => { if (r.error && r.error.code !== 'PGRST116') throw r.error; return r.data || null; }); },
+  updateMessage(id, d) { return sb.messages.update(id, d); },
+  deleteMessage(id) { return sb.messages.delete(id); },
+
+  addMessageRead(data) { return sb.message_reads.add(data); },
+  getMessageReads(msgId) { return supabaseClient.from('message_reads').select('*').eq('messageId', msgId).then(r => { if (r.error) throw r.error; return r.data || []; }); },
+
+  setTypingStatus(data) {
+    return supabaseClient.from('typing_status').upsert(data, { onConflict: 'conversationId,userId' }).select().single().then(r => { if (r.error) throw r.error; return r.data; });
+  },
+  getTypingUsers(convId) { return supabaseClient.from('typing_status').select('*').eq('conversationId', convId).eq('isTyping', true).then(r => { if (r.error) throw r.error; return r.data || []; }); },
+
+  setUserPresence(data) {
+    return supabaseClient.from('user_presence').upsert(data, { onConflict: 'userId' }).select().single().then(r => { if (r.error) throw r.error; return r.data; });
+  },
+  getUserPresence(userId) { return supabaseClient.from('user_presence').select('*').eq('userId', userId).single().then(r => { if (r.error && r.error.code !== 'PGRST116') throw r.error; return r.data || null; }); },
+  getAllPresence() { return supabaseClient.from('user_presence').select('*').then(r => { if (r.error) throw r.error; return r.data || []; }); },
+
+  blockUser(data) { return sb.blocked_users.add(data); },
+  unblockUser(userId, blockedId) { return supabaseClient.from('blocked_users').delete().eq('userId', userId).eq('blockedUserId', blockedId).then(r => { if (r.error) throw r.error; return true; }); },
+  getBlockedUsers(userId) { return supabaseClient.from('blocked_users').select('*').eq('userId', userId).then(r => { if (r.error) throw r.error; return r.data || []; }); },
+};
+
+// Smart DB wrappers for chat
+DB.createConversation = rw(d => supabaseChat.createConversation(d), d => fileDB.createConversation(d));
+DB.getConversations = ar(() => supabaseChat.getConversations(), () => fileDB.getConversations());
+DB.getConversation = ar(id => supabaseChat.getConversation(id), id => fileDB.getConversation(id));
+DB.updateConversation = rw((id, d) => supabaseChat.updateConversation(id, d), (id, d) => fileDB.updateConversation(id, d));
+DB.deleteConversation = rw(id => supabaseChat.deleteConversation(id), id => fileDB.deleteConversation(id));
+
+DB.addConversationMember = rw(d => supabaseChat.addConversationMember(d), d => fileDB.addConversationMember(d));
+DB.getConversationMembers = ar(convId => supabaseChat.getConversationMembers(convId), convId => fileDB.getConversationMembers(convId));
+DB.removeConversationMember = rw(id => supabaseChat.removeConversationMember(id), id => fileDB.removeConversationMember(id));
+DB.getUserConversations = ar(userId => supabaseChat.getUserConversations(userId), userId => fileDB.getUserConversations(userId));
+
+DB.createMessage = rw(d => supabaseChat.createMessage(d), d => fileDB.createMessage(d));
+DB.getMessages = ar(convId => supabaseChat.getMessages(convId), convId => fileDB.getMessages(convId));
+DB.getMessage = ar(id => supabaseChat.getMessage(id), id => fileDB.getMessage(id));
+DB.updateMessage = rw((id, d) => supabaseChat.updateMessage(id, d), (id, d) => fileDB.updateMessage(id, d));
+DB.deleteMessage = rw(id => supabaseChat.deleteMessage(id), id => fileDB.deleteMessage(id));
+
+DB.addMessageRead = rw(d => supabaseChat.addMessageRead(d), d => fileDB.addMessageRead(d));
+DB.getMessageReads = ar(msgId => supabaseChat.getMessageReads(msgId), msgId => fileDB.getMessageReads(msgId));
+
+DB.setTypingStatus = rw(d => supabaseChat.setTypingStatus(d), d => fileDB.setTypingStatus(d));
+DB.getTypingUsers = ar(convId => supabaseChat.getTypingUsers(convId), convId => fileDB.getTypingUsers(convId));
+
+DB.setUserPresence = rw(d => supabaseChat.setUserPresence(d), d => fileDB.setUserPresence(d));
+DB.getUserPresence = ar(userId => supabaseChat.getUserPresence(userId), userId => fileDB.getUserPresence(userId));
+DB.getAllPresence = ar(() => supabaseChat.getAllPresence(), () => fileDB.getAllPresence());
+
+DB.blockUser = rw(d => supabaseChat.blockUser(d), d => fileDB.blockUser(d));
+DB.unblockUser = rw((userId, blockedId) => supabaseChat.unblockUser(userId, blockedId), (userId, blockedId) => fileDB.unblockUser(userId, blockedId));
+DB.getBlockedUsers = ar(userId => supabaseChat.getBlockedUsers(userId), userId => fileDB.getBlockedUsers(userId));
+
+// Upload to Supabase Storage
+DB.uploadChatFile = async (fileBuffer, fileName, mimeType) => {
+  if (await sbReady() && supabaseClient) {
+    const ext = fileName.split('.').pop() || 'bin';
+    const key = `chat/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { data } = await supabaseClient.storage.from('chat-uploads').upload(key, fileBuffer, { contentType: mimeType });
+    if (data) {
+      const { data: { publicUrl } } = supabaseClient.storage.from('chat-uploads').getPublicUrl(key);
+      return { url: publicUrl, key };
+    }
+  }
+  return { url: '', key: '' };
+};
+
 module.exports = DB;
