@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, Users, Crown, Swords, Calendar, Image,
   ShoppingBag, MessageSquare, Camera, Bell, ClipboardList, LogOut,
-  Medal, Award, Sparkles, MessageCircle
+  Medal, Award, Sparkles, MessageCircle, Trophy
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -14,6 +14,7 @@ const items = [
   { href: "/admin", label: "لوحة التحكم", icon: LayoutDashboard, color: "#00E5FF" },
   { href: "/admin/members", label: "الأعضاء", icon: Users, color: "#00E5FF" },
   { href: "/admin/tournaments", label: "البطولات", icon: Swords, color: "#8B5CF6" },
+  { href: "/admin/leaderboard", label: "ترتيب اللاعبين", icon: Trophy, color: "#FFD700" },
   { href: "/admin/events", label: "الفعاليات", icon: Calendar, color: "#00E676" },
   { href: "/admin/awards", label: "الأوسمة", icon: Medal, color: "#FFD700" },
   { href: "/admin/vip", label: "VIP", icon: Crown, color: "#FFD700" },
