@@ -45,6 +45,7 @@
 *::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
 
 body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; transition: background 0.3s, color 0.3s; }
+input, textarea, select { font-size: 16px !important; touch-action: manipulation; }
 [data-theme="light"] .admin-bg { opacity: 0.3; }
 [data-theme="light"] .admin-grid { opacity: 0.04; }
 [data-theme="light"] .admin-welcome-gradient { background: linear-gradient(135deg, rgba(0,184,212,0.05) 0%, rgba(124,58,237,0.05) 50%, rgba(217,119,6,0.03) 100%); }
