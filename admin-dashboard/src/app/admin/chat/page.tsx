@@ -7,15 +7,18 @@ import Modal from "@/components/ui/Modal";
 import Spinner from "@/components/ui/Spinner";
 import DataTable from "@/components/admin/DataTable";
 import { FormInput, FormTextarea } from "@/components/admin/FormField";
+import { api } from "@/lib/api";
+import FormFileUpload from "@/components/admin/FormFileUpload";
 import {
   MessageCircle, Users, MessageSquare, Settings as SettingsIcon,
-  RefreshCw, Trash2, Edit3, Plus, Palette, Save
+  RefreshCw, Trash2, Edit3, Plus, Palette, Save, UserPlus
 } from "lucide-react";
 
-type Tab = "members" | "conversations" | "messages" | "settings";
+type Tab = "manageMembers" | "members" | "conversations" | "messages" | "settings";
 
 const tabs: { key: Tab; label: string; icon: any }[] = [
-  { key: "members", label: "الأعضاء", icon: Users },
+  { key: "manageMembers", label: "إدارة الأعضاء", icon: UserPlus },
+  { key: "members", label: "المتواجدون", icon: Users },
   { key: "conversations", label: "المحادثات", icon: MessageCircle },
   { key: "messages", label: "الرسائل", icon: MessageSquare },
   { key: "settings", label: "الإعدادات", icon: SettingsIcon },
@@ -45,10 +48,84 @@ export default function AdminChatPage() {
         })}
       </div>
 
+      {tab === "manageMembers" && <ManageMembersTab />}
       {tab === "members" && <MembersTab />}
       {tab === "conversations" && <ConversationsTab />}
       {tab === "messages" && <MessagesTab />}
       {tab === "settings" && <SettingsTab />}
+    </div>
+  );
+}
+
+// ===================== Manage Members Tab =====================
+function ManageMembersTab() {
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [modal, setModal] = useState(false);
+  const [edit, setEdit] = useState<any>(null);
+  const [form, setForm] = useState<any>({});
+
+  const load = () => { setLoading(true); api.getMembers().then(setData).finally(() => setLoading(false)); };
+  useEffect(() => { load(); }, []);
+
+  const openAdd = () => { setEdit(null); setForm({}); setModal(true); };
+  const openEdit = (row: any) => { setEdit(row); setForm({ ...row }); setModal(true); };
+
+  const save = async () => {
+    try {
+      if (edit) await api.updateMember(edit.id, form);
+      else await api.addMember(form);
+      setModal(false); load();
+    } catch (err: any) { alert("خطأ: " + (err.message || "فشل الحفظ")); }
+  };
+
+  const remove = async (row: any) => {
+    if (!confirm("هل أنت متأكد من حذف العضو؟")) return;
+    try { await api.deleteMember(row.id); load(); }
+    catch (err: any) { alert("خطأ: " + (err.message || "فشل الحذف")); }
+  };
+
+  const columns = [
+    { key: "image", label: "الصورة", render: (v: string) => v ? (
+      <img src={v} alt="" className="w-10 h-10 rounded-full object-cover" onError={e => (e.target as HTMLImageElement).style.display = "none"} />
+    ) : "—" },
+    { key: "name", label: "الاسم" },
+    { key: "gameId", label: "معرف اللعبة" },
+    { key: "role", label: "الدور" },
+    { key: "chatName", label: "دردشة", render: (v: string) => v ? <span className="text-[var(--primary)] text-xs font-medium">{v}</span> : "—" },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-[var(--text-muted)]">إدارة أعضاء الكلان — {data.length} عضو</p>
+        <div className="flex gap-2">
+          <button onClick={load} className="p-2 rounded-[10px] glass hover:bg-[var(--surface-hover)] transition-colors"><RefreshCw size={15} /></button>
+          <Button onClick={openAdd}><Plus size={16} /> إضافة عضو</Button>
+        </div>
+      </div>
+      {loading ? <Spinner /> : <DataTable columns={columns} data={data} onEdit={openEdit} onDelete={remove} />}
+
+      <Modal open={modal} onClose={() => setModal(false)} title={edit ? "تعديل العضو" : "إضافة عضو"}>
+        <div className="space-y-4 max-h-[70vh] overflow-y-auto px-1">
+          <FormFileUpload label="الصورة الشخصية" value={form.image || ""} onChange={url => setForm({ ...form, image: url })} accept="image/*" />
+          <FormInput label="الاسم" value={form.name || ""} onChange={e => setForm({ ...form, name: e.target.value })} />
+          <FormInput label="معرف اللعبة" value={form.gameId || ""} onChange={e => setForm({ ...form, gameId: e.target.value })} />
+          <FormInput label="الدور" value={form.role || ""} onChange={e => setForm({ ...form, role: e.target.value })} placeholder="leader/vice/chief/elite/member" />
+          <FormInput label="المستوى" type="number" value={form.level || ""} onChange={e => setForm({ ...form, level: e.target.value })} />
+          <FormInput label="الفوز" type="number" value={form.wins || ""} onChange={e => setForm({ ...form, wins: e.target.value })} />
+          <FormInput label="البلد" value={form.country || ""} onChange={e => setForm({ ...form, country: e.target.value })} />
+          <div className="border-t border-[var(--border)] pt-4 mt-2">
+            <div className="flex items-center gap-2 mb-3">
+              <MessageCircle size={16} className="text-[var(--primary)]" />
+              <span className="text-sm font-bold text-[var(--primary)]">بيانات الدخول إلى الدردشة</span>
+            </div>
+            <FormInput label="اسم المستخدم في الدردشة" value={form.chatName || ""} onChange={e => setForm({ ...form, chatName: e.target.value })} placeholder="الاسم الذي يسجل به في الدردشة" />
+            <FormInput label="كلمة سر الدردشة" value={form.chatPassword || ""} onChange={e => setForm({ ...form, chatPassword: e.target.value })} placeholder="كلمة السر للدخول إلى الدردشة" />
+          </div>
+          <Button onClick={save} className="w-full">{edit ? "تحديث" : "إضافة"}</Button>
+        </div>
+      </Modal>
     </div>
   );
 }
