@@ -13,8 +13,8 @@ async function req<T>(url: string, opts?: RequestInit): Promise<T> {
 }
 
 export const chatApi = {
-  // Join (password validation)
-  join: (password: string) => req<any>("/api/chat/join", { method: "POST", body: JSON.stringify({ password }) }),
+  // Join (name + password validation against member credentials)
+  join: (name: string, password: string) => req<any>("/api/chat/join", { method: "POST", body: JSON.stringify({ name, password }) }),
 
   // Conversations
   getConversations: () => req<any[]>("/api/chat/conversations"),

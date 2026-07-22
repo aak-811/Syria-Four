@@ -653,16 +653,25 @@ app.post('/api/chat/upload', upload.single('file'), async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// --- Chat Join (password validation + auto-create SYRIA FOUR group) ---
+// --- Chat Join (name + password validation, or global admin password) ---
 const CHAT_PASSWORD = 'aak.syria';
 const DEFAULT_CONVERSATION_NAME = 'SYRIA FOUR';
 
 app.post('/api/chat/join', async (req, res) => {
   try {
-    const { password } = req.body;
-    if (password !== CHAT_PASSWORD) {
-      return res.status(403).json({ error: 'كلمة السر خاطئة' });
+    const { name, password } = req.body;
+
+    // Allow global admin password
+    if (password === CHAT_PASSWORD) {
+      // Continue below
+    } else {
+      // Check member credentials: find member with matching chatName + chatPassword
+      if (!name) return res.status(403).json({ error: 'الاسم مطلوب' });
+      const members = await DB.getMembers();
+      const member = members.find(m => m.chatName === name && m.chatPassword === password);
+      if (!member) return res.status(403).json({ error: 'الاسم أو كلمة السر خاطئة' });
     }
+
     // Find or create the default "SYRIA FOUR" conversation
     const conversations = await DB.getConversations();
     let conv = conversations.find(c => c.name === DEFAULT_CONVERSATION_NAME && c.type === 'group');

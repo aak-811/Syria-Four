@@ -8,7 +8,7 @@ import DataTable from "@/components/admin/DataTable";
 import { FormInput, FormTextarea } from "@/components/admin/FormField";
 import FormFileUpload from "@/components/admin/FormFileUpload";
 import { api } from "@/lib/api";
-import { Plus } from "lucide-react";
+import { Plus, MessageCircle, KeyRound } from "lucide-react";
 
 export default function AdminMembersPage() {
   const [data, setData] = useState<any[]>([]);
@@ -47,6 +47,7 @@ export default function AdminMembersPage() {
     { key: "level", label: "المستوى" },
     { key: "wins", label: "الفوز" },
     { key: "country", label: "البلد" },
+    { key: "chatName", label: "دردشة", render: (v: string) => v ? <span className="text-[var(--primary)] text-xs font-medium">{v}</span> : "—" },
   ];
 
   return (
@@ -89,6 +90,16 @@ export default function AdminMembersPage() {
           </div>
           <FormInput label="لون الاسم (hex)" value={form.nameColor || ""} onChange={e => setForm({ ...form, nameColor: e.target.value })} placeholder="مثل: #FFD700" />
           <FormInput label="لون صفحة العضو (hex)" value={form.profileColor || ""} onChange={e => setForm({ ...form, profileColor: e.target.value })} placeholder="مثل: #8B5CF6" />
+          <div className="border-t border-[var(--border)] pt-4 mt-2">
+            <div className="flex items-center gap-2 mb-3">
+              <MessageCircle size={16} className="text-[var(--primary)]" />
+              <span className="text-sm font-bold text-[var(--primary)]">بيانات الدخول إلى الدردشة</span>
+            </div>
+            <FormInput label="اسم المستخدم في الدردشة" value={form.chatName || ""} onChange={e => setForm({ ...form, chatName: e.target.value })} placeholder="الاسم الذي يسجل به في الدردشة" />
+            <div className="relative">
+              <FormInput label="كلمة سر الدردشة" value={form.chatPassword || ""} onChange={e => setForm({ ...form, chatPassword: e.target.value })} placeholder="كلمة السر للدخول إلى الدردشة" />
+            </div>
+          </div>
           <FormTextarea label="السيرة" value={form.bio || ""} onChange={e => setForm({ ...form, bio: e.target.value })} rows={3} />
           <Button onClick={save} className="w-full">{edit ? "تحديث" : "إضافة"}</Button>
         </div>

@@ -89,7 +89,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const join = useCallback(async (name: string, password: string): Promise<boolean> => {
     setJoinError("");
     try {
-      const result = await chatApi.join(password);
+      const result = await chatApi.join(name, password);
       if (!result.conversation) { setJoinError("خطأ في إنشاء المحادثة"); return false; }
       const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00E5FF&color=fff&bold=true`;
       localStorage.setItem("chat_user_id", userId);
