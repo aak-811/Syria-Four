@@ -40,6 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     localStorage.removeItem("dashboard_auth");
+    fetch("/api/admin-logout", { method: "POST" }).catch(() => {});
     setIsLoggedIn(false);
   };
 

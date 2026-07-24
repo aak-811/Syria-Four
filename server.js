@@ -24,13 +24,30 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Admin login redirect
+// Parse cookies from request header
+function parseCookies(req) {
+  const cookie = req.headers.cookie;
+  if (!cookie) return {};
+  return Object.fromEntries(cookie.split(';').map(c => {
+    const parts = c.trim().split('=');
+    return [parts[0], parts.slice(1).join('=')];
+  }).map(([k, v]) => [k, decodeURIComponent(v)]));
+}
+
+// Admin login redirect (sets httpOnly cookie)
 app.post('/api/admin-login', (req, res) => {
   const { password } = req.body;
   if (password === 'syria2026' || password === 'aak1qusai7' || password === 'Za3im1syria') {
+    res.setHeader('Set-Cookie', 'admin_auth=true; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400');
     return res.json({ redirect: '/admin/' });
   }
   return res.status(401).json({ error: 'كلمة المرور خاطئة' });
+});
+
+// Admin logout (clears cookie)
+app.post('/api/admin-logout', (req, res) => {
+  res.setHeader('Set-Cookie', 'admin_auth=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0');
+  res.json({ success: true });
 });
 
 // Serve Next.js dashboard (static export) at root /
@@ -53,6 +70,14 @@ app.use('/uploads', express.static(path.join(__dirname, 'clan-site', 'uploads'))
 function serveDashboard(req, res, next) {
   if (req.method !== 'GET') return next();
   if (!dashboardExists) return next();
+
+  // Admin auth protection: only /admin/login bypasses the check
+  if (req.path.startsWith('/admin') && req.path !== '/admin/login') {
+    const cookies = parseCookies(req);
+    if (cookies.admin_auth !== 'true') {
+      return res.redirect('/admin/login');
+    }
+  }
 
   if (req.path === '/' || req.path === '') {
     return res.sendFile(path.join(dashboardPath, 'index.html'));
