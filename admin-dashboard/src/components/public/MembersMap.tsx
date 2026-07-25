@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, useMemo } from "react";
-import L from "leaflet";
 
 const countryCoords: Record<string, { lat: number; lng: number; name: string }> = {
   SY: { lat: 34.8021, lng: 38.9968, name: "سوريا" },
@@ -107,6 +106,7 @@ export default function MembersMap({
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const markersLayer = useRef<any>(null);
+  const LRef = useRef<any>(null);
   const [mapReady, setMapReady] = useState(false);
 
   const locations = useMemo(() => {
@@ -120,34 +120,44 @@ export default function MembersMap({
 
   useEffect(() => {
     if (!mapRef.current || mapInstance.current) return;
+    let cancelled = false;
+    import("leaflet").then(async (LModule) => {
+      const L = LModule.default || LModule;
+      try { await import("leaflet/dist/leaflet.css"); } catch {};
+      if (cancelled || !mapRef.current) return;
+      LRef.current = L;
 
-    const map = L.map(mapRef.current, {
-      center: [34.8, 38.9],
-      zoom: 5,
-      zoomControl: false,
-      attributionControl: false,
-      scrollWheelZoom: true,
-      dragging: true,
+      const map = L.map(mapRef.current, {
+        center: [34.8, 38.9],
+        zoom: 5,
+        zoomControl: false,
+        attributionControl: false,
+        scrollWheelZoom: true,
+        dragging: true,
+      });
+
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        maxZoom: 19,
+      }).addTo(map);
+
+      const zoomControl = L.control.zoom({ position: "bottomright" });
+      zoomControl.addTo(map);
+
+      mapInstance.current = map;
+      setMapReady(true);
     });
-
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-      maxZoom: 19,
-    }).addTo(map);
-
-    const zoomControl = L.control.zoom({ position: "bottomright" });
-    zoomControl.addTo(map);
-
-    mapInstance.current = map;
-    setMapReady(true);
-
     return () => {
-      map.remove();
-      mapInstance.current = null;
+      cancelled = true;
+      if (mapInstance.current) {
+        mapInstance.current.remove();
+        mapInstance.current = null;
+      }
     };
   }, []);
 
   useEffect(() => {
-    if (!mapReady || !mapInstance.current) return;
+    const L = LRef.current;
+    if (!mapReady || !mapInstance.current || !L) return;
     const map = mapInstance.current;
 
     if (markersLayer.current) {
@@ -205,7 +215,7 @@ export default function MembersMap({
     markersLayer.current = layer;
 
     if (clusters.length > 0) {
-      const bounds = L.latLngBounds(clusters.map(c => [c.lat, c.lng]));
+      const bounds = L.latLngBounds(clusters.map((c: any) => [c.lat, c.lng]));
       map.fitBounds(bounds, { padding: [50, 50], maxZoom: 8 });
     }
   }, [clusters, hoveredId, mapReady]);

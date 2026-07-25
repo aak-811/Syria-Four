@@ -1,17 +1,5 @@
-"use client";
-
 import "./globals.css";
-import { AuthProvider } from "@/lib/auth-context";
-import { useEffect } from "react";
-
-function PWARegister() {
-  useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {});
-    }
-  }, []);
-  return null;
-}
+import ClientProviders from "@/components/layout/ClientProviders";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -25,8 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
       </head>
       <body>
-        <AuthProvider>{children}</AuthProvider>
-        <PWARegister />
+        <ClientProviders>{children}</ClientProviders>
       </body>
     </html>
   );
