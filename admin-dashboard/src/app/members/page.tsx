@@ -8,7 +8,7 @@ import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
 import AnimatedCounter from "@/components/ui/AnimatedCounter";
 import { api } from "@/lib/api";
-import { Users, Search, Crown, Star, Shield, Swords, Medal, Camera, Phone, Calendar, Gamepad2 } from "lucide-react";
+import { Users, Search, Crown, Star, Shield, Swords, Medal, Camera, Phone, Calendar, Gamepad2, MessageCircle } from "lucide-react";
 
 const roleColors: Record<string, "danger" | "gold" | "success" | "info" | "default"> = {
   leader: "danger", chief: "gold", vice: "info", elite: "success", member: "default",
@@ -189,6 +189,14 @@ export default function MembersPage() {
                       <Crown size={14} className="text-white" />
                     </div>
                   )}
+                  {selected.isPrime && (
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
+                      <div className="relative w-7 h-7 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FF6B35] flex items-center justify-center shadow-lg shadow-[rgba(255,215,0,0.4)] animate-pulse">
+                        <Star size={14} className="text-white" />
+                        <span className="absolute inset-0 rounded-full bg-[#FFD700] animate-ping opacity-30" />
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <h2 className="text-xl font-bold mt-3" style={{ color: selected.nameColor || "#FFFFFF" }}>{selected.name}</h2>
                 <p className="text-sm text-[#9CA3AF]">{selected.gameId}</p>
@@ -196,12 +204,21 @@ export default function MembersPage() {
                   {selected.role && <Badge variant={roleColors[selected.role] || "default"}>{roleLabels[selected.role] || selected.role}</Badge>}
                   {selected.country && <Badge variant="default">{selected.country}</Badge>}
                   {selected.vipBadge && <Badge variant="gold">VIP</Badge>}
+                  {selected.isPrime && <Badge variant="gold">برايم</Badge>}
                 </div>
-                <div className="grid grid-cols-3 gap-3 mt-6">
+
+                {selected.bio && (
+                  <div className="mt-4 glass rounded-[14px] p-3 text-right">
+                    <p className="text-[10px] text-[#6B7280] mb-1">السيرة الذاتية</p>
+                    <p className="text-sm text-[#9CA3AF] leading-relaxed">{selected.bio}</p>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-3 gap-3 mt-4">
                   {[
-                    { label: "البطولات", value: selected.tournaments || 0, color: "#00E5FF" },
-                    { label: "المستوى", value: selected.level || "—", color: "#8B5CF6" },
-                    { label: "فوز", value: selected.wins || 0, color: "#FFD700" },
+                    { label: "البطولات", value: selected.tournaments ?? "—", color: "#00E5FF" },
+                    { label: "المستوى", value: selected.level ?? "—", color: "#8B5CF6" },
+                    { label: "فوز", value: selected.wins ?? "—", color: "#FFD700" },
                   ].map(f => (
                     <div key={f.label} className="glass rounded-[14px] p-3">
                       <p className="text-lg font-bold" style={{ color: f.color }}>{f.value}</p>
@@ -209,20 +226,53 @@ export default function MembersPage() {
                     </div>
                   ))}
                 </div>
+
                 {selected.playStyle && (
-                  <div className="mt-4 glass rounded-[14px] p-3 text-right">
-                    <p className="text-[10px] text-[#6B7280] mb-1">أسلوب اللعب</p>
-                    <p className="text-sm font-semibold flex items-center gap-2">
+                  <div className="mt-3 glass rounded-[14px] p-3 text-right flex items-center justify-between">
+                    <span className="text-sm font-semibold flex items-center gap-2">
                       <Gamepad2 size={14} className="text-[#00E5FF]" /> {selected.playStyle}
-                    </p>
+                    </span>
+                    <span className="text-[10px] text-[#6B7280]">أسلوب اللعب</span>
                   </div>
                 )}
-                {selected.age && (
-                  <div className="mt-2 glass rounded-[14px] p-3 text-right">
-                    <p className="text-[10px] text-[#6B7280] mb-1">العمر</p>
-                    <p className="text-sm font-semibold">{selected.age} سنة</p>
+
+                <div className="grid grid-cols-2 gap-3 mt-3">
+                  {selected.age && (
+                    <div className="glass rounded-[14px] p-3 text-right">
+                      <p className="text-[10px] text-[#6B7280] mb-1">العمر</p>
+                      <p className="text-sm font-semibold">{selected.age} سنة</p>
+                    </div>
+                  )}
+                  {selected.joinDate && (
+                    <div className="glass rounded-[14px] p-3 text-right">
+                      <p className="text-[10px] text-[#6B7280] mb-1">تاريخ الانضمام</p>
+                      <p className="text-sm font-semibold flex items-center gap-2">
+                        <Calendar size={14} className="text-[var(--primary)]" />
+                        {typeof selected.joinDate === "string" ? selected.joinDate.split("T")[0] : selected.joinDate}
+                      </p>
+                    </div>
+                  )}
+                  {selected.chatName && (
+                    <div className="glass rounded-[14px] p-3 text-right col-span-2">
+                      <p className="text-[10px] text-[#6B7280] mb-1">الدردشة</p>
+                      <p className="text-sm font-semibold flex items-center gap-2">
+                        <MessageCircle size={14} className="text-[var(--primary)]" />
+                        {selected.chatName}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {selected.galleryImage && (
+                  <div className="mt-3">
+                    <p className="text-[10px] text-[#6B7280] mb-2 text-right">معرض الصور</p>
+                    <img src={selected.galleryImage} alt=""
+                      className="w-full h-40 object-cover rounded-[14px] border border-[rgba(255,255,255,0.08)]"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    />
                   </div>
                 )}
+
                 {(selected.instagram || selected.phone) && (
                   <div className="flex items-center justify-center gap-3 mt-4 flex-wrap">
                     {selected.instagram && (
@@ -239,6 +289,28 @@ export default function MembersPage() {
                         <Phone size={12} /> واتساب
                       </a>
                     )}
+                  </div>
+                )}
+
+                {selected.nameColor && selected.profileColor && (
+                  <div className="flex items-center justify-center gap-3 mt-3 text-[10px] text-[#6B7280]">
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: selected.nameColor }} />
+                      لون الاسم
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: selected.profileColor }} />
+                      لون الخلفية
+                    </span>
+                  </div>
+                )}
+
+                {selected.isOnline !== undefined && (
+                  <div className="mt-3 flex items-center justify-center gap-2 text-xs">
+                    <span className={`w-2 h-2 rounded-full ${selected.isOnline ? "bg-[#00E676] shadow-[0_0_8px_rgba(0,230,118,0.5)]" : "bg-[#6B7280]"}`} />
+                    <span className={selected.isOnline ? "text-[#00E676]" : "text-[#6B7280]"}>
+                      {selected.isOnline ? "متصل" : "غير متصل"}
+                    </span>
                   </div>
                 )}
               </div>
