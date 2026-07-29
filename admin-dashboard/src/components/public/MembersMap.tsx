@@ -57,32 +57,35 @@ const namedLocations: Record<string, { lat: number; lng: number; city: string; g
 };
 
 function getMemberCoords(member: any, index: number): { lat: number; lng: number; city: string; gov: string } {
-  const countryVal = member.country || "";
-  const cityVal = member.city || member.gov || "";
+  const raw = [member.country, member.city, member.gov].filter(Boolean).join(" ");
+  const vals = [member.country || "", member.city || "", member.gov || ""];
 
-  // Try to find exact city/place match
-  const exact = namedLocations[countryVal] || namedLocations[cityVal];
-  if (exact) return exact;
+  // Exact match on any field
+  for (const v of vals) {
+    if (namedLocations[v]) return namedLocations[v];
+    if (countryCoords[v]) {
+      const cc = countryCoords[v];
+      return { lat: cc.lat, lng: cc.lng, city: cc.name, gov: cc.name };
+    }
+  }
 
-  // Try country code lookup
-  const cc = countryCoords[countryVal];
-  if (cc) return { lat: cc.lat, lng: cc.lng, city: cc.name, gov: cc.name };
+  // Partial match: find any namedLocation whose key is a substring of the input or vice versa
+  for (const key of Object.keys(namedLocations)) {
+    const loc = namedLocations[key];
+    for (const v of vals) {
+      if (v && (v.includes(key) || key.includes(v))) return loc;
+    }
+  }
 
   // Fallback - center on SY with deterministic offset based on index
   const offsets = [
-    { lat: 0, lng: 0 },
-    { lat: 1.5, lng: -1 },
-    { lat: -1, lng: 1.5 },
-    { lat: 0.5, lng: -2 },
-    { lat: -1.5, lng: -0.5 },
-    { lat: 2, lng: 1 },
-    { lat: -0.5, lng: 2.5 },
-    { lat: 1, lng: -1.5 },
-    { lat: -2, lng: 0.5 },
+    { lat: 0, lng: 0 }, { lat: 1.5, lng: -1 }, { lat: -1, lng: 1.5 },
+    { lat: 0.5, lng: -2 }, { lat: -1.5, lng: -0.5 }, { lat: 2, lng: 1 },
+    { lat: -0.5, lng: 2.5 }, { lat: 1, lng: -1.5 }, { lat: -2, lng: 0.5 },
     { lat: 0, lng: -3 },
   ];
   const o = offsets[index % offsets.length];
-  return { lat: 34.8 + o.lat, lng: 38.9 + o.lng, city: countryVal || "", gov: "" };
+  return { lat: 34.8 + o.lat, lng: 38.9 + o.lng, city: vals[0] || "", gov: "" };
 }
 
 interface MemberLocation {

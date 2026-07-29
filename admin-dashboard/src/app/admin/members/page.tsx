@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import Spinner from "@/components/ui/Spinner";
@@ -8,11 +8,26 @@ import DataTable from "@/components/admin/DataTable";
 import { FormInput, FormTextarea } from "@/components/admin/FormField";
 import FormFileUpload from "@/components/admin/FormFileUpload";
 import { api } from "@/lib/api";
-import { Plus, MessageCircle, Crown, Sparkles, Star, MapPin, X } from "lucide-react";
+import { Plus, MessageCircle, Crown, Sparkles, Star, MapPin, X, Search } from "lucide-react";
 
-const countries = [
-  "سوريا", "دمشق", "حلب", "حمص", "حماة", "اللاذقية", "طرطوس", "الحسكة", "الرقة", "دير الزور", "ريف دمشق", "إدلب", "درعا", "السويداء", "القنيطرة",
-  "السعودية", "الإمارات", "مصر", "العراق", "الأردن", "لبنان", "فلسطين", "قطر", "البحرين", "الكويت", "عمان", "اليمن",
+const locations = [
+  // Syria cities & towns
+  "دمشق", "حلب", "حمص", "حماة", "اللاذقية", "طرطوس", "الحسكة", "الرقة", "دير الزور", "إدلب", "درعا", "السويداء", "القنيطرة",
+  "ريف دمشق", "دوما", "حرستا", "جرمانا", "داريا", "قطنا", "الزبداني", "يبرود", "النبك", "التل", "سرغايا",
+  "منبج", "الباب", "عفرين", "السفيرة", "عزاز", "جبل سمعان", "اعزاز",
+  "تدمر", "المخرم", "القصير", "الرستن", "تلبيسة", "كفرلاها",
+  "سلمية", "مصياف", "محردة", "السقيلبية", "كفرزيتا", "طيبة الإمام",
+  "جبلة", "القرداحة", "الحفة", "بانياس",
+  "صافيتا", "بانياس", "الشيخ بدر", "الدريكيش",
+  "القامشلي", "المالكية", "عامودا", "رأس العين", "تل حميس",
+  "الطبقة", "منصور", "الثورة",
+  "الميادين", "البوكمال", "القورية",
+  "معرة النعمان", "جسر الشغور", "أريحا", "حارم", "سرمدا",
+  "ازرع", "نوى", "الحراك", "جاسم", "إنخل", "الشيخ مسكين",
+  "شهبا", "صلخد",
+  // Country names
+  "سوريا", "السعودية", "الإمارات", "مصر", "العراق", "الأردن", "لبنان", "فلسطين", "قطر", "البحرين", "الكويت", "عمان", "اليمن",
+  // Country codes
   "SY", "SA", "AE", "EG", "IQ", "JO", "LB", "PS", "QA", "BH", "KW", "OM", "YE",
 ];
 
@@ -36,9 +51,19 @@ export default function AdminMembersPage() {
   const [modal, setModal] = useState(false);
   const [edit, setEdit] = useState<any>(null);
   const [form, setForm] = useState<any>({});
+  const [showLocations, setShowLocations] = useState(false);
+  const locRef = useRef<HTMLDivElement>(null);
 
   const load = () => { setLoading(true); api.getMembers().then(setData).finally(() => setLoading(false)); };
   useEffect(() => { load(); }, []);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (locRef.current && !locRef.current.contains(e.target as Node)) setShowLocations(false);
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
   const openAdd = () => { setEdit(null); setForm({}); setModal(true); };
   const openEdit = (row: any) => { setEdit(row); setForm({ ...row }); setModal(true); };
@@ -56,6 +81,10 @@ export default function AdminMembersPage() {
   const remove = async (row: any) => {
     if (confirm("هل أنت متأكد؟")) { await api.deleteMember(row.id); load(); }
   };
+
+  const filteredLocations = form.country?.length > 0
+    ? locations.filter(l => l.includes(form.country) || l.toLowerCase().includes(form.country.toLowerCase())).slice(0, 10)
+    : [];
 
   const columns = [
     { key: "image", label: "الصورة", render: (v: string) => v ? (
@@ -122,22 +151,35 @@ export default function AdminMembersPage() {
           <FormInput label="المستوى" type="number" value={form.level || ""} onChange={e => setForm({ ...form, level: e.target.value })} />
           <FormInput label="الفوز" type="number" value={form.wins || ""} onChange={e => setForm({ ...form, wins: e.target.value })} />
 
-          <div className="relative">
+          <div className="relative" ref={locRef}>
             <label className="block text-sm font-medium text-[var(--text-muted)] mb-1.5">
-              <MapPin size={14} className="inline ml-1" />البلد / المدينة
+              <MapPin size={14} className="inline ml-1" />البلد / المنطقة
             </label>
-            <input value={form.country || ""} onChange={e => setForm({ ...form, country: e.target.value, _showSuggestions: true })} onFocus={() => setForm({ ...form, _showSuggestions: true })}
-              placeholder="ابحث عن مدينة أو دولة..."
-              className="w-full bg-[rgba(255,255,255,0.04)] border border-[var(--border)] rounded-[12px] px-4 py-2.5 pr-10 text-sm text-white placeholder-[var(--text-dim)] outline-none focus:border-[var(--primary)] transition-colors"
-            />
-            <MapPin size={14} className="absolute right-3 top-[38px] text-[var(--text-dim)]" />
-            {form._showSuggestions && form.country?.length > 0 && (
-              <div className="absolute top-full mt-1 left-0 right-0 z-20 bg-[rgba(5,8,22,0.98)] backdrop-blur-[20px] border border-[rgba(255,255,255,0.1)] rounded-[14px] p-2 shadow-xl max-h-40 overflow-y-auto">
-                {countries.filter(c => c.includes(form.country)).slice(0, 8).map(c => (
-                  <button key={c} type="button" onClick={() => { setForm({ ...form, country: c, _showSuggestions: false }); }}
-                    className="w-full text-right px-3 py-2 rounded-[10px] text-sm text-[#9CA3AF] hover:bg-[rgba(255,255,255,0.04)] hover:text-white transition-all border-0 cursor-pointer flex items-center gap-2"
-                  ><MapPin size={12} className="text-[var(--primary)]" /> {c}</button>
+            <div className="relative">
+              <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-dim)] pointer-events-none" />
+              <input value={form.country || ""} onChange={e => { setForm({ ...form, country: e.target.value }); setShowLocations(true); }}
+                onFocus={() => setShowLocations(true)}
+                placeholder="اكتب اسم مدينة، قرية، أو دولة..."
+                className="w-full bg-[rgba(255,255,255,0.04)] border border-[var(--border)] rounded-[12px] px-4 py-2.5 pr-10 text-sm text-white placeholder-[var(--text-dim)] outline-none focus:border-[var(--primary)] transition-colors"
+              />
+              {form.country && (
+                <button onClick={() => { setForm({ ...form, country: "" }); setShowLocations(false); }}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full hover:bg-[rgba(255,255,255,0.1)] transition-colors border-0 bg-transparent cursor-pointer"
+                ><X size={14} className="text-[var(--text-dim)]" /></button>
+              )}
+            </div>
+            {showLocations && filteredLocations.length > 0 && (
+              <div className="absolute top-full mt-1 left-0 right-0 z-20 bg-[rgba(5,8,22,0.98)] backdrop-blur-[20px] border border-[rgba(255,255,255,0.1)] rounded-[14px] p-2 shadow-xl max-h-48 overflow-y-auto">
+                {filteredLocations.map(l => (
+                  <button key={l} type="button" onClick={() => { setForm({ ...form, country: l }); setShowLocations(false); }}
+                    className="w-full text-right px-3 py-2.5 rounded-[10px] text-sm text-[#9CA3AF] hover:bg-[rgba(0,229,255,0.08)] hover:text-white transition-all border-0 cursor-pointer flex items-center gap-2"
+                  ><MapPin size={14} className="text-[var(--primary)]" /> {l}</button>
                 ))}
+              </div>
+            )}
+            {showLocations && form.country?.length > 0 && filteredLocations.length === 0 && (
+              <div className="absolute top-full mt-1 left-0 right-0 z-20 bg-[rgba(5,8,22,0.98)] backdrop-blur-[20px] border border-[rgba(255,255,255,0.1)] rounded-[14px] p-3 shadow-xl">
+                <p className="text-sm text-[#6B7280] text-center">لا توجد نتائج - سيتم استخدام "{form.country}" كموقع مخصص</p>
               </div>
             )}
           </div>
