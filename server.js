@@ -155,6 +155,20 @@ function createRouter(collection) {
   return router;
 }
 
+// --- Auto-notification helper ---
+async function autoNotify(type, title, message, metadata = {}) {
+  try {
+    await DB.addNotification({
+      title, message, type, priority: 'normal', category: 'everyone',
+      icon: type === 'member' ? 'UserPlus' : type === 'tournament' ? 'Swords' : type === 'gallery' ? 'Image' : type === 'video' ? 'Video' : 'Bell',
+      color: type === 'member' ? '#00E676' : type === 'tournament' ? '#FF6B35' : type === 'gallery' ? '#FF6B35' : type === 'video' ? '#E1306C' : '#00E5FF',
+      status: 'active', active: true, isPinned: false, isArchived: false,
+      date: new Date().toISOString().split('T')[0],
+      ...metadata,
+    });
+  } catch (e) { console.warn('Auto-notify error:', e.message); }
+}
+
 // --- Member-specific routes with duplicate chatName check ---
 app.post('/api/members', async (req, res) => {
   try {
@@ -166,6 +180,7 @@ app.post('/api/members', async (req, res) => {
       }
     }
     const item = await DB.add('members', req.body);
+    autoNotify('member', 'عضو جديد', `تم انضمام ${req.body.name || 'عضو جديد'} إلى SYRIA FOUR`, { target: 'everyone' });
     res.status(201).json(item);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -180,6 +195,7 @@ app.put('/api/members/:id', async (req, res) => {
     }
     const item = await DB.update('members', req.params.id, req.body);
     if (!item) return res.status(404).json({ error: 'Not found' });
+    if (req.body.name) autoNotify('member', 'تحديث عضو', `تم تحديث بيانات ${req.body.name}`);
     res.json(item);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
