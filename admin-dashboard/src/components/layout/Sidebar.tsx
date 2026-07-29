@@ -25,7 +25,7 @@ const iconMap: Record<string, React.ReactNode> = {
 const publicItems = [
   { icon: "LayoutDashboard", label: "الرئيسية", href: "/" },
   { icon: "Users", label: "الأعضاء", href: "/members" },
-  { icon: "MapPin", label: "أحدث الأعضاء", href: "/new-members" },
+  { icon: "MapPin", label: "خريطة الأعضاء", href: "/new-members" },
   { icon: "Swords", label: "البطولات", href: "/tournaments" },
   { icon: "Calendar", label: "الفعاليات", href: "/events" },
   { icon: "Image", label: "المعرض", href: "/gallery" },

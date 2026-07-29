@@ -100,8 +100,8 @@ export default function NewMembersPage() {
     <PublicLayout>
       <div className="space-y-6">
         <div className="animate-fade-slide-up">
-          <h1 className="text-2xl font-black">أحدث الأعضاء</h1>
-          <p className="text-[#9CA3AF] text-sm mt-1">اكتشف أحدث المنضمين لكلان SYRIA FOUR حول العالم</p>
+          <h1 className="text-2xl font-black">خريطة الأعضاء</h1>
+          <p className="text-[#9CA3AF] text-sm mt-1">خريطة تفاعلية لجميع أعضاء SYRIA FOUR حول العالم</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, Users, Crown, Swords, Calendar, Image,
   ShoppingBag, MessageSquare, Camera, Bell, ClipboardList, LogOut,
-  Medal, Award, Sparkles, MessageCircle, Trophy
+  Medal, Sparkles, MessageCircle, Trophy
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -18,7 +18,6 @@ const items = [
   { href: "/admin/events", label: "الفعاليات", icon: Calendar, color: "#00E676" },
   { href: "/admin/awards", label: "الأوسمة", icon: Medal, color: "#FFD700" },
   { href: "/admin/vip", label: "VIP", icon: Crown, color: "#FFD700" },
-  { href: "/admin/hall-of-fame", label: "قاعة المشاهير", icon: Award, color: "#FFD700" },
   { href: "/admin/gallery", label: "المعرض والفيديو", icon: Image, color: "#FF6B35" },
   { href: "/admin/orders", label: "الطلبات", icon: ShoppingBag, color: "#5865F2" },
   { href: "/admin/support", label: "الدعم", icon: MessageSquare, color: "#25D366" },
@@ -48,8 +47,8 @@ export default function AdminSidebar() {
           return (
             <div key={item.href}>
               {idx === 1 && <div className="mx-3 my-2 h-px bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.06)] to-transparent" />}
-              {idx === 8 && <div className="mx-3 my-2 h-px bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.06)] to-transparent" />}
-              {idx === 13 && <div className="mx-3 my-2 h-px bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.06)] to-transparent" />}
+              {idx === 7 && <div className="mx-3 my-2 h-px bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.06)] to-transparent" />}
+              {idx === 12 && <div className="mx-3 my-2 h-px bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.06)] to-transparent" />}
               <Link
                 href={item.href}
                 className={cn(

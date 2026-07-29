@@ -18,43 +18,71 @@ const countryCoords: Record<string, { lat: number; lng: number; name: string }> 
   YE: { lat: 15.5527, lng: 48.5164, name: "اليمن" },
 };
 
-const syrianCities: { lat: number; lng: number; city: string; gov: string }[] = [
-  { lat: 33.5131, lng: 36.2919, city: "دمشق", gov: "دمشق" },
-  { lat: 36.2028, lng: 37.1343, city: "حلب", gov: "حلب" },
-  { lat: 34.7333, lng: 36.7167, city: "حمص", gov: "حمص" },
-  { lat: 35.1333, lng: 36.7500, city: "حماة", gov: "حماة" },
-  { lat: 35.5167, lng: 35.7833, city: "اللاذقية", gov: "اللاذقية" },
-  { lat: 35.6500, lng: 35.8833, city: "طرطوس", gov: "طرطوس" },
-  { lat: 37.0500, lng: 41.2167, city: "القامشلي", gov: "الحسكة" },
-  { lat: 36.5000, lng: 40.7500, city: "الحسكة", gov: "الحسكة" },
-  { lat: 35.9500, lng: 39.0167, city: "الرقة", gov: "الرقة" },
-  { lat: 35.2000, lng: 40.1833, city: "دير الزور", gov: "دير الزور" },
-  { lat: 33.4500, lng: 36.6000, city: "دوما", gov: "ريف دمشق" },
-  { lat: 34.5500, lng: 38.2833, city: "تدمر", gov: "حمص" },
-  { lat: 35.6167, lng: 35.7833, city: "جبلة", gov: "اللاذقية" },
-  { lat: 34.8833, lng: 36.3167, city: "مصياف", gov: "حماة" },
-  { lat: 35.4000, lng: 36.5833, city: "سلمية", gov: "حماة" },
-  { lat: 34.7439, lng: 36.7183, city: "الرستن", gov: "حمص" },
-  { lat: 36.6667, lng: 36.9833, city: "عفرين", gov: "حلب" },
-  { lat: 36.1667, lng: 36.6167, city: "إدلب", gov: "إدلب" },
-  { lat: 35.1333, lng: 37.0667, city: "السفيرة", gov: "حلب" },
-  { lat: 34.4667, lng: 36.9833, city: "السخنة", gov: "حمص" },
-];
+const namedLocations: Record<string, { lat: number; lng: number; city: string; gov: string }> = {
+  // Syria cities
+  "دمشق": { lat: 33.5131, lng: 36.2919, city: "دمشق", gov: "دمشق" },
+  "Damascus": { lat: 33.5131, lng: 36.2919, city: "دمشق", gov: "دمشق" },
+  "حلب": { lat: 36.2028, lng: 37.1343, city: "حلب", gov: "حلب" },
+  "Aleppo": { lat: 36.2028, lng: 37.1343, city: "حلب", gov: "حلب" },
+  "حمص": { lat: 34.7333, lng: 36.7167, city: "حمص", gov: "حمص" },
+  "Homs": { lat: 34.7333, lng: 36.7167, city: "حمص", gov: "حمص" },
+  "حماة": { lat: 35.1333, lng: 36.75, city: "حماة", gov: "حماة" },
+  "Hama": { lat: 35.1333, lng: 36.75, city: "حماة", gov: "حماة" },
+  "اللاذقية": { lat: 35.5167, lng: 35.7833, city: "اللاذقية", gov: "اللاذقية" },
+  "Latakia": { lat: 35.5167, lng: 35.7833, city: "اللاذقية", gov: "اللاذقية" },
+  "طرطوس": { lat: 34.8833, lng: 35.8833, city: "طرطوس", gov: "طرطوس" },
+  "Tartus": { lat: 34.8833, lng: 35.8833, city: "طرطوس", gov: "طرطوس" },
+  "الحسكة": { lat: 36.5, lng: 40.75, city: "الحسكة", gov: "الحسكة" },
+  "القامشلي": { lat: 37.05, lng: 41.2167, city: "القامشلي", gov: "الحسكة" },
+  "الرقة": { lat: 35.95, lng: 39.0167, city: "الرقة", gov: "الرقة" },
+  "دير الزور": { lat: 35.2, lng: 40.1833, city: "دير الزور", gov: "دير الزور" },
+  "إدلب": { lat: 35.9333, lng: 36.6333, city: "إدلب", gov: "إدلب" },
+  "Idlib": { lat: 35.9333, lng: 36.6333, city: "إدلب", gov: "إدلب" },
+  "درعا": { lat: 32.6167, lng: 36.1, city: "درعا", gov: "درعا" },
+  "السويداء": { lat: 32.7, lng: 36.5667, city: "السويداء", gov: "السويداء" },
+  // Country names (Arabic)
+  "سوريا": { lat: 34.8021, lng: 38.9968, city: "سوريا", gov: "سوريا" },
+  "السعودية": { lat: 24.7136, lng: 46.6753, city: "السعودية", gov: "السعودية" },
+  "الإمارات": { lat: 23.4241, lng: 53.8478, city: "الإمارات", gov: "الإمارات" },
+  "مصر": { lat: 26.8206, lng: 30.8025, city: "مصر", gov: "مصر" },
+  "العراق": { lat: 33.2232, lng: 43.6793, city: "العراق", gov: "العراق" },
+  "الأردن": { lat: 30.5852, lng: 36.2384, city: "الأردن", gov: "الأردن" },
+  "لبنان": { lat: 33.8547, lng: 35.8623, city: "لبنان", gov: "لبنان" },
+  "فلسطين": { lat: 31.9522, lng: 35.2332, city: "فلسطين", gov: "فلسطين" },
+  "قطر": { lat: 25.3548, lng: 51.1839, city: "قطر", gov: "قطر" },
+  "البحرين": { lat: 25.9304, lng: 50.6378, city: "البحرين", gov: "البحرين" },
+  "الكويت": { lat: 29.3759, lng: 47.9774, city: "الكويت", gov: "الكويت" },
+  "عمان": { lat: 21.4735, lng: 55.9754, city: "عمان", gov: "عمان" },
+  "اليمن": { lat: 15.5527, lng: 48.5164, city: "اليمن", gov: "اليمن" },
+};
 
-function getRandomSyrianCity() {
-  return syrianCities[Math.floor(Math.random() * syrianCities.length)];
-}
+function getMemberCoords(member: any, index: number): { lat: number; lng: number; city: string; gov: string } {
+  const countryVal = member.country || "";
+  const cityVal = member.city || member.gov || "";
 
-function getMemberCoords(member: any, index: number) {
-  if (member.country === "SY" || !member.country) {
-    const c = getRandomSyrianCity();
-    return { lat: c.lat + (Math.random() - 0.5) * 0.1, lng: c.lng + (Math.random() - 0.5) * 0.1, city: c.city, gov: c.gov };
-  }
-  const cc = countryCoords[member.country];
-  if (cc) {
-    return { lat: cc.lat + (Math.random() - 0.5) * 2, lng: cc.lng + (Math.random() - 0.5) * 2, city: cc.name, gov: cc.name };
-  }
-  return { lat: 34.8 + (Math.random() - 0.5) * 5, lng: 38.9 + (Math.random() - 0.5) * 5, city: "", gov: "" };
+  // Try to find exact city/place match
+  const exact = namedLocations[countryVal] || namedLocations[cityVal];
+  if (exact) return exact;
+
+  // Try country code lookup
+  const cc = countryCoords[countryVal];
+  if (cc) return { lat: cc.lat, lng: cc.lng, city: cc.name, gov: cc.name };
+
+  // Fallback - center on SY with deterministic offset based on index
+  const offsets = [
+    { lat: 0, lng: 0 },
+    { lat: 1.5, lng: -1 },
+    { lat: -1, lng: 1.5 },
+    { lat: 0.5, lng: -2 },
+    { lat: -1.5, lng: -0.5 },
+    { lat: 2, lng: 1 },
+    { lat: -0.5, lng: 2.5 },
+    { lat: 1, lng: -1.5 },
+    { lat: -2, lng: 0.5 },
+    { lat: 0, lng: -3 },
+  ];
+  const o = offsets[index % offsets.length];
+  return { lat: 34.8 + o.lat, lng: 38.9 + o.lng, city: countryVal || "", gov: "" };
 }
 
 interface MemberLocation {

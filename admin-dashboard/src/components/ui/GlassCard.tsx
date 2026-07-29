@@ -6,6 +6,7 @@ import type { ReactNode, MouseEventHandler } from "react";
 interface GlassCardProps {
   children: ReactNode;
   className?: string;
+  style?: React.CSSProperties;
   glow?: "red" | "gold" | "none";
   hover?: boolean;
   onClick?: MouseEventHandler<HTMLDivElement>;
@@ -14,13 +15,14 @@ interface GlassCardProps {
   onDrop?: (e: React.DragEvent) => void;
 }
 
-export default function GlassCard({ children, className, glow = "none", hover, onClick, onDragOver, onDragLeave, onDrop }: GlassCardProps) {
+export default function GlassCard({ children, className, style, glow = "none", hover, onClick, onDragOver, onDragLeave, onDrop }: GlassCardProps) {
   return (
     <div
       onClick={onClick}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
+      style={style}
       className={cn(
         "rounded-[18px] p-6 transition-all duration-300",
         "bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.10)]",

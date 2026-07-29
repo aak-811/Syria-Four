@@ -9,9 +9,16 @@ import { FormInput, FormTextarea } from "@/components/admin/FormField";
 import FormFileUpload from "@/components/admin/FormFileUpload";
 import Badge from "@/components/ui/Badge";
 import { api } from "@/lib/api";
-import { Plus } from "lucide-react";
+import { Plus, Calendar } from "lucide-react";
 
 const typeMap: Record<string, string> = { previous: "سابقة", current: "جارية", upcoming: "قادمة" };
+
+const prizeTypes = [
+  { value: "جواهر", label: "جواهر" },
+  { value: "حساب", label: "حساب" },
+  { value: "بوياباس", label: "بوياباس" },
+  { value: "هدية برايم", label: "هدية برايم" },
+];
 
 export default function AdminTournamentsPage() {
   const [data, setData] = useState<any[]>([]);
@@ -67,11 +74,42 @@ export default function AdminTournamentsPage() {
           <FormInput label="النوع (current/upcoming/previous)" value={form.type || ""} onChange={e => setForm({ ...form, type: e.target.value })} />
           <FormInput label="الوضع" value={form.mode || ""} onChange={e => setForm({ ...form, mode: e.target.value })} placeholder="5v5, 4v4, إلخ" />
           <FormInput label="نوع الخريطة" value={form.mapType || ""} onChange={e => setForm({ ...form, mapType: e.target.value })} placeholder="بربرة، هيد شوت، بيرمودا" />
-          <FormInput label="نوع الثلج" value={form.snowType || ""} onChange={e => setForm({ ...form, snowType: e.target.value })} placeholder="محدود / غير محدود" />
-          <FormInput label="تاريخ البداية" type="date" value={form.startDate || ""} onChange={e => setForm({ ...form, startDate: e.target.value })} />
-          <FormInput label="تاريخ النهاية" type="date" value={form.endDate || ""} onChange={e => setForm({ ...form, endDate: e.target.value })} />
-          <FormInput label="نوع الجائزة" value={form.prizeType || ""} onChange={e => setForm({ ...form, prizeType: e.target.value })} placeholder="ديموند، عملة، إلخ" />
-          <FormInput label="قيمة الجائزة" value={form.prizeValue || ""} onChange={e => setForm({ ...form, prizeValue: e.target.value })} />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-[var(--text-muted)] mb-1.5">
+                <Calendar size={14} className="inline ml-1" />تاريخ البداية
+              </label>
+              <input type="date" value={form.startDate || ""} onChange={e => setForm({ ...form, startDate: e.target.value })}
+                className="w-full bg-[rgba(255,255,255,0.04)] border border-[var(--border)] rounded-[12px] px-4 py-2.5 text-sm text-white outline-none focus:border-[var(--primary)] transition-colors [direction:ltr] [text-align:right]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[var(--text-muted)] mb-1.5">
+                <Calendar size={14} className="inline ml-1" />تاريخ النهاية
+              </label>
+              <input type="date" value={form.endDate || ""} onChange={e => setForm({ ...form, endDate: e.target.value })}
+                className="w-full bg-[rgba(255,255,255,0.04)] border border-[var(--border)] rounded-[12px] px-4 py-2.5 text-sm text-white outline-none focus:border-[var(--primary)] transition-colors [direction:ltr] [text-align:right]"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-[var(--text-muted)] mb-1.5">نوع الجائزة</label>
+            <div className="grid grid-cols-2 gap-2">
+              {prizeTypes.map(pt => (
+                <button key={pt.value} type="button" onClick={() => setForm({ ...form, prizeType: pt.value })}
+                  className={`px-3 py-2 rounded-[10px] text-xs font-semibold transition-all border-0 cursor-pointer ${
+                    form.prizeType === pt.value
+                      ? "bg-[var(--primary)] text-[#050816]"
+                      : "bg-[rgba(255,255,255,0.04)] text-[var(--text-muted)] hover:text-white hover:bg-[rgba(255,255,255,0.08)]"
+                  }`}
+                >{pt.label}</button>
+              ))}
+            </div>
+          </div>
+          <FormInput label="قيمة الجائزة" value={form.prizeValue || ""} onChange={e => {
+            const v = e.target.value.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d).toString());
+            setForm({ ...form, prizeValue: v });
+          }} placeholder="مثال: 5000" />
           <FormInput label="عدد الفرق" type="number" value={form.teamsCount || ""} onChange={e => setForm({ ...form, teamsCount: e.target.value })} />
           <FormInput label="عدد اللاعبين" type="number" value={form.maxPlayers || ""} onChange={e => setForm({ ...form, maxPlayers: e.target.value })} />
           <Button onClick={save} className="w-full">{edit ? "تحديث" : "إضافة"}</Button>

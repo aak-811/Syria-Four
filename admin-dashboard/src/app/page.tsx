@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import PublicLayout from "@/components/layout/PublicLayout";
 import GlassCard from "@/components/ui/GlassCard";
 import Avatar from "@/components/ui/Avatar";
@@ -8,8 +9,10 @@ import { api } from "@/lib/api";
 import {
   Swords, Trophy, Sparkles,
   Medal, Crown,
-  Star, Gift, Award,
-  Camera, ExternalLink, Heart, MessageCircle, Users
+  Star, Gift,
+  Camera, ExternalLink, Heart, MessageCircle, Users,
+  Bot, Clock, Image as ImageIcon, Calendar, ChevronLeft,
+  Shield, MapPin, ShoppingBag, Diamond, Award
 } from "lucide-react";
 
 const fallbackAwards = [
@@ -23,25 +26,26 @@ const fallbackVip = [
   { id: "1", title: "عضوية VIP", description: "إطار ذهبي، شارة VIP، مزايا حصرية، أولوية الدعم", instagram1: "qusai7r", instagram2: "aak.811", isEnabled: true },
 ];
 
-const fallbackHallOfFame = [
-  { id: "1", title: "أكثر لاعب نشطاً", playerName: "AAK Khalid", description: "الأكثر نشاطاً وتواجداً", image: "" },
-  { id: "2", title: "أقوى لاعب رومات", playerName: "Qusai", description: "الأقوى في الرومات", image: "" },
-  { id: "3", title: "أقوى لاعب رانكد", playerName: "Za3im", description: "الأعلى في الرانكد", image: "" },
-  { id: "4", title: "أقوى لاعب", playerName: "AAK Khalid", description: "أقوى لاعب في الكلان", image: "" },
-];
-
 const fallbackInstagram = [
   { id: "1", name: "أبو أمير", username: "aak.811", icon: "crown" },
   { id: "2", name: "قصي | QUSAI", username: "qusai7r", icon: "crown" },
   { id: "3", name: "Abu", username: "@Aak.811", icon: "crown" },
 ];
 
+const assistantSuggestions = [
+  "كيف أنضم إلى الكلان؟",
+  "ما هي قوانين الكلان؟",
+  "ما هي مزايا VIP؟",
+  "كيف أشحن جواهر؟",
+];
+
 export default function HomePage() {
   const [members, setMembers] = useState<any[]>([]);
   const [tournaments, setTournaments] = useState<any[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
+  const [gallery, setGallery] = useState<any[]>([]);
   const [awards, setAwards] = useState<any[]>(fallbackAwards);
   const [vipSettings, setVipSettings] = useState<any[]>(fallbackVip);
-  const [hallOfFame, setHallOfFame] = useState<any[]>(fallbackHallOfFame);
   const [instagram, setInstagram] = useState<any[]>(fallbackInstagram);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,33 +56,36 @@ export default function HomePage() {
       api.getTournaments().catch(() => []),
       api.getAwards().catch(() => fallbackAwards),
       api.getVipSettings().catch(() => fallbackVip),
-      api.getHallOfFame().catch(() => fallbackHallOfFame),
       api.getInstagram().catch(() => fallbackInstagram),
       api.getLeaderboard().catch(() => []),
-    ]).then(([m, t, a, v, h, insta, lb]) => {
+      api.getEvents().catch(() => []),
+      api.getGallery().catch(() => []),
+    ]).then(([m, t, a, v, insta, lb, e, g]) => {
       setMembers(m.length > 0 ? m : []);
       setTournaments(t.length > 0 ? t : []);
       if (a.length > 0) setAwards(a);
       if (v.length > 0) setVipSettings(v);
-      if (h.length > 0) setHallOfFame(h);
       if (insta.length > 0) setInstagram(insta);
       setLeaderboard(lb.length > 0 ? lb : []);
+      setEvents(e.length > 0 ? e : []);
+      setGallery(g.length > 0 ? g : []);
     }).catch(() => {
     }).finally(() => setLoading(false));
   }, []);
 
   const vip = vipSettings[0];
+  const currentTournaments = tournaments.filter(t => t.type === "current" || t.type === "upcoming").slice(0, 3);
+  const recentEvents = events.slice(0, 3);
+  const galleryImages = gallery.slice(0, 4);
 
   return (
     <PublicLayout>
       <div className="space-y-10">
 
-        {/* Hero Banner - Logo beside title on desktop */}
         <div className="fade-in text-center py-12 md:py-16 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-[rgba(0,229,255,0.06)] via-transparent to-[rgba(139,92,246,0.04)] pointer-events-none" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[rgba(0,229,255,0.03)] blur-[100px] pointer-events-none" />
           <div className="flex flex-col md:flex-row items-center justify-center gap-6 relative">
-            {/* Animated Logo */}
             <div className="w-28 h-28 md:w-32 md:h-32 rounded-2xl shadow-[0_0_60px_rgba(0,229,255,0.3)] relative overflow-hidden animate-logo-float"
               style={{ animation: "logoFloat 3s ease-in-out infinite" }}>
               <img src="/images/clan-logo.png" alt="SYRIA FOUR" className="w-full h-full object-contain"
@@ -108,7 +115,67 @@ export default function HomePage() {
           }
         `}</style>
 
-        {/* القسم الثاني: الأوسمة النادرة */}
+        {currentTournaments.length > 0 && (
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-[12px] bg-[rgba(139,92,246,0.1)] flex items-center justify-center">
+                <Swords size={20} className="text-[#8B5CF6]" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-bold">البطولات</h2>
+                <p className="text-xs text-[#9CA3AF]">البطولات الحالية والقادمة</p>
+              </div>
+              <Link href="/tournaments" className="text-xs text-[#00E5FF] hover:underline flex items-center gap-1 no-underline">
+                عرض المزيد <ChevronLeft size={12} />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {currentTournaments.map((t, i) => (
+                <div key={t.id || i} className="fade-in" style={{ animationDelay: `${i * 0.1}s` }}>
+                  <GlassCard className="p-4 text-center group relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8B5CF6] to-[#00E5FF] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <Swords size={24} className="mx-auto mb-2 text-[#8B5CF6]" />
+                    <h3 className="font-bold text-sm">{t.name}</h3>
+                    <p className="text-[10px] text-[#6B7280] mt-1">{t.mode || ""} {t.teamsCount ? `- ${t.teamsCount} فريق` : ""}</p>
+                    <span className={`inline-block mt-2 px-2 py-0.5 rounded-full text-[10px] font-semibold ${t.type === "current" ? "bg-[rgba(0,230,118,0.12)] text-[#00E676]" : "bg-[rgba(0,229,255,0.12)] text-[#00E5FF]"}`}>
+                      {t.type === "current" ? "جارية" : "قادمة"}
+                    </span>
+                  </GlassCard>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {recentEvents.length > 0 && (
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-[12px] bg-[rgba(255,215,0,0.1)] flex items-center justify-center">
+                <Calendar size={20} className="text-[#FFD700]" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-bold">الفعاليات</h2>
+                <p className="text-xs text-[#9CA3AF]">أحدث الفعاليات والأنشطة</p>
+              </div>
+              <Link href="/events" className="text-xs text-[#00E5FF] hover:underline flex items-center gap-1 no-underline">
+                عرض المزيد <ChevronLeft size={12} />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {recentEvents.map((e, i) => (
+                <div key={e.id || i} className="fade-in" style={{ animationDelay: `${i * 0.1}s` }}>
+                  <GlassCard className="p-4 text-center group relative overflow-hidden">
+                    <Calendar size={24} className="mx-auto mb-2 text-[#FFD700]" />
+                    <h3 className="font-bold text-sm">{e.title}</h3>
+                    <p className="text-[10px] text-[#6B7280] mt-1">{e.description?.slice(0, 40)}</p>
+                    {e.prize && <span className="text-[10px] text-[#FFD700] mt-1 block">{e.prize}</span>}
+                  </GlassCard>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div>
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-[12px] bg-[rgba(255,215,0,0.1)] flex items-center justify-center">
@@ -147,7 +214,32 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* القسم الثالث: عضوية VIP */}
+        {/* Assistant Snippet */}
+        <div>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-[12px] bg-gradient-to-br from-[#00E5FF] to-[#8B5CF6] flex items-center justify-center">
+              <Bot size={20} className="text-white" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-xl font-bold">المساعد الذكي</h2>
+              <p className="text-xs text-[#9CA3AF]">استفسارات سريعة عن الكلان</p>
+            </div>
+            <Link href="/assistant" className="text-xs text-[#00E5FF] hover:underline flex items-center gap-1 no-underline">
+              عرض المزيد <ChevronLeft size={12} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {assistantSuggestions.map((q, i) => (
+              <Link key={i} href="/assistant"
+                className="glass rounded-[14px] p-3 text-center hover:bg-[rgba(255,255,255,0.06)] transition-all no-underline"
+              >
+                <Sparkles size={16} className="mx-auto mb-1 text-[#00E5FF]" />
+                <p className="text-[11px] font-medium text-[#9CA3AF]">{q}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+
         {vip && (
           <div>
             <div className="flex items-center gap-3 mb-6">
@@ -198,7 +290,6 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* القسم الرابع: حسابات إنستغرام */}
         <div>
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-[12px] bg-gradient-to-br from-[#E1306C] to-[#833AB4] flex items-center justify-center shadow-[0_0_20px_rgba(225,48,108,0.3)]">
@@ -209,42 +300,26 @@ export default function HomePage() {
               <p className="text-xs text-[#9CA3AF]">تابع حسابات SYRIA FOUR الرسمية</p>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-2 md:gap-3">
             {instagram.map((acc, i) => {
               const username = acc.username.replace("@", "");
-              const gradient = i === 0
-                ? "from-[#E1306C] via-[#833AB4] to-[#405DE6]"
-                : i === 1
-                ? "from-[#FCAF45] via-[#E1306C] to-[#833AB4]"
-                : "from-[#833AB4] via-[#405DE6] to-[#00E5FF]";
               return (
                 <div key={acc.id || i} className="fade-in group" style={{ animationDelay: `${i * 0.15}s` }}>
                   <a href={`https://instagram.com/${username}`} target="_blank" rel="noopener noreferrer"
-                    className="block glass rounded-[20px] p-6 text-center relative overflow-hidden hover:scale-[1.02] transition-all duration-500 no-underline"
+                    className="block glass rounded-[14px] p-3 md:p-4 text-center relative overflow-hidden hover:scale-[1.02] transition-all duration-500 no-underline"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-b from-[rgba(0,0,0,0)] via-[rgba(0,0,0,0)] to-[rgba(0,0,0,0.3)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-[rgba(225,48,108,0.1)] to-transparent rounded-full blur-[40px] group-hover:scale-150 transition-transform duration-700" />
                     <div className="relative z-10">
-                      <div className="w-20 h-20 rounded-full mx-auto mb-4 bg-gradient-to-br shadow-[0_0_30px_rgba(225,48,108,0.3)] flex items-center justify-center p-[3px]"
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full mx-auto mb-2 bg-gradient-to-br shadow-[0_0_20px_rgba(225,48,108,0.3)] flex items-center justify-center p-[2px]"
                         style={{ background: `linear-gradient(135deg, ${i === 0 ? "#E1306C" : i === 1 ? "#FCAF45" : "#833AB4"}, ${i === 0 ? "#833AB4" : i === 1 ? "#E1306C" : "#405DE6"})` }}>
                         <div className="w-full h-full rounded-full bg-[#050816] flex items-center justify-center">
-                          <Camera size={28} className="text-white" />
+                          <Camera size={14} className="text-white md:w-[18px]" />
                         </div>
                       </div>
-                      <h3 className="text-lg font-bold text-white mb-1">{acc.name}</h3>
-                      <p className="text-sm font-semibold bg-gradient-to-l bg-clip-text text-transparent" style={{ backgroundImage: `linear-gradient(to left, ${i === 0 ? "#E1306C, #833AB4" : i === 1 ? "#FCAF45, #E1306C" : "#833AB4, #405DE6"})` }}>
+                      <h3 className="text-xs md:text-sm font-bold text-white truncate">{acc.name}</h3>
+                      <p className="text-[10px] font-semibold truncate bg-gradient-to-l bg-clip-text text-transparent" style={{ backgroundImage: `linear-gradient(to left, ${i === 0 ? "#E1306C, #833AB4" : i === 1 ? "#FCAF45, #E1306C" : "#833AB4, #405DE6"})` }}>
                         @{username}
                       </p>
-                      <div className="flex items-center justify-center gap-4 mt-4 text-xs text-[#6B7280]">
-                        <span className="flex items-center gap-1"><Heart size={12} className="text-[#E1306C]" /> متابعة</span>
-                        <span className="flex items-center gap-1"><MessageCircle size={12} className="text-[#833AB4]" /> تواصل</span>
-                      </div>
-                      <div className="mt-4 px-4 py-2 rounded-[12px] text-xs font-bold text-white transition-all duration-300 group-hover:scale-105"
-                        style={{ background: `linear-gradient(135deg, ${i === 0 ? "#E1306C" : i === 1 ? "#FCAF45" : "#833AB4"}, ${i === 0 ? "#833AB4" : i === 1 ? "#E1306C" : "#405DE6"})` }}>
-                        <ExternalLink size={12} className="inline ml-1" /> زيارة الحساب
-                      </div>
                     </div>
-                    <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#E1306C] via-[#833AB4] to-[#405DE6] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-right" />
                   </a>
                 </div>
               );
@@ -252,7 +327,30 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* القسم الخامس: ترتيب اللاعبين (جوري + حروب رابطة) */}
+        {galleryImages.length > 0 && (
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-[12px] bg-[rgba(255,107,53,0.1)] flex items-center justify-center">
+                <ImageIcon size={20} className="text-[#FF6B35]" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-bold">معرض الصور</h2>
+                <p className="text-xs text-[#9CA3AF]">صور من الكلان</p>
+              </div>
+              <Link href="/gallery" className="text-xs text-[#00E5FF] hover:underline flex items-center gap-1 no-underline">
+                عرض المزيد <ChevronLeft size={12} />
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {galleryImages.map((img, i) => (
+                <div key={img.id || i} className="fade-in rounded-[14px] overflow-hidden aspect-video" style={{ animationDelay: `${i * 0.1}s` }}>
+                  <img src={img.src} alt={img.label || ""} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div>
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-[12px] bg-[rgba(139,92,246,0.1)] flex items-center justify-center">
@@ -317,38 +415,6 @@ export default function HomePage() {
               </table>
             </div>
           </GlassCard>
-        </div>
-
-        {/* القسم السادس: قاعة المشاهير */}
-        <div>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-[12px] bg-[rgba(255,215,0,0.1)] flex items-center justify-center">
-              <Award size={20} className="text-[#FFD700]" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold">قاعة مشاهير الكلان</h2>
-              <p className="text-xs text-[#9CA3AF]">أفضل لاعبي SYRIA FOUR</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {hallOfFame.map((h, i) => (
-              <div key={h.id || i} className="fade-in" style={{ animationDelay: `${i * 0.1}s` }}>
-                <GlassCard className="text-center py-6 group relative overflow-hidden">
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FFD700] via-[#8B5CF6] to-[#00E5FF] opacity-0 group-hover:opacity-100 transition-opacity" />
-                  {h.image ? (
-                    <img src={h.image} alt="" className="w-16 h-16 rounded-full mx-auto mb-3 object-cover ring-2 ring-[rgba(255,215,0,0.3)]" />
-                  ) : (
-                    <div className="w-16 h-16 rounded-full mx-auto mb-3 bg-gradient-to-br from-[#FFD700] to-[#FF6B35] flex items-center justify-center shadow-[0_0_20px_rgba(255,215,0,0.2)]">
-                      <Trophy size={24} className="text-white" />
-                    </div>
-                  )}
-                  <h3 className="font-bold text-sm">{h.title}</h3>
-                  <p className="text-lg font-black mt-1 bg-gradient-to-l from-[#FFD700] to-[#FF6B35] bg-clip-text text-transparent">{h.playerName}</p>
-                  {h.description && <p className="text-[10px] text-[#6B7280] mt-1">{h.description}</p>}
-                </GlassCard>
-              </div>
-            ))}
-          </div>
         </div>
 
       </div>
