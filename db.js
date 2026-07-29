@@ -98,6 +98,11 @@ const fileDB = {
   addNotification(d) { return fileDB.add('notifications', d); },
   updateNotification(id, d) { return fileDB.update('notifications', id, d); },
   deleteNotification(id) { return fileDB.delete('notifications', id); },
+  markNotificationRead(id) { const n = fileDB.getAll('notifications').find(x => x.id === id); if (!n) return null; n.isRead = true; if (!n.readBy) n.readBy = []; n.readBy.push({ userId: 'admin', readAt: new Date().toISOString() }); writeCollection('notifications', fileDB.getAll('notifications').map(x => x.id === id ? n : x)); return n; },
+  markAllNotificationsRead() { const all = fileDB.getAll('notifications'); all.forEach(n => { n.isRead = true; if (!n.readBy) n.readBy = []; n.readBy.push({ userId: 'admin', readAt: new Date().toISOString() }); }); writeCollection('notifications', all); return true; },
+  archiveNotification(id) { return fileDB.update('notifications', id, { isArchived: true, status: 'archived' }); },
+  pinNotification(id) { return fileDB.update('notifications', id, { isPinned: true }); },
+  unpinNotification(id) { return fileDB.update('notifications', id, { isPinned: false }); },
   getPlayers() { return fileDB.getAll('players'); },
   addPlayer(data) {
     const slug = data.name
@@ -308,6 +313,11 @@ const supabaseDB = {
   addNotification(d) { return sb.notifications.add(d); },
   updateNotification(id, d) { return sb.notifications.update(id, d); },
   deleteNotification(id) { return sb.notifications.delete(id); },
+  markNotificationRead(id) { return supabaseClient.from('notifications').update({ isRead: true }).eq('id', id).select().single().then(r => { if (r.error) throw r.error; return r.data; }); },
+  markAllNotificationsRead() { return supabaseClient.from('notifications').update({ isRead: true }).eq('isRead', false).then(r => { if (r.error) throw r.error; return true; }); },
+  archiveNotification(id) { return supabaseClient.from('notifications').update({ isArchived: true, status: 'archived' }).eq('id', id).select().single().then(r => { if (r.error) throw r.error; return r.data; }); },
+  pinNotification(id) { return supabaseClient.from('notifications').update({ isPinned: true }).eq('id', id).select().single().then(r => { if (r.error) throw r.error; return r.data; }); },
+  unpinNotification(id) { return supabaseClient.from('notifications').update({ isPinned: false }).eq('id', id).select().single().then(r => { if (r.error) throw r.error; return r.data; }); },
   getPlayers() { return sb.players.getAll(); },
   addPlayer(data) {
     const slug = data.name
@@ -440,6 +450,11 @@ const DB = {
   addNotification: rw(d => supabaseDB.addNotification(d), d => fileDB.addNotification(d)),
   updateNotification: rw((id, d) => supabaseDB.updateNotification(id, d), (id, d) => fileDB.updateNotification(id, d)),
   deleteNotification: rw(id => supabaseDB.deleteNotification(id), id => fileDB.deleteNotification(id)),
+  markNotificationRead: rw(id => supabaseDB.markNotificationRead(id), id => fileDB.markNotificationRead(id)),
+  markAllNotificationsRead: rw(() => supabaseDB.markAllNotificationsRead(), () => fileDB.markAllNotificationsRead()),
+  archiveNotification: rw(id => supabaseDB.archiveNotification(id), id => fileDB.archiveNotification(id)),
+  pinNotification: rw(id => supabaseDB.pinNotification(id), id => fileDB.pinNotification(id)),
+  unpinNotification: rw(id => supabaseDB.unpinNotification(id), id => fileDB.unpinNotification(id)),
 
   getPlayers: ar(() => supabaseDB.getPlayers(), () => fileDB.getPlayers()),
   addPlayer: rw(d => supabaseDB.addPlayer(d), d => fileDB.addPlayer(d)),

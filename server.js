@@ -193,7 +193,6 @@ app.use('/api/support', createRouter('support'));
 app.use('/api/instagram', createRouter('instagram'));
 app.use('/api/gallery', createRouter('gallery'));
 app.use('/api/videos', createRouter('videos'));
-app.use('/api/notifications', createRouter('notifications'));
 app.use('/api/requests', createRouter('requests'));
 app.use('/api/awards', createRouter('awards'));
 app.use('/api/vip', createRouter('vip'));
@@ -508,31 +507,161 @@ app.get('/api/admin/audit-logs', authMiddleware, async (req, res) => {
 });
 
 // --- Notifications ---
-app.get('/api/notifications/mine', authMiddleware, async (req, res) => {
+app.get('/api/notifications', async (req, res) => {
+  try {
+    const { type, priority, category, status, search, sort, order, page, limit } = req.query;
+    let notifications = await DB.getNotifications();
+
+    if (type) notifications = notifications.filter(n => n.type === type);
+    if (priority) notifications = notifications.filter(n => n.priority === priority);
+    if (category) notifications = notifications.filter(n => n.category === category);
+    if (status) notifications = notifications.filter(n => n.status === status);
+    if (search) {
+      const q = search.toLowerCase();
+      notifications = notifications.filter(n =>
+        (n.title || '').toLowerCase().includes(q) ||
+        (n.message || '').toLowerCase().includes(q) ||
+        (n.description || '').toLowerCase().includes(q)
+      );
+    }
+
+    const sortField = sort || 'createdAt';
+    const sortOrder = order === 'asc' ? 1 : -1;
+    notifications.sort((a, b) => {
+      const va = a[sortField] || '';
+      const vb = b[sortField] || '';
+      if (typeof va === 'string') return va.localeCompare(vb) * sortOrder;
+      return (va < vb ? -1 : va > vb ? 1 : 0) * sortOrder;
+    });
+
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 50;
+    const start = (pageNum - 1) * limitNum;
+    const paginated = notifications.slice(start, start + limitNum);
+
+    res.json({
+      notifications: paginated,
+      total: notifications.length,
+      page: pageNum,
+      limit: limitNum,
+      totalPages: Math.ceil(notifications.length / limitNum),
+      stats: {
+        total: notifications.length,
+        unread: notifications.filter(n => !n.isRead).length,
+        pinned: notifications.filter(n => n.isPinned).length,
+        archived: notifications.filter(n => n.isArchived).length,
+        active: notifications.filter(n => n.status === 'active' || n.status === undefined).length,
+        expired: notifications.filter(n => n.status === 'expired').length,
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/notifications/mine', async (req, res) => {
   try {
     const all = await DB.getNotifications();
-    const mine = all.filter(n => n.userId === req.user.id || !n.userId);
+    const mine = all.filter(n => n.category === 'everyone' || n.category === 'members' || !n.category);
     res.json({ notifications: mine });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.put('/api/notifications/:id/read', authMiddleware, async (req, res) => {
+app.get('/api/notifications/:id', async (req, res) => {
   try {
-    await DB.updateNotification(req.params.id, { read: true });
+    const all = await DB.getNotifications();
+    const n = all.find(x => x.id === req.params.id);
+    if (!n) return res.status(404).json({ error: 'Not found' });
+    res.json(n);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/notifications', async (req, res) => {
+  try {
+    const notif = await DB.addNotification({
+      ...req.body,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      readBy: [],
+      isRead: false,
+      isPinned: false,
+      isArchived: false,
+      status: 'active',
+      metadata: req.body.metadata || {},
+    });
+    res.status(201).json(notif);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/api/notifications/:id', async (req, res) => {
+  try {
+    const updated = await DB.updateNotification(req.params.id, { ...req.body, updatedAt: new Date().toISOString() });
+    if (!updated) return res.status(404).json({ error: 'Not found' });
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/notifications/:id', async (req, res) => {
+  try {
+    const deleted = await DB.deleteNotification(req.params.id);
+    if (!deleted) return res.status(404).json({ error: 'Not found' });
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.put('/api/notifications/read-all', authMiddleware, async (req, res) => {
+app.patch('/api/notifications/:id/read', async (req, res) => {
   try {
-    const all = await DB.getNotifications();
-    for (const n of all.filter(n => n.userId === req.user.id && !n.read)) {
-      await DB.updateNotification(n.id, { read: true });
-    }
+    const n = await DB.markNotificationRead(req.params.id);
+    if (!n) return res.status(404).json({ error: 'Not found' });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.patch('/api/notifications/read-all', async (req, res) => {
+  try {
+    await DB.markAllNotificationsRead();
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.patch('/api/notifications/:id/archive', async (req, res) => {
+  try {
+    const n = await DB.archiveNotification(req.params.id);
+    if (!n) return res.status(404).json({ error: 'Not found' });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.patch('/api/notifications/:id/pin', async (req, res) => {
+  try {
+    const n = await DB.pinNotification(req.params.id);
+    if (!n) return res.status(404).json({ error: 'Not found' });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.patch('/api/notifications/:id/unpin', async (req, res) => {
+  try {
+    const n = await DB.unpinNotification(req.params.id);
+    if (!n) return res.status(404).json({ error: 'Not found' });
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });

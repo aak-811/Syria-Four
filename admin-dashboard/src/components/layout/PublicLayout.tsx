@@ -4,6 +4,7 @@ import { useState } from "react";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import MobileNav from "./MobileNav";
+import BannerNotification from "@/components/ui/BannerNotification";
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   const [mobileSidebar, setMobileSidebar] = useState(false);
@@ -29,6 +30,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <main className="pt-[70px] pb-24 lg:pb-8 px-4 md:px-8 transition-all duration-300"
         style={{ marginRight: "var(--sidebar-width, 260px)" }}
       >
+        <BannerNotification />
         <div className="max-w-7xl mx-auto">
           {children}
         </div>

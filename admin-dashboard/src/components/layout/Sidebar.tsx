@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, Users, Swords, Calendar, Image as ImageIcon,
-  ShoppingCart, HeadphonesIcon, Hand, Bot, MapPin, Shield, MessageCircle,
+  ShoppingCart, HeadphonesIcon, Hand, Bot, MapPin, Shield, MessageCircle, Bell,
 } from "lucide-react";
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -20,6 +20,7 @@ const iconMap: Record<string, React.ReactNode> = {
   Hand: <Hand size={20} />,
   Bot: <Bot size={20} />,
   MessageCircle: <MessageCircle size={20} />,
+  Bell: <Bell size={20} />,
 };
 
 const publicItems = [
@@ -34,6 +35,7 @@ const publicItems = [
   { icon: "MessageCircle", label: "الدردشة", href: "/chat" },
   { icon: "ShoppingCart", label: "الشحن", href: "/shop" },
   { icon: "HeadphonesIcon", label: "الدعم", href: "/support" },
+  { icon: "Bell", label: "الإشعارات", href: "/notifications" },
 ];
 
 export default function Sidebar() {

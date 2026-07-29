@@ -1,6 +1,7 @@
 "use client";
 
 import { AuthProvider } from "@/lib/auth-context";
+import ToastProvider from "@/components/ui/ToastProvider";
 import { useEffect } from "react";
 
 function PWARegister() {
@@ -16,6 +17,7 @@ export default function ClientProviders({ children }: { children: React.ReactNod
   return (
     <>
       <AuthProvider>{children}</AuthProvider>
+      <ToastProvider />
       <PWARegister />
     </>
   );

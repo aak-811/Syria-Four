@@ -112,10 +112,27 @@ CREATE TABLE IF NOT EXISTS notifications (
   id TEXT PRIMARY KEY,
   title TEXT DEFAULT '',
   message TEXT DEFAULT '',
+  description TEXT DEFAULT '',
   type TEXT DEFAULT 'info',
+  priority TEXT DEFAULT 'normal',
+  category TEXT DEFAULT 'everyone',
+  icon TEXT DEFAULT 'Bell',
+  color TEXT DEFAULT '#00E5FF',
+  image TEXT DEFAULT '',
+  target TEXT DEFAULT '',
+  link TEXT DEFAULT '',
+  createdBy TEXT DEFAULT '',
+  createdAt TIMESTAMPTZ DEFAULT NOW(),
+  updatedAt TIMESTAMPTZ DEFAULT NOW(),
+  expiresAt TIMESTAMPTZ DEFAULT NULL,
+  readBy JSONB DEFAULT '[]'::jsonb,
+  isRead BOOLEAN DEFAULT false,
+  isPinned BOOLEAN DEFAULT false,
+  isArchived BOOLEAN DEFAULT false,
+  status TEXT DEFAULT 'active',
+  metadata JSONB DEFAULT '{}'::jsonb,
   active BOOLEAN DEFAULT false,
-  date TEXT DEFAULT '',
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  date TEXT DEFAULT ''
 );
 
 CREATE TABLE IF NOT EXISTS players (

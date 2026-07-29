@@ -7,6 +7,7 @@ import AdminSidebar from "@/components/layout/AdminSidebar";
 import AdminTopbar from "@/components/layout/AdminTopbar";
 import AdminMobileNav from "@/components/layout/AdminMobileNav";
 import Spinner from "@/components/ui/Spinner";
+import BannerNotification from "@/components/ui/BannerNotification";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { isLoggedIn } = useAuth();
@@ -44,6 +45,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         )}
 
         <main className="pt-[70px] pb-24 lg:pb-8 px-4 md:px-8 lg:mr-[260px] transition-all duration-300 relative">
+          <BannerNotification />
           <div className="max-w-7xl mx-auto animate-fade-in">
             {children}
           </div>

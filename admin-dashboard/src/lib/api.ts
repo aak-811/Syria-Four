@@ -62,10 +62,16 @@ export const api = {
   updateVideo: (id: string, d: any) => request<any>(`/api/videos/${id}`, { method: "PUT", body: JSON.stringify(d) }),
   deleteVideo: (id: string) => request<any>(`/api/videos/${id}`, { method: "DELETE" }),
 
-  getNotifications: () => request<any[]>("/api/notifications"),
+  getNotifications: () => request<any>("/api/notifications"),
+  getNotification: (id: string) => request<any>(`/api/notifications/${id}`),
   addNotification: (d: any) => request<any>("/api/notifications", { method: "POST", body: JSON.stringify(d) }),
   updateNotification: (id: string, d: any) => request<any>(`/api/notifications/${id}`, { method: "PUT", body: JSON.stringify(d) }),
   deleteNotification: (id: string) => request<any>(`/api/notifications/${id}`, { method: "DELETE" }),
+  markAsRead: (id: string) => request<any>(`/api/notifications/${id}/read`, { method: "PATCH" }),
+  markAllAsRead: () => request<any>("/api/notifications/read-all", { method: "PATCH" }),
+  archiveNotification: (id: string) => request<any>(`/api/notifications/${id}/archive`, { method: "PATCH" }),
+  pinNotification: (id: string) => request<any>(`/api/notifications/${id}/pin`, { method: "PATCH" }),
+  unpinNotification: (id: string) => request<any>(`/api/notifications/${id}/unpin`, { method: "PATCH" }),
 
   getRequests: () => request<any[]>("/api/requests"),
   addRequest: (d: any) => request<any>("/api/requests", { method: "POST", body: JSON.stringify(d) }),
@@ -98,9 +104,4 @@ export const api = {
   addVipSetting: (d: any) => request<any>("/api/vip", { method: "POST", body: JSON.stringify(d) }),
   updateVipSetting: (id: string, d: any) => request<any>(`/api/vip/${id}`, { method: "PUT", body: JSON.stringify(d) }),
   deleteVipSetting: (id: string) => request<any>(`/api/vip/${id}`, { method: "DELETE" }),
-
-  getHallOfFame: () => request<any[]>("/api/hall-of-fame"),
-  addHallOfFame: (d: any) => request<any>("/api/hall-of-fame", { method: "POST", body: JSON.stringify(d) }),
-  updateHallOfFame: (id: string, d: any) => request<any>(`/api/hall-of-fame/${id}`, { method: "PUT", body: JSON.stringify(d) }),
-  deleteHallOfFame: (id: string) => request<any>(`/api/hall-of-fame/${id}`, { method: "DELETE" }),
 };

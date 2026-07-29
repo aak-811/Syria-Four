@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Shield, MessageCircle } from "lucide-react";
+import NotificationBell from "@/components/public/NotificationBell";
 
 export default function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
   return (
@@ -18,6 +19,7 @@ export default function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => vo
         </div>
 
         <div className="flex items-center gap-2">
+          <NotificationBell />
           <Link href="/chat">
             <div className="flex items-center gap-2 glass rounded-[14px] px-4 py-2.5 glass-hover text-sm font-medium text-[var(--text-muted)] hover:text-white transition-colors">
               <MessageCircle size={16} />

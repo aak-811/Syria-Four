@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import {
   LayoutDashboard, Users, Swords, Calendar, Image as ImageIcon,
-  ShoppingCart, HeadphonesIcon, Hand, Shield, Menu, X, Bot, MapPin, MessageCircle,
+  ShoppingCart, HeadphonesIcon, Hand, Shield, Menu, X, Bot, MapPin, MessageCircle, Bell,
 } from "lucide-react";
 
 type NavItem = { label: string; icon: any; href: string };
@@ -23,6 +23,7 @@ const publicItems: NavItem[] = [
   { label: "الشحن", icon: ShoppingCart, href: "/shop" },
   { label: "القوانين", icon: Hand, href: "/rules" },
   { label: "الدعم", icon: HeadphonesIcon, href: "/support" },
+  { label: "الإشعارات", icon: Bell, href: "/notifications" },
 ];
 
 export default function MobileNav() {
